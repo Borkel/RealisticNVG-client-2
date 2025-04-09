@@ -255,6 +255,7 @@ namespace BorkelRNVG.Helpers.Configuration
 
             Plugin.t7Pixelation = configFile.Bind(Plugin.t7Category, "1. Pixelation", true, "Requires restart. Pixelates the T-7, like a real digital screen");
             Plugin.t7HzLock = configFile.Bind(Plugin.t7Category, "2. Hz lock", true, "Requires restart. Locks the Hz of the T-7 to 60Hz, like a real digital screen");
+            Plugin.t7MaskSize = configFile.Bind(Plugin.t7Category, "3. Mask Size", 1.15f, "Changes the size of the T-7 mask, shrinking or enlarging the viewable window");
         }
     }
 }

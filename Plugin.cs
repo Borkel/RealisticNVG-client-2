@@ -37,6 +37,7 @@ namespace BorkelRNVG
         // T-7 specific
         public static ConfigEntry<bool> t7Pixelation;
         public static ConfigEntry<bool> t7HzLock;
+        public static ConfigEntry<float> t7MaskSize;
 
         //sprint patch stuff
         public static ConfigEntry<bool> enableSprintPatch;
@@ -124,6 +125,7 @@ namespace BorkelRNVG
                 new NightVisionApplySettingsPatch().Enable();
                 new NightVisionSetMaskPatch().Enable();
                 new ThermalVisionSetMaskPatch().Enable();
+                new ThermalVisionSetMaterialPropertiesPatch().Enable();
                 new SprintPatch().Enable();
                 new NightVisionMethod_1().Enable(); //reshade
                 new MenuPatch().Enable(); //reshade
