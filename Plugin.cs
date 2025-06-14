@@ -9,7 +9,8 @@ using Comfort.Common;
 using BepInEx.Logging;
 using BorkelRNVG.Helpers.Configuration;
 using BorkelRNVG.Helpers;
-using BorkelRNVG.Helpers.Enum;
+using HarmonyLib;
+using System.Reflection;
 
 namespace BorkelRNVG
 {
@@ -17,6 +18,7 @@ namespace BorkelRNVG
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;
+        public static Harmony harmony = new Harmony("com.borkel.nvgmasks");
 
         //categories
         public static string miscCategory = "0. Miscellaneous";
@@ -33,6 +35,7 @@ namespace BorkelRNVG
         // global
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
+        public static ConfigEntry<bool> allowAmbientChange;
 
         // T-7 specific
         public static ConfigEntry<bool> t7Pixelation;
@@ -108,6 +111,8 @@ namespace BorkelRNVG
             // Global
             globalMaskSize = Config.Bind(globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
             globalGain = Config.Bind(globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
+            allowAmbientChange = Config.Bind(globalCategory, "3. Allow ambient change", true, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
+            allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
 
             // other variables.. idk
             gatingLevel.Value = 0;
@@ -120,6 +125,8 @@ namespace BorkelRNVG
             
             try
             {
+                harmony.PatchAll();
+
                 new NightVisionAwakePatch().Enable();
                 new NightVisionApplySettingsPatch().Enable();
                 new NightVisionSetMaskPatch().Enable();
