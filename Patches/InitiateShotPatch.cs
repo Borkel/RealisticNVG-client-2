@@ -37,7 +37,10 @@ namespace BorkelRNVG.Patches
             string nvgId = Util.GetCurrentNvgItemId();
             if (nvgId == null) return;
 
-            NightVisionConfig nvgConfig = NightVisionItemConfig.Get(nvgId).NightVisionConfig;
+            NightVisionItemConfig nvgItemConfig = NightVisionItemConfig.Get(nvgId);
+            if (nvgItemConfig == null) return;
+
+            NightVisionConfig nvgConfig = nvgItemConfig.NightVisionConfig;
             if (nvgConfig == null) return;
 
             EGatingType gatingType = nvgConfig.AutoGatingType.Value;

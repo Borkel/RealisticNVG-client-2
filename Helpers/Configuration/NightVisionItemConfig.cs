@@ -169,6 +169,9 @@ namespace BorkelRNVG.Helpers.Configuration
             Add("66326bfd46817c660d015148", Get(gpnvg18));
             Add("66326bfd46817c660d015146", Get(gpnvg18));
 
+            // painter
+            Add("6782e59050893b2c1e2cabc8", Get(gpnvg18));
+
             // PVS-14
             string pvs14 = "57235b6f24597759bf5a30f1";
             var pvs14Config = new NightVisionConfig(

@@ -20,15 +20,16 @@ namespace BorkelRNVG.Patches
         }
 
         [PatchPrefix]
-        private static void PatchPrefix(ref NightVision __instance)
+        private static bool PatchPrefix(ref NightVision __instance)
         {
             string nvgID = Util.GetCurrentNvgItemId();
-            if (nvgID == null) return;
+            if (nvgID == null) return true;
 
             Texture2D nvgMask = NightVisionItemConfig.Get(nvgID).MaskTexture;
-            if (nvgMask == null) return;
+            if (nvgMask == null) return true;
 
             __instance.Mask = nvgMask;
+            return false;
         }
     }
 }
