@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BorkelRNVG", "BorkelRNVG.csproj", "{5E8F7250-8E63-4B3F-8A16-D13E053A9055}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BorkelRNVG", "BorkelRNVG\BorkelRNVG.csproj", "{5E8F7250-8E63-4B3F-8A16-D13E053A9055}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BorkelRNVGServer", "BorkelRNVGServer\BorkelRNVGServer.csproj", "{3B87CDA4-4DE1-465B-94EC-28D2F2A84FC2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{5E8F7250-8E63-4B3F-8A16-D13E053A9055}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E8F7250-8E63-4B3F-8A16-D13E053A9055}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E8F7250-8E63-4B3F-8A16-D13E053A9055}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B87CDA4-4DE1-465B-94EC-28D2F2A84FC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B87CDA4-4DE1-465B-94EC-28D2F2A84FC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B87CDA4-4DE1-465B-94EC-28D2F2A84FC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B87CDA4-4DE1-465B-94EC-28D2F2A84FC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

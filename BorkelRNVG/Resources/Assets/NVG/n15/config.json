@@ -1,0 +1,17 @@
+{
+  "itemId": "5c066e3a0db834001b7353f0",
+  "category": "N-15",
+  "gain": 2.1,
+  "noiseIntensity": 0.25,
+  "noiseSize": 0.15,
+  "maskSize": 1.0,
+  "red": 60,
+  "green": 235,
+  "blue": 100,
+  "gatingType": "AutoGain",
+  "gatingSpeed": 0.3,
+  "minBrightness": 0.2,
+  "maxBrightness": 1,
+  "minBrightnessThreshold": 0,
+  "maxBrightnessThreshold": 0.15
+}

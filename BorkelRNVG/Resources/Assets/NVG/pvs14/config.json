@@ -1,0 +1,17 @@
+{
+  "itemId": "5c110624d174af029e69734c",
+  "category": "PVS-14",
+  "gain": 2.4,
+  "noiseIntensity": 0.2,
+  "noiseSize": 0.1,
+  "maskSize": 1,
+  "red": 95,
+  "green": 210,
+  "blue": 255,
+  "gatingType": "AutoGating",
+  "gatingSpeed": 0.3,
+  "minBrightness": 0.2,
+  "maxBrightness": 1,
+  "minBrightnessThreshold": 0,
+  "maxBrightnessThreshold": 0.15
+}

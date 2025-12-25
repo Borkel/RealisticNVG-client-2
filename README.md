@@ -1,6 +1,8 @@
 # RealisticNVG-client
+
 My very humble attempt at modding the NVG mask textures without replacing the original bundle.
-Many thanks Fontaine, Mirni, Cj, GrooveypenguinX, Choccster, kiobu-kouhai, GrakiaXYZ, kiki, Props (sorry if i forget someone).
+Many thanks Fontaine, Mirni, Cj, GrooveypenguinX, Choccster, kiobu-kouhai, GrakiaXYZ, kiki, Props (sorry if i forget
+someone).
 Link to the mod: https://hub.sp-tarkov.com/files/file/1303-borkel-s-realistic-night-vision-goggles-nvg/ .
 This client mod will replace all mask textures of the NVGs to look more realistic.
 

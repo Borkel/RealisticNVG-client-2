@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SPTarkov.Server.Core" Version="4.0.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildProjectFullPath).user" Condition="Exists('$(MSBuildProjectFullPath).user')" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Resources\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="BorkelRNVGServer.csproj.user" />
+    </ItemGroup>
+
+    <Target Name="CopyToSPT" AfterTargets="AfterBuild" Condition="'$(SPTPath)' != ''">
+        <PropertyGroup>
+            <ModsDirectoryPath>$(SPTPath)\SPT\user\mods\$(MSBuildProjectName)</ModsDirectoryPath>
+        </PropertyGroup>
+
+        <Message Importance="high" Text="Copying mods to $(ModsDirectoryPath)" />
+        <ItemGroup>
+            <FilesToCopy Include="$(OutputPath)$(TargetName)$(TargetExt)" />
+            <FilesToCopy Include="$(OutputPath)$(TargetName).pdb" />
+            <FilesToCopy Include="Resources\**\*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(ModsDirectoryPath)\%(RecursiveDir)" ContinueOnError="false" />
+        <Message Importance="high" Text="Files copied" />
+    </Target>
+
+</Project>

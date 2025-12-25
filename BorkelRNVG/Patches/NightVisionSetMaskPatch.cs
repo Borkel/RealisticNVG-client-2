@@ -1,0 +1,37 @@
+﻿using SPT.Reflection.Patching;
+using BSG.CameraEffects;
+using HarmonyLib;
+using System.Reflection;
+using UnityEngine;
+using BorkelRNVG.Configuration;
+using BorkelRNVG.Helpers;
+using BorkelRNVG.Models;
+using EFT;
+
+
+namespace BorkelRNVG.Patches
+{
+    internal class NightVisionSetMaskPatch : ModulePatch
+    {
+        // This will patch the instance of the NightVision class
+        // Thanks Fontaine, Mirni, Cj, GrooveypenguinX, Choccster, kiobu-kouhai, GrakiaXYZ, kiki, Props (sorry if i forget someone)
+
+        protected override MethodBase GetTargetMethod()
+        {
+            return AccessTools.Method(typeof(NightVision), nameof(NightVision.SetMask));
+        }
+
+        [PatchPrefix]
+        private static bool PatchPrefix(ref NightVision __instance)
+        {
+            string itemId = PlayerHelper.GetCurrentNvgItemId();
+            if (itemId == null) return true;
+
+            NvgData nvgData = NvgHelper.GetNvgData(itemId);
+            if (nvgData == null) return true;
+            
+            __instance.Mask = nvgData.MaskTexture;
+            return false;
+        }
+    }
+}
