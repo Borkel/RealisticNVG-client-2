@@ -28,7 +28,6 @@ namespace BorkelRNVG.Patches
         private static void PatchPrefix(EEftScreenType eftScreenType)
         {
             if (!Plugin.enableReshade.Value || !Plugin.disableReshadeInMenus.Value) return;
-
             if (!Util.IsNvgValid()) return;
 
             InputSimulator inputSimulator = new InputSimulator(); // poop

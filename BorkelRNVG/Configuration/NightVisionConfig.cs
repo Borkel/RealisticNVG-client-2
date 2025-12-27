@@ -2,6 +2,7 @@
 using BorkelRNVG.Enum;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Struct;
+using UnityEngine;
 
 namespace BorkelRNVG.Configuration
 {
@@ -35,7 +36,7 @@ namespace BorkelRNVG.Configuration
             Red = config.Bind(category, "5. Red", configStruct.Red, new ConfigDescription("Adjusts the red color component of the NVG tint.", new AcceptableValueRange<float>(0f, 255f)));
             Green = config.Bind(category, "6. Green", configStruct.Green, new ConfigDescription("Adjusts the green color component of the NVG tint.", new AcceptableValueRange<float>(0f, 255f)));
             Blue = config.Bind(category, "7. Blue", configStruct.Blue, new ConfigDescription("Adjusts the blue color component of the NVG tint.", new AcceptableValueRange<float>(0f, 255f)));
-
+            
             // auto-gating
             AutoGatingType = config.Bind(category, "8. Adjustment Type", configStruct.GatingType, new ConfigDescription("Enables automatic brightness adjustment for this device. Only used if the global setting is enabled. Off will disable any automatic brightness adjustment. AutoGain will make brightness adjust to ambient light only. AutoGating will also make brightness react to gunshots."));
             GatingSpeed = config.Bind(category, "9. Adjustment Speed", configStruct.GatingSpeed, new ConfigDescription("Changes the rate at which brightness adjusts."));

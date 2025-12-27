@@ -1,13 +1,10 @@
-﻿using BorkelRNVG.Configuration;
-using BorkelRNVG.Enum;
+﻿using BorkelRNVG.Enum;
 using BorkelRNVG.Controllers;
 using BorkelRNVG.Models;
 using BSG.CameraEffects;
 using Comfort.Common;
 using EFT;
-using EFT.CameraControl;
 using EFT.InventoryLogic;
-using System;
 using UnityEngine;
 
 namespace BorkelRNVG.Helpers
@@ -16,7 +13,7 @@ namespace BorkelRNVG.Helpers
     {
         public static bool IsNvgValid()
         {
-            return Singleton<GameWorld>.Instance.MainPlayer.NightVisionObserver.Component?.Item?.StringTemplateId != null;
+            return Singleton<GameWorld>.Instance.MainPlayer?.NightVisionObserver?.Component?.Item?.StringTemplateId != null;
         }
 
         public static void ApplyNightVisionSettings()

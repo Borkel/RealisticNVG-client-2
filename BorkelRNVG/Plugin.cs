@@ -14,7 +14,7 @@ using HarmonyLib;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.0")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -24,6 +24,7 @@ namespace BorkelRNVG
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
+        public static ConfigEntry<bool> debugLogging;
 
         //sprint patch stuff
         public static ConfigEntry<bool> enableSprintPatch;
@@ -68,7 +69,8 @@ namespace BorkelRNVG
             enableSprintPatch = Config.Bind(Category.miscCategory, "Sprint toggles tactical devices. DO NOT USE WITH FIKA.", false, "Sprinting will toggle tactical devices until you stop sprinting, this mitigates the IR lights being visible outside of the NVGs. I recommend enabling this feature.");
             enableReshade = Config.Bind(Category.miscCategory, "Enable ReShade input simulation", false, "Will enable the input simulation to enable the ReShade, will use numpad keys. GPNVG-18 -> numpad 9. PVS-14 -> numpad 8. N-15 -> numpad 7. PNV-10T -> numpad 6. Off -> numpad 5. Only enable if you've installed the ReShade.");
             disableReshadeInMenus = Config.Bind(Category.miscCategory, "Disable ReShade when in menus", true, "Is a bit wonky in the hideout, but works well in-raid.");
-
+            debugLogging = Config.Bind(Category.miscCategory, "Enable Debug Logging", false, "Enables debug logging.");
+            
             // IR illumination
             irFlashlightBrightnessMult = Config.Bind(Category.illuminationCategory, "IR flashlight brightness multiplier", 1.5f, new ConfigDescription("Brightness multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 5f)));
             irFlashlightRangeMult = Config.Bind(Category.illuminationCategory, "IR flashlight range multiplier", 2f, new ConfigDescription("Range multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 10f)));
@@ -161,6 +163,13 @@ namespace BorkelRNVG
                 Singleton<BetterAudio>.Instance.PlayAtPoint(new Vector3(0, 0, 0), AssetHelper.LoadedAudioClips["gatingKnob.wav"], 0, BetterAudio.AudioSourceGroupType.Nonspatial, 100);
                 CameraClass.Instance.NightVision.ApplySettings();
             }
+        }
+
+        public static void Log(string message)
+        {
+            if (!debugLogging.Value) return;
+            
+            Logger.LogInfo(message);
         }
     }
 }

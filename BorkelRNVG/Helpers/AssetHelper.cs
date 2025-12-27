@@ -89,7 +89,7 @@ namespace BorkelRNVG.Helpers
                     
                     NvgData.Add(nvgConfig.ItemId, nvgData);
                     
-                    Plugin.Logger.LogInfo($"Loaded Nvg {nvgConfig.Category} with id: {nvgConfig.ItemId}");
+                    Plugin.Log($"Loaded Nvg {nvgConfig.Category} with id: {nvgConfig.ItemId}");
                     continue;
                 }
 
@@ -145,7 +145,7 @@ namespace BorkelRNVG.Helpers
                     
                     ThermalData.Add(thermalConfig.ItemId, thermalData);
                     
-                    Plugin.Logger.LogInfo($"Loaded thermal {thermalConfig.Category} with id: {thermalConfig.ItemId}");
+                    Plugin.Log($"Loaded thermal {thermalConfig.Category} with id: {thermalConfig.ItemId}");
                     continue;
                 }
 
@@ -180,7 +180,7 @@ namespace BorkelRNVG.Helpers
             }
             catch (Exception ex)
             {
-                Plugin.Logger.LogError(ex);
+                Plugin.Log(ex.ToString());
             } 
         }
     }

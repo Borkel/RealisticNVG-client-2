@@ -10,7 +10,7 @@ namespace BorkelRNVGServer
         public override string Name { get; init; } =  "Borkel's Realistic Night Vision Goggles";
         public override string Author { get; init; } = "Borkel";
         public override List<string>? Contributors { get; init; } = ["Fontaine", "Mirni", "CJ", "GrooveypenguinX", "Choccster", "kiobu-kouhai", "DrakiaXYZ", "kiki", "Props", "Mattdokn"];
-        public override Version Version { get; init; } = new Version("2.0.0");
+        public override Version Version { get; init; } = new Version("2.0.1");
         public override Range SptVersion { get; init; } = new Range("~4.0.0");
         public override string? Url { get; init; } = "https://github.com/Borkel/RealisticNVG-client-2/";
         public override bool? IsBundleMod { get; init; } = true;

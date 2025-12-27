@@ -14,7 +14,7 @@ namespace BorkelRNVG.Helpers
             
             if (data == null)
             {
-                Plugin.Logger.LogWarning($"NVG data not found for item {itemId}. Attempting to get fallback...");
+                Plugin.Log($"NVG data not found for item {itemId}. Attempting to get fallback...");
 
                 if (PlayerHelper.LocalPlayer.NightVisionObserver.Component == null) return null;
                     
@@ -32,7 +32,7 @@ namespace BorkelRNVG.Helpers
 
             if (data == null)
             {
-                Plugin.Logger.LogWarning($"Thermal data not found for item {itemId}");
+                Plugin.Log($"Thermal data not found for item {itemId}");
             }
             
             return data;

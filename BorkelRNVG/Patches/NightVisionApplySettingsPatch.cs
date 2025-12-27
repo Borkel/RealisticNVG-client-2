@@ -3,13 +3,9 @@ using BSG.CameraEffects;
 using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
-using System.Collections.Generic;
-using BorkelRNVG.Configuration;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Controllers;
-using BorkelRNVG.Enum;
 using BorkelRNVG.Models;
-using EFT;
 
 namespace BorkelRNVG.Patches
 {
@@ -56,11 +52,7 @@ namespace BorkelRNVG.Patches
             NvgData nvgData = NvgHelper.GetNvgData(itemId);
             if (nvgData == null) return;
             
-            EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
-            bool enableGating = gatingType != EGatingType.Off;
-            
             AutoGatingController.Instance?.ApplySettings(nvgData.NightVisionConfig);
-            AutoGatingController.Instance?.SetEnabled(enableGating);
 
             float gatingMult = AutoGatingController.Instance?.GatingMultiplier ?? 1f;
             float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
