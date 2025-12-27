@@ -30,8 +30,6 @@ namespace BorkelRNVG.Patches
             __instance.BinocularMaskTexture = NvgHelper.GetNvgData(ItemIds.N15).MaskTexture;
             // pvs-14 default
             __instance.OldMonocularMaskTexture = NvgHelper.GetNvgData(ItemIds.PVS14).MaskTexture;
-            // thermal default
-            __instance.ThermalMaskTexture = NvgHelper.GetNvgData(ItemIds.T7).MaskTexture;
             __instance.Noise = AssetHelper.noiseTexture;
 
             // :^)
