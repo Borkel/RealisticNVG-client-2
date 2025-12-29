@@ -18,7 +18,6 @@ namespace BorkelRNVG.Patches
         private static void PatchPostfix(GameWorld __instance)
         {
             AssetHelper.LoadAudioClips();
-            AutoGatingController.Create();
         }
     }
 }

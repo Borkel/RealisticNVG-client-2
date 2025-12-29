@@ -18,19 +18,11 @@ namespace BorkelRNVG.Patches
             return typeof(Player.FirearmController).GetMethod(nameof(Player.FirearmController.InitiateShot));
         }
 
-        private static float EaseOut(float val)
-        {
-            return 1 - Mathf.Pow(1 - val, 3);
-        }
-
-        private static float ClampDot90Deg(float dot)
-        {
-            return Mathf.Max(0, dot);
-        }
-
         [PatchPostfix]
         private static void PatchPostfix(Player.FirearmController __instance, AmmoItemClass ammo, Vector3 shotPosition, Vector3 shotDirection)
         {
+            if (!Plugin.enableAutoGating.Value) return;
+            
             string itemId = PlayerHelper.GetCurrentNvgItemId();
             if (itemId == null) return;
 

@@ -7,7 +7,7 @@ namespace BorkelRNVG.Helpers
 {
     public static class PlayerHelper
     {
-        public static Player LocalPlayer => Singleton<GameWorld>.Instance.MainPlayer;
+        public static Player LocalPlayer => Singleton<GameWorld>.Instance?.MainPlayer;
         
         public static string GetCurrentNvgItemId()
         {

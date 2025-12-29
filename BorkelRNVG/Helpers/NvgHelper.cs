@@ -16,7 +16,7 @@ namespace BorkelRNVG.Helpers
             {
                 Plugin.Log($"NVG data not found for item {itemId}. Attempting to get fallback...");
 
-                if (PlayerHelper.LocalPlayer.NightVisionObserver.Component == null) return null;
+                if (PlayerHelper.LocalPlayer?.NightVisionObserver?.Component == null) return null;
                     
                 NightVisionComponent.EMask mask = PlayerHelper.LocalPlayer.NightVisionObserver.Component.Template.Mask;
                 NvgData fallback = GetFallbackData(mask);

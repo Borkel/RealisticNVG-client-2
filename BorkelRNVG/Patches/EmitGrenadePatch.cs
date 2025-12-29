@@ -23,6 +23,8 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(Effects __instance, Vector3 position)
         {
+            if (!Plugin.enableAutoGating.Value) return;
+            
             string nvgId = PlayerHelper.GetCurrentNvgItemId();
             if (nvgId == null) return;
             

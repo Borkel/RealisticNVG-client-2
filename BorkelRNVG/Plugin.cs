@@ -8,13 +8,15 @@ using WindowsInput.Native;
 using Comfort.Common;
 using BepInEx.Logging;
 using BorkelRNVG.Configuration;
+using BorkelRNVG.Controllers;
 using BorkelRNVG.Helpers;
 using EFT;
+using EFT.CameraControl;
 using HarmonyLib;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.1")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -108,6 +110,9 @@ namespace BorkelRNVG
             AssetHelper.LoadNvgs(Config);
             AssetHelper.LoadThermals(Config);
             AssetHelper.LoadAudioClips();
+
+            PlayerCameraController.OnPlayerCameraControllerCreated += OnCameraCreated;
+            PlayerCameraController.OnPlayerCameraControllerDestroyed += OnCameraDestroyed;
             
             try
             {
@@ -170,6 +175,22 @@ namespace BorkelRNVG
             if (!debugLogging.Value) return;
             
             Logger.LogInfo(message);
+        }
+
+        private static void OnCameraCreated(PlayerCameraController controller, Camera cam)
+        {
+            if (!AutoGatingController.Instance)
+            {
+                AutoGatingController.Create();
+            }
+        }
+
+        private static void OnCameraDestroyed()
+        {
+            if (AutoGatingController.Instance)
+            {
+                Destroy(AutoGatingController.Instance);
+            }
         }
     }
 }
