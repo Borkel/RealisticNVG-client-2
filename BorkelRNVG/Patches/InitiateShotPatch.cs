@@ -22,6 +22,7 @@ namespace BorkelRNVG.Patches
         private static void PatchPostfix(Player.FirearmController __instance, AmmoItemClass ammo, Vector3 shotPosition, Vector3 shotDirection)
         {
             if (!Plugin.enableAutoGating.Value) return;
+            if (AutoGatingController.Instance == null) return;
             
             string itemId = PlayerHelper.GetCurrentNvgItemId();
             if (itemId == null) return;

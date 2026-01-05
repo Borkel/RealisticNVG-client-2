@@ -223,6 +223,7 @@ namespace BorkelRNVG.Controllers
             {
                 _currentBrightness = 1f;
                 GatingMultiplier = 1f;
+                return;
             }
             
             string nvgId = PlayerHelper.GetCurrentNvgItemId();
@@ -232,7 +233,7 @@ namespace BorkelRNVG.Controllers
             if (nvgData == null) return;
 
             EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
-            bool nvgGatingEnabled = gatingType == EGatingType.AutoGating || gatingType == EGatingType.AutoGain;
+            bool nvgGatingEnabled = gatingType != EGatingType.Off;
 
             if (!nvgGatingEnabled)
             {

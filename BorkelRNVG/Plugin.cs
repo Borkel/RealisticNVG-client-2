@@ -16,7 +16,7 @@ using HarmonyLib;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.2")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.3")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
