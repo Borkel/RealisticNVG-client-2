@@ -21,7 +21,7 @@ namespace BorkelRNVGServer
 
             if (adapterTemplate != null)
             {
-                // ?????
+                // ????? - pein
                 adapterTemplate.Properties?.Slots?
                 .FirstOrDefault()?
                 .Properties?.Filters?

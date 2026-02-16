@@ -6,6 +6,7 @@ using BorkelRNVG.Models;
 using Comfort.Common;
 using EFT;
 using SPT.Reflection.Patching;
+using System;
 using System.Reflection;
 using UnityEngine;
 
@@ -21,61 +22,14 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(Player.FirearmController __instance, AmmoItemClass ammo, Vector3 shotPosition, Vector3 shotDirection)
         {
-            if (!Plugin.enableAutoGating.Value) return;
-            if (AutoGatingController.Instance == null) return;
-            
-            string itemId = PlayerHelper.GetCurrentNvgItemId();
-            if (itemId == null) return;
-
-            NvgData nvgData = NvgHelper.GetNvgData(itemId);
-            if (nvgData == null) return;
-            
-            EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
-            if (gatingType != EGatingType.AutoGating) return;
-
-            EMuzzleDeviceType deviceType = Util.GetMuzzleDeviceType(__instance);
-
-            Player mainPlayer = PlayerHelper.LocalPlayer;
-            Player firearmOwner = __instance.GetComponentInParent<Player>();
-            Camera camera = CameraClass.Instance.Camera;
-
-            float gatingLerp;
-            switch (deviceType)
+            try
             {
-                case EMuzzleDeviceType.None:
-                    gatingLerp = 0.15f;
-                    break;
-                case EMuzzleDeviceType.Suppressor:
-                    gatingLerp = 1.0f;
-                    break;
-                case EMuzzleDeviceType.FlashHider:
-                    gatingLerp = 0.3f;
-                    break;
-                default:
-                    gatingLerp = 1.0f;
-                    break;
+                RealisticNvgController.Instance?.GatingController?.AdjustGatingFromFlash(shotPosition, __instance);
             }
-
-            if (firearmOwner != mainPlayer)
+            catch (Exception e)
             {
-                Vector3 cameraPos = camera.transform.position;
-                Vector3 dir = shotPosition - cameraPos;
-
-                float maxShotDistance = 15f;
-                float shotDistance = dir.magnitude;
-                float shotDistanceMult = Mathf.Clamp01(1 - (shotDistance / maxShotDistance));
-                bool isVisible = Util.VisibilityCheckBetweenPoints(cameraPos, shotPosition, LayerMaskClass.HighPolyWithTerrainMask);
-                bool isOnScreen = Util.VisibilityCheckOnScreen(shotPosition);
-
-                if (isVisible && isOnScreen)
-                {
-                    float finalGatingMult = Mathf.Lerp(0, shotDistanceMult, gatingLerp);
-                    AutoGatingController.Instance?.StartCoroutine(AutoGatingController.Instance.AdjustAutoGating(0.05f, finalGatingMult, nvgData));
-                }
-            }
-            else
-            {
-                AutoGatingController.Instance?.StartCoroutine(AutoGatingController.Instance.AdjustAutoGating(0.05f, gatingLerp, nvgData));
+                Plugin.Logger.LogError(e);
+                throw;
             }
         }
     }

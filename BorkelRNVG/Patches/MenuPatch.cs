@@ -1,4 +1,5 @@
-﻿using SPT.Reflection.Patching;
+﻿using BorkelRNVG.Controllers;
+using SPT.Reflection.Patching;
 using EFT.UI;
 using EFT.UI.Screens;
 using HarmonyLib;
@@ -30,19 +31,21 @@ namespace BorkelRNVG.Patches
             if (!Plugin.enableReshade.Value || !Plugin.disableReshadeInMenus.Value) return;
             if (!Util.IsNvgValid()) return;
 
-            InputSimulator inputSimulator = new InputSimulator(); // poop
+            InputSimulator inputSimulator = new InputSimulator();
+            RealisticNvgController nvgController = RealisticNvgController.Instance;
+            
             switch (eftScreenType)
             {
                 case EEftScreenType.None:
                     break;
                 case EEftScreenType.BattleUI:
-                    if (Plugin.nvgOn)
+                    if (nvgController.IsNvgOn)
                     {
                         Task.Run(() => ToggleReshadeAsync(inputSimulator, Plugin.nvgKey));
                     }
                     break;
                 default:
-                    if (Plugin.nvgOn)
+                    if (nvgController.IsNvgOn)
                     {
                         Task.Run(() => ToggleReshadeAsync(inputSimulator, VirtualKeyCode.NUMPAD5));
                     }

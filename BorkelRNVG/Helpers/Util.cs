@@ -19,19 +19,13 @@ namespace BorkelRNVG.Helpers
         public static void ApplyNightVisionSettings()
         {
             NightVision nightVision = CameraClass.Instance.NightVision;
-
             nightVision.ApplySettings();
         }
 
         public static void ApplyGatingSettings()
         {
-            string itemId = PlayerHelper.GetCurrentNvgItemId();
-            if (itemId == null) return;
-
-            NvgData nvgData = NvgHelper.GetNvgData(itemId);
-            if (nvgData == null) return;
-
-            AutoGatingController.Instance?.ApplySettings(nvgData.NightVisionConfig);
+            NvgData nvgData = RealisticNvgController.Instance.CurrentNvgData;
+            RealisticNvgController.Instance.GatingController.ApplySettings(nvgData);
         }
 
         public static EMuzzleDeviceType GetMuzzleDeviceType(Player.FirearmController controller)
@@ -48,6 +42,17 @@ namespace BorkelRNVG.Helpers
             }
 
             return EMuzzleDeviceType.None;
+        }
+
+        public static float GatingLerpFromMuzzleType(EMuzzleDeviceType muzzleType)
+        {
+            return muzzleType switch
+            {
+                EMuzzleDeviceType.Suppressor => 1f,
+                EMuzzleDeviceType.FlashHider => 0.3f,
+                EMuzzleDeviceType.None => 1f,
+                _ => 1f
+            };
         }
 
         public static bool VisibilityCheckBetweenPoints(Vector3 v1, Vector3 v2, LayerMask layer)

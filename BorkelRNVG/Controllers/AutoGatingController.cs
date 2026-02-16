@@ -7,6 +7,7 @@ using BSG.CameraEffects;
 using EFT;
 using System.Collections;
 using System.IO;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -15,13 +16,12 @@ namespace BorkelRNVG.Controllers
 {
     public class AutoGatingController : MonoBehaviour
     {
-        public static AutoGatingController Instance;
-
         public float GatingMultiplier = 1.0f;
 
         // component vars
         public Camera mainCamera;
         public NightVision nightVision;
+        public RealisticNvgController nvgController;
 
         // computeshader vars
         public ComputeShader computeShader = FileHelper.LoadComputeShader("assets/shaders/pein/shaders/brightnessshader.compute", Path.Combine(ModDirectories.ShadersPath, "pein_shaders"));
@@ -29,6 +29,7 @@ namespace BorkelRNVG.Controllers
         private CommandBuffer _commandBuffer;
         private const float BRIGHTNESS_SCALE = 10000f;
         private int _kernel;
+        private bool _isGpuReadbackBusy = false;
 
         // various other vars
         private float _currentBrightness = 1.0f; // value that GatingMultiplier gets lerped to
@@ -60,13 +61,6 @@ namespace BorkelRNVG.Controllers
         public float contrastLevel = 3f;
         public float exposureAmount = 4f;
 
-        public static AutoGatingController Create()
-        {
-            GameObject camera = CameraClass.Instance.Camera.gameObject;
-            AutoGatingController autoGatingController = camera.AddComponent<AutoGatingController>();
-            return autoGatingController;
-        }
-
         public IEnumerator AdjustAutoGating(float delay, float multiplier, NvgData nvgData)
         {
             yield return new WaitForSeconds(delay);
@@ -89,12 +83,18 @@ namespace BorkelRNVG.Controllers
             
             if (enabled) return;
             
+            ResetGating();
+        }
+
+        public void ResetGating()
+        {
             _currentBrightness = 1f;
             GatingMultiplier = 1f;
         }
 
-        public void ApplySettings(NightVisionConfig config)
+        public void ApplySettings(NvgData nvgData)
         {
+            NightVisionConfig config = nvgData.NightVisionConfig;
             EGatingType gatingType = config.AutoGatingType.Value;
             if (gatingType != EGatingType.Off)
             {
@@ -106,29 +106,55 @@ namespace BorkelRNVG.Controllers
             }
             else
             {
-                _currentBrightness = 1.0f;
-                GatingMultiplier = 1.0f;
+                ResetGating();
             }
         }
 
-        public void SetBrightnessTarget(float target)
+        public void AdjustGatingFromFlash(Vector3 pos, Player.FirearmController fc, float maxDistance = 15f, float delay = 0.05f)
         {
-            _currentBrightness = target;
+            if (nvgController == null) return;
+            
+            NvgData nvgData = nvgController.CurrentNvgData;
+            if (nvgData == null) return;
+            
+            EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
+            if (gatingType != EGatingType.AutoGating) return;
+            
+            EMuzzleDeviceType muzzleType = Util.GetMuzzleDeviceType(fc);
+            
+            Player fcOwner = fc?.GetComponent<Player>();
+            Camera camera = CameraClass.Instance.Camera;
+
+            float gatingLerp = Util.GatingLerpFromMuzzleType(muzzleType);
+
+            if (fc && !fcOwner.IsYourPlayer)
+            {
+                Vector3 cameraPos = camera.transform.position;
+                Vector3 shotDir = pos - cameraPos;
+                
+                bool isVisible = Util.VisibilityCheckBetweenPoints(cameraPos, pos, LayerMaskClass.HighPolyWithTerrainMask);
+                bool isOnScreen = Util.VisibilityCheckOnScreen(pos);
+
+                if (isVisible && isOnScreen)
+                {
+                    float shotDist = shotDir.magnitude;
+                    float shotDistMult = Mathf.Clamp01(shotDist / maxDistance);
+
+                    float finalGatingMult = Mathf.Lerp(0f, shotDistMult, gatingLerp);
+                    StartCoroutine(AdjustAutoGating(delay, finalGatingMult, nvgData));
+                }
+            }
+            else
+            {
+                StartCoroutine(AdjustAutoGating(delay, gatingLerp, nvgData));
+            }
         }
 
         private void Awake()
         {
-            if (Instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
             mainCamera = CameraClass.Instance.Camera;
             nightVision = CameraClass.Instance.NightVision;
+            nvgController = GetComponent<RealisticNvgController>();
 
             // everything beyond this point makes my head hurt
             renderTexture = CreateRenderTexture();
@@ -156,7 +182,7 @@ namespace BorkelRNVG.Controllers
             computeShader.SetInt("_Height", _textureHeight);
 
             // rendertexture debug
-            if (Plugin.gatingDebug.Value == true)
+            if (Plugin.gatingDebug.Value)
             {
                 var canvas = new GameObject("Canvas", typeof(Canvas)).GetComponent<Canvas>();
                 canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -195,8 +221,10 @@ namespace BorkelRNVG.Controllers
             mainCamera.AddCommandBuffer(CameraEvent.BeforeImageEffects, _commandBuffer);
         }
 
-        public IEnumerator ComputeBrightness()
+        private void ComputeBrightness()
         {
+            if (_isGpuReadbackBusy) return;
+            
             uint[] bufferData = new uint[1];
             _brightnessBuffer.SetData(bufferData);
 
@@ -206,39 +234,38 @@ namespace BorkelRNVG.Controllers
             computeShader.SetBuffer(_kernel, "_BrightnessBuffer", _brightnessBuffer);
             computeShader.Dispatch(_kernel, threadGroupsX, threadGroupsY, 1);
 
-            // wait a frame (is this even necessary?)
-            yield return new WaitForEndOfFrame();
+            _isGpuReadbackBusy = true;
+            AsyncGPUReadback.Request(_brightnessBuffer, request =>
+            {
+                _isGpuReadbackBusy = false;
+                if (request.hasError) return;
 
-            _brightnessBuffer.GetData(bufferData);
+                NativeArray<uint> data = request.GetData<uint>();
 
-            uint totalBrightness = bufferData[0];
-            float avgBrightness = totalBrightness / (_textureWidth * _textureHeight * BRIGHTNESS_SCALE);
+                uint totalBrightness = data[0];
+                float avgBrightness = totalBrightness / (_textureWidth * _textureHeight * BRIGHTNESS_SCALE);
 
-            _currentBrightness = avgBrightness;
+                _currentBrightness = avgBrightness;
+            });
         }
 
         private void FixedUpdate()
         {
-            if (!Plugin.nvgOn || !Plugin.enableAutoGating.Value)
+            if (!nvgController || !nvgController.IsNvgOn || !Plugin.enableAutoGating.Value)
             {
-                _currentBrightness = 1f;
-                GatingMultiplier = 1f;
+                Plugin.Log("no nvgcontroller or autogating disabled");
+                ResetGating();
                 return;
             }
-            
-            string nvgId = PlayerHelper.GetCurrentNvgItemId();
-            if (nvgId == null) return;
 
-            NvgData nvgData = NvgHelper.GetNvgData(nvgId);
-            if (nvgData == null) return;
-
+            NvgData nvgData = nvgController.CurrentNvgData;
             EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
             bool nvgGatingEnabled = gatingType != EGatingType.Off;
 
             if (!nvgGatingEnabled)
             {
-                _currentBrightness = 1f;
-                GatingMultiplier = 1f;
+                Plugin.Log("nvg has gating disabled (is set to Off)");
+                ResetGating();
                 return;
             }
 
@@ -246,7 +273,7 @@ namespace BorkelRNVG.Controllers
             if (_frameCount >= _frameInterval)
             {
                 _frameCount = 0;
-                StartCoroutine(ComputeBrightness());
+                ComputeBrightness();
             }
 
             contrastMaterial.SetFloat("_Amount", contrastLevel);
@@ -255,10 +282,11 @@ namespace BorkelRNVG.Controllers
             maskMaterial.SetTexture("_OverlayTex", nightVision.Material_0.GetTexture(Shader.PropertyToID("_Mask")));
 
             float gatingTarget = Mathf.Lerp(maxBrightnessMult, minBrightnessMult, Mathf.Clamp((_currentBrightness - minInput) / (maxInput - minInput), 0.0f, 1.0f));
-
+            float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
+            
             GatingMultiplier = Mathf.Lerp(GatingMultiplier, gatingTarget, gateSpeed);
-
-            nightVision.ApplySettings();
+            nvgController.NightVision.Intensity = intensity * GatingMultiplier;
+            nvgController.UpdateNvgMaterialIntensity();
         }
 
         private RenderTexture CreateRenderTexture()

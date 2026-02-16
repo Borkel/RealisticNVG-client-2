@@ -7,6 +7,7 @@ using Comfort.Common;
 using EFT;
 using HarmonyLib;
 using SPT.Reflection.Patching;
+using System;
 using System.Reflection;
 using Systems.Effects;
 using UnityEngine;
@@ -23,30 +24,14 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(Effects __instance, Vector3 position)
         {
-            if (!Plugin.enableAutoGating.Value) return;
-            if (AutoGatingController.Instance == null) return;
-            
-            string nvgId = PlayerHelper.GetCurrentNvgItemId();
-            if (nvgId == null) return;
-            
-            NvgData nvgData = NvgHelper.GetNvgData(nvgId);
-            if (nvgData == null) return;
-            
-            Camera camera = CameraClass.Instance.Camera;
-            Vector3 cameraPos = camera.transform.position;
-            Vector3 dir = position - cameraPos;
-
-            float maxShotDistance = 25f;
-            float grenadeDistance = dir.magnitude;
-            float grenadeDistanceMult = Mathf.Clamp01(1f - grenadeDistance / maxShotDistance);
-            bool isVisible = Util.VisibilityCheckBetweenPoints(cameraPos, position, LayerMaskClass.HighPolyWithTerrainMask);
-            bool isOnScreen = Util.VisibilityCheckOnScreen(position);
-
-            if (isVisible && isOnScreen)
+            try
             {
-                float finalGatingMult = Mathf.Lerp(0, grenadeDistanceMult, grenadeDistanceMult);
-                
-                AutoGatingController.Instance?.StartCoroutine(AutoGatingController.Instance.AdjustAutoGating(0.05f, finalGatingMult, nvgData));
+                RealisticNvgController.Instance?.GatingController?.AdjustGatingFromFlash(position, null);
+            }
+            catch (Exception e)
+            {
+                Plugin.Logger.LogError(e);
+                throw;
             }
         }
     }

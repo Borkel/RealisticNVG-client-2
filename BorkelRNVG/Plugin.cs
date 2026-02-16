@@ -16,7 +16,7 @@ using HarmonyLib;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.3")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.4")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -59,8 +59,6 @@ namespace BorkelRNVG
         public static ConfigEntry<bool> enableAutoGating;
         public static ConfigEntry<bool> clampMinGating;
         public static ConfigEntry<bool> gatingDebug;
-
-        public static bool nvgOn = false;
 
         private void Awake()
         {
@@ -112,7 +110,6 @@ namespace BorkelRNVG
             AssetHelper.LoadAudioClips();
 
             PlayerCameraController.OnPlayerCameraControllerCreated += OnCameraCreated;
-            PlayerCameraController.OnPlayerCameraControllerDestroyed += OnCameraDestroyed;
             
             try
             {
@@ -154,6 +151,10 @@ namespace BorkelRNVG
 
         void Update()
         {
+            RealisticNvgController controller = RealisticNvgController.Instance;
+            if (!controller) return;
+            
+            bool nvgOn = controller.IsNvgOn;
             if (!nvgOn) return;
             
             if (Input.GetKeyDown(gatingInc.Value) && gatingLevel.Value < 2)
@@ -177,20 +178,9 @@ namespace BorkelRNVG
             Logger.LogInfo(message);
         }
 
-        private static void OnCameraCreated(PlayerCameraController controller, Camera cam)
+        private static void OnCameraCreated(PlayerCameraController controller, Camera camera)
         {
-            if (!AutoGatingController.Instance)
-            {
-                AutoGatingController.Create();
-            }
-        }
-
-        private static void OnCameraDestroyed()
-        {
-            if (AutoGatingController.Instance)
-            {
-                Destroy(AutoGatingController.Instance);
-            }
+            camera.gameObject.AddComponent<RealisticNvgController>();
         }
     }
 }

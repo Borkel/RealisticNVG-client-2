@@ -1,4 +1,5 @@
-﻿using SPT.Reflection.Patching;
+﻿using BorkelRNVG.Controllers;
+using SPT.Reflection.Patching;
 using BSG.CameraEffects;
 using HarmonyLib;
 using System.Reflection;
@@ -26,9 +27,12 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(bool __0) //if i use the name of the parameter it doesn't work, __0 works correctly
         {
-            Plugin.nvgOn = __0;
+            RealisticNvgController nvgController = RealisticNvgController.Instance;
+            if (nvgController == null) return;
+            
+            nvgController.IsNvgOn = __0;
+            
             if (!Plugin.enableReshade.Value) return;
-
             if (!Util.IsNvgValid()) return;
 
             InputSimulator inputSimulator = new InputSimulator(); // poop

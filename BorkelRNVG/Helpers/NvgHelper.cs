@@ -1,7 +1,5 @@
-using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
-using EFT;
 using EFT.InventoryLogic;
 
 namespace BorkelRNVG.Helpers
@@ -17,9 +15,12 @@ namespace BorkelRNVG.Helpers
                 Plugin.Log($"NVG data not found for item {itemId}. Attempting to get fallback...");
 
                 if (PlayerHelper.LocalPlayer?.NightVisionObserver?.Component == null) return null;
-                    
+                
                 NightVisionComponent.EMask mask = PlayerHelper.LocalPlayer.NightVisionObserver.Component.Template.Mask;
                 NvgData fallback = GetFallbackData(mask);
+                
+                Plugin.Log($"Loaded fallback NVG data for nvg mask: {mask.ToString()}");
+                
                 return fallback;
             }
             
