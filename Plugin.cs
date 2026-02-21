@@ -14,7 +14,7 @@ using System.Reflection;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "1.7.1")]
+    [BepInPlugin("com.borkel.rnvg", "Borkel's Realistic NVGs", "1.7.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static ManualLogSource Log;

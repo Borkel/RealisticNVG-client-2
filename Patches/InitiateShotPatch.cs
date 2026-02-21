@@ -26,7 +26,7 @@ namespace BorkelRNVG.Patches
         }
 
         [PatchPostfix]
-        private static void PatchPostfix(Player.FirearmController __instance, AmmoItemClass ammo, Vector3 shotPosition, Vector3 shotDirection)
+        private static void PatchPostfix(Player.FirearmController __instance, BulletClass ammo, Vector3 shotPosition, Vector3 shotDirection)
         {
             CameraClass cameraClass = Util.GetCameraClass();
             if (cameraClass == null || cameraClass.Camera == null) return;

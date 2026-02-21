@@ -59,7 +59,7 @@ namespace BorkelRNVG.Helpers
 
             if (_mainPlayer.NightVisionObserver.Component == null
                 || _mainPlayer.NightVisionObserver.Component.Item == null
-                || _mainPlayer.NightVisionObserver.Component.Item.StringTemplateId == null)
+                || _mainPlayer.NightVisionObserver.Component.Item.TemplateId == null)
                 return false;
 
             return true;
@@ -69,7 +69,7 @@ namespace BorkelRNVG.Helpers
         {
             if (!IsNvgValid()) return null;
         
-            return _mainPlayer.NightVisionObserver.Component.Item.StringTemplateId;
+            return _mainPlayer.NightVisionObserver.Component.Item.TemplateId;
         }
 
         private static void OnCameraDestroyed()
@@ -113,14 +113,14 @@ namespace BorkelRNVG.Helpers
         {
             if (controller.IsSilenced) return EMuzzleDeviceType.Suppressor;
 
-            Slot[] slots = controller.Item.Slots;
+            /*Slot[] slots = controller.Item.Slots;
             for (int i = 0; i < slots.Length; i++)
             {
                 if (slots[i].ContainedItem is FlashHiderItemClass)
                 {
                     return EMuzzleDeviceType.FlashHider;
                 }
-            }
+            }*/
 
             return EMuzzleDeviceType.None;
         }
