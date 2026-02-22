@@ -22,6 +22,8 @@ namespace BorkelRNVG.Helpers.Configuration
         public Texture2D MaskTexture { get; set; }
         public Texture2D LensTexture { get; set; }
         public Action Update { get; set; }
+        public float EdgeDistortion { get; set; }
+        public float EdgeDistortionStart { get; set; }
 
         // am i abusing delegates too hard? probably not.. just feels weird
         // is this too much voodoo
@@ -36,7 +38,10 @@ namespace BorkelRNVG.Helpers.Configuration
             Func<float> b,
             Texture2D maskTexture,
             Texture2D lensTexture,
-            VirtualKeyCode key)
+            VirtualKeyCode key,
+            Func<float> edgeDistortion,
+            Func<float> edgeDistortionStart
+            )
         {
             // define the update action
             Update = () =>
@@ -54,6 +59,8 @@ namespace BorkelRNVG.Helpers.Configuration
                 MaskTexture = maskTexture;
                 LensTexture = lensTexture;
                 NightVisionConfig = nvgConfig;
+                EdgeDistortion = edgeDistortion();
+                EdgeDistortionStart = edgeDistortionStart();
             };
 
             // initial calculation
@@ -70,18 +77,9 @@ namespace BorkelRNVG.Helpers.Configuration
             Func<float> g,
             Func<float> b,
             Texture2D maskTexture,
-            Texture2D lensTexture) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, maskTexture, lensTexture, VirtualKeyCode.NONAME) { }
-
-        public NightVisionItemConfig(
-            NightVisionConfig nvgConfig,
-            Func<float> intensityCalc,
-            Func<float> noiseIntensityCalc,
-            Func<float> noiseScaleCalc,
-            Func<float> maskSizeCalc,
-            Func<float> r,
-            Func<float> g,
-            Func<float> b,
-            NVGTextureData textureData) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, VirtualKeyCode.NONAME) { }
+            Texture2D lensTexture,
+            Func<float> edgeDistortion,
+            Func<float> edgeDistortionStart) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, maskTexture, lensTexture, VirtualKeyCode.NONAME, edgeDistortion, edgeDistortionStart) { }
 
         public NightVisionItemConfig(
             NightVisionConfig nvgConfig,
@@ -93,7 +91,22 @@ namespace BorkelRNVG.Helpers.Configuration
             Func<float> g,
             Func<float> b,
             NVGTextureData textureData,
-            VirtualKeyCode key) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, key) { }
+            Func<float> edgeDistortion,
+            Func<float> edgeDistortionStart) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, VirtualKeyCode.NONAME, edgeDistortion, edgeDistortionStart) { }
+
+        public NightVisionItemConfig(
+            NightVisionConfig nvgConfig,
+            Func<float> intensityCalc,
+            Func<float> noiseIntensityCalc,
+            Func<float> noiseScaleCalc,
+            Func<float> maskSizeCalc,
+            Func<float> r,
+            Func<float> g,
+            Func<float> b,
+            NVGTextureData textureData,
+            VirtualKeyCode key,
+            Func<float> edgeDistortion,
+            Func<float> edgeDistortionStart) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, key, edgeDistortion, edgeDistortionStart) { }
 
         public static Dictionary<string, NightVisionItemConfig> Configs = new();
 
@@ -149,7 +162,8 @@ namespace BorkelRNVG.Helpers.Configuration
             NightVisionConfig gpnvgConfig = new NightVisionConfig(
                     configFile, Plugin.gpnvgCategory,
                     2.5f, 0.2f, 0.1f, 0.96f, 152f, 214f, 252f,
-                    EGatingType.AutoGating, 0.3f, 1f, 0.2f, 0f, 0.15f
+                    EGatingType.AutoGating, 0.3f, 1f, 0.2f, 0f, 0.15f,
+                    0.01f, 0.72f
                 );
             Add(gpnvg18, new NightVisionItemConfig(
                 gpnvgConfig,
@@ -161,7 +175,9 @@ namespace BorkelRNVG.Helpers.Configuration
                 () => gpnvgConfig.Green.Value / 255,
                 () => gpnvgConfig.Blue.Value / 255,
                 new NVGTextureData($"{assetsDirectory}\\MaskTextures\\mask_anvis.png", $"{assetsDirectory}\\LensTextures\\lens_anvis.png"),
-                VirtualKeyCode.NUMPAD9
+                VirtualKeyCode.NUMPAD9,
+                () => gpnvgConfig.EdgeDistortion.Value,
+                () => gpnvgConfig.EdgeDistortionStart.Value
             ));
 
             // artem nvgs
@@ -177,7 +193,8 @@ namespace BorkelRNVG.Helpers.Configuration
             var pvs14Config = new NightVisionConfig(
                     configFile, Plugin.pvsCategory,
                     2.4f, 0.2f, 0.1f, 1f, 95f, 210f, 255f,
-                    EGatingType.AutoGating, 0.3f, 1f, 0.2f, 0f, 0.15f
+                    EGatingType.AutoGating, 0.3f, 1f, 0.2f, 0f, 0.15f,
+                    0.01f, 0.72f
                 );
             Add(pvs14, new NightVisionItemConfig(
                 pvs14Config,
@@ -189,7 +206,9 @@ namespace BorkelRNVG.Helpers.Configuration
                 () => pvs14Config.Green.Value / 255,
                 () => pvs14Config.Blue.Value / 255,
                 AssetHelper.NightVisionTextures[ENVGTexture.Monocular],
-                VirtualKeyCode.NUMPAD8
+                VirtualKeyCode.NUMPAD8,
+                () => pvs14Config.EdgeDistortion.Value,
+                () => pvs14Config.EdgeDistortionStart.Value
             ));
 
             // N-15
@@ -197,7 +216,8 @@ namespace BorkelRNVG.Helpers.Configuration
             NightVisionConfig n15Config = new NightVisionConfig(
                     configFile, Plugin.nCategory,
                     2.1f, 0.25f, 0.15f, 1f, 60f, 235f, 100f,
-                    EGatingType.AutoGain, 0.3f, 1f, 0.2f, 0f, 0.15f
+                    EGatingType.AutoGain, 0.3f, 1f, 0.2f, 0f, 0.15f,
+                    0.01f, 0.72f
                 );
             Add(n15, new NightVisionItemConfig(
                 n15Config,
@@ -209,7 +229,9 @@ namespace BorkelRNVG.Helpers.Configuration
                 () => n15Config.Green.Value / 255,
                 () => n15Config.Blue.Value / 255,
                 AssetHelper.NightVisionTextures[ENVGTexture.Binocular],
-                VirtualKeyCode.NUMPAD7
+                VirtualKeyCode.NUMPAD7,
+                () => n15Config.EdgeDistortion.Value,
+                () => n15Config.EdgeDistortionStart.Value
             ));
 
             // artem nvgs
@@ -221,7 +243,8 @@ namespace BorkelRNVG.Helpers.Configuration
             NightVisionConfig pnv10Config = new NightVisionConfig(
                     configFile, Plugin.pnvCategory,
                     1.8f, 0.3f, 0.2f, 1f, 60f, 210f, 60f,
-                    EGatingType.Off, 0.3f, 1f, 0.2f, 0f, 0.15f
+                    EGatingType.Off, 0.3f, 1f, 0.2f, 0f, 0.15f,
+                    0.01f, 0.72f
                 );
             Add(pnv10t, new NightVisionItemConfig(
                 pnv10Config,
@@ -233,7 +256,9 @@ namespace BorkelRNVG.Helpers.Configuration
                 () => pnv10Config.Green.Value / 255,
                 () => pnv10Config.Blue.Value / 255,
                 AssetHelper.NightVisionTextures[ENVGTexture.Pnv],
-                VirtualKeyCode.NUMPAD6
+                VirtualKeyCode.NUMPAD6,
+                () => pnv10Config.EdgeDistortion.Value,
+                () => pnv10Config.EdgeDistortionStart.Value
             ));
 
             // PNV-57E
@@ -241,7 +266,8 @@ namespace BorkelRNVG.Helpers.Configuration
             NightVisionConfig pnv57Config = new NightVisionConfig(
                     configFile, Plugin.pnv57Category,
                     1.2f, 0.35f, 0.2f, 1f, 60f, 215f, 80f,
-                    EGatingType.Off, 0.3f, 1f, 0.2f, 0f, 0.15f
+                    EGatingType.Off, 0.3f, 1f, 0.2f, 0f, 0.15f,
+                    0.01f, 0.72f
                 );
             Add(pnv57, new NightVisionItemConfig(
                 pnv57Config,
@@ -253,7 +279,9 @@ namespace BorkelRNVG.Helpers.Configuration
                 () => pnv57Config.Green.Value / 255,
                 () => pnv57Config.Blue.Value / 255,
                 AssetHelper.NightVisionTextures[ENVGTexture.Binocular],
-                VirtualKeyCode.NUMPAD7
+                VirtualKeyCode.NUMPAD7,
+                () => pnv57Config.EdgeDistortion.Value,
+                () => pnv57Config.EdgeDistortionStart.Value
             ));
 
             Plugin.t7Pixelation = configFile.Bind(Plugin.t7Category, "1. Pixelation", true, "Requires restart. Pixelates the T-7, like a real digital screen");

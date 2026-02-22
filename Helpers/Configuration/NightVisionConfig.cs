@@ -22,12 +22,16 @@ namespace BorkelRNVG.Helpers.Configuration
         public ConfigEntry<float> MinBrightnessThreshold;
         public ConfigEntry<float> MaxBrightnessThreshold;
 
+        //lens distortion
+        public ConfigEntry<float> EdgeDistortion;
+        public ConfigEntry<float> EdgeDistortionStart;
+
         // config constructor. all parameters are DEFAULT values
         public NightVisionConfig(ConfigFile config, string category,
             float gain, float noiseIntensity, float noiseSize, float maskSize,
             float red, float green, float blue,
             EGatingType gatingType, float gatingSpeed, float maxBrightness,
-            float minBrightness, float minBrightnessThreshold, float maxBrightnessThreshold)
+            float minBrightness, float minBrightnessThreshold, float maxBrightnessThreshold, float edgeDistortion, float edgeDistortionStart)
         {
             // night vision
             Gain = config.Bind(category, "1. Gain", gain, new ConfigDescription("Light amplification", new AcceptableValueRange<float>(0f, 5f)));
@@ -46,6 +50,10 @@ namespace BorkelRNVG.Helpers.Configuration
             MinBrightnessThreshold = config.Bind(category, "12. Min Brightness Threshold", minBrightnessThreshold, new ConfigDescription("Changes the minimum brightness level for auto-gating", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
             MaxBrightnessThreshold = config.Bind(category, "13. Max Brightness Threshold", maxBrightnessThreshold, new ConfigDescription("Changes the maximum brightness level for auto-gating.", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
 
+            //lens distortion
+            EdgeDistortion = config.Bind(category, "14. Edge distortion amount", edgeDistortion, new ConfigDescription("Adjusts the amount of distortion around the lens.", new AcceptableValueRange<float>(0.01f, 0.15f)));
+            EdgeDistortionStart = config.Bind(category, "15. Edge distortion radius", edgeDistortionStart, new ConfigDescription("Adjusts the starting point of the distortion.", new AcceptableValueRange<float>(0.01f, 1f)));
+
             Gain.SettingChanged += Util.ApplyNightVisionSettings;
             NoiseIntensity.SettingChanged += Util.ApplyNightVisionSettings;
             NoiseSize.SettingChanged += Util.ApplyNightVisionSettings;
@@ -53,6 +61,8 @@ namespace BorkelRNVG.Helpers.Configuration
             Red.SettingChanged += Util.ApplyNightVisionSettings;
             Green.SettingChanged += Util.ApplyNightVisionSettings;
             Blue.SettingChanged += Util.ApplyNightVisionSettings;
+            EdgeDistortion.SettingChanged += Util.ApplyNightVisionSettings;
+            EdgeDistortionStart.SettingChanged += Util.ApplyNightVisionSettings;
 
             AutoGatingType.SettingChanged += Util.ApplyGatingSettings;
             GatingSpeed.SettingChanged += Util.ApplyGatingSettings;
