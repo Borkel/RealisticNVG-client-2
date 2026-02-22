@@ -79,7 +79,8 @@ namespace BorkelRNVG.Helpers.Configuration
             Texture2D maskTexture,
             Texture2D lensTexture,
             Func<float> edgeDistortion,
-            Func<float> edgeDistortionStart) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, maskTexture, lensTexture, VirtualKeyCode.NONAME, edgeDistortion, edgeDistortionStart) { }
+            Func<float> edgeDistortionStart
+            ) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, maskTexture, lensTexture, VirtualKeyCode.NONAME, edgeDistortion, edgeDistortionStart) { }
 
         public NightVisionItemConfig(
             NightVisionConfig nvgConfig,
@@ -92,7 +93,8 @@ namespace BorkelRNVG.Helpers.Configuration
             Func<float> b,
             NVGTextureData textureData,
             Func<float> edgeDistortion,
-            Func<float> edgeDistortionStart) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, VirtualKeyCode.NONAME, edgeDistortion, edgeDistortionStart) { }
+            Func<float> edgeDistortionStart
+            ) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, VirtualKeyCode.NONAME, edgeDistortion, edgeDistortionStart) { }
 
         public NightVisionItemConfig(
             NightVisionConfig nvgConfig,
@@ -106,7 +108,8 @@ namespace BorkelRNVG.Helpers.Configuration
             NVGTextureData textureData,
             VirtualKeyCode key,
             Func<float> edgeDistortion,
-            Func<float> edgeDistortionStart) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, key, edgeDistortion, edgeDistortionStart) { }
+            Func<float> edgeDistortionStart
+            ) : this(nvgConfig, intensityCalc, noiseIntensityCalc, noiseScaleCalc, maskSizeCalc, r, g, b, textureData.Mask, textureData.Lens, key, edgeDistortion, edgeDistortionStart) { }
 
         public static Dictionary<string, NightVisionItemConfig> Configs = new();
 

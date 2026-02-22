@@ -51,8 +51,8 @@ namespace BorkelRNVG.Helpers.Configuration
             MaxBrightnessThreshold = config.Bind(category, "13. Max Brightness Threshold", maxBrightnessThreshold, new ConfigDescription("Changes the maximum brightness level for auto-gating.", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
 
             //lens distortion
-            EdgeDistortion = config.Bind(category, "14. Edge distortion amount", edgeDistortion, new ConfigDescription("Adjusts the amount of distortion around the lens.", new AcceptableValueRange<float>(0.01f, 0.15f)));
-            EdgeDistortionStart = config.Bind(category, "15. Edge distortion radius", edgeDistortionStart, new ConfigDescription("Adjusts the starting point of the distortion.", new AcceptableValueRange<float>(0.01f, 1f)));
+            EdgeDistortion = config.Bind(category, "14. Edge distortion amount", edgeDistortion, new ConfigDescription("Adjusts the amount of distortion around the lens.", new AcceptableValueRange<float>(0f, 1f)));
+            EdgeDistortionStart = config.Bind(category, "15. Edge distortion radius", edgeDistortionStart, new ConfigDescription("Adjusts the starting point of the distortion.", new AcceptableValueRange<float>(0f, 1f)));
 
             Gain.SettingChanged += Util.ApplyNightVisionSettings;
             NoiseIntensity.SettingChanged += Util.ApplyNightVisionSettings;

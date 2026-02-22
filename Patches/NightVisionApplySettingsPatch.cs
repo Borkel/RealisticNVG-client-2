@@ -45,8 +45,8 @@ namespace BorkelRNVG.Patches
                 NightVisionItemConfig nvgItemConfig = NightVisionItemConfig.Get(nvgID);
                 if (nvgItemConfig != null)
                 {
-                    material.SetFloat("_EdgeDistortion", nvgItemConfig.EdgeDistortion);
-                    material.SetFloat("_EdgeDistortionStart", nvgItemConfig.EdgeDistortionStart);
+                    material.SetFloat("_EdgeDistortion", (nvgItemConfig.EdgeDistortion/10));
+                    material.SetFloat("_EdgeDistortionStart", (nvgItemConfig.EdgeDistortionStart));
                 }
                 Texture lens = nvgItemConfig.LensTexture;
 
