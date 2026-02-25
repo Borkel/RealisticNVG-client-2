@@ -52,7 +52,7 @@ namespace BorkelRNVG.Helpers.Configuration
 
             //lens distortion
             EdgeDistortion = config.Bind(category, "14. Edge distortion amount", edgeDistortion, new ConfigDescription("Adjusts the amount of distortion around the lens.", new AcceptableValueRange<float>(0f, 1f)));
-            EdgeDistortionStart = config.Bind(category, "15. Edge distortion radius", edgeDistortionStart, new ConfigDescription("Adjusts the starting point of the distortion.", new AcceptableValueRange<float>(0f, 1f)));
+            EdgeDistortionStart = config.Bind(category, "15. Edge distortion radius", edgeDistortionStart, new ConfigDescription("Adjusts the starting point of the distortion.", new AcceptableValueRange<float>(0f, 0.55f)));
 
             Gain.SettingChanged += Util.ApplyNightVisionSettings;
             NoiseIntensity.SettingChanged += Util.ApplyNightVisionSettings;

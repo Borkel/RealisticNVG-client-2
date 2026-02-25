@@ -61,7 +61,6 @@ Shader "Hidden/CustomNightVision"
 			float _InvMaskSize;
 			float _InvAspect;
 			float _CameraAspect;
-			float4 _Mask_TexelSize;
 			sampler2D _MainTex;
 			sampler2D _Mask;
 			sampler2D _Noise;
@@ -119,61 +118,46 @@ Shader "Hidden/CustomNightVision"
 					return o;
 				}
 				float4 noise = tex2D(_Noise, inp.texcoord1.xy);
-				float4 mask = tex2D(_Mask, inp.texcoord2.xy);
-				mask = 1 - mask;
-				if (mask.w <= 0.5)
+				float4 rawMask = tex2D(_Mask, inp.texcoord2.xy);
+				float maskAlpha = 1.0 - rawMask.a;
+				if (maskAlpha <= 0.5)
 				{
 					o.sv_target = tmp0;
 					return o;
 				}
 
-				// Distortion driven by the nearest inner edge of the mask shape (works with multi-lens masks).
-				float2 dirs[8] = {
-					float2(1.0, 0.0), float2(-1.0, 0.0),
-					float2(0.0, 1.0), float2(0.0, -1.0),
-					normalize(float2(1.0, 1.0)), normalize(float2(-1.0, 1.0)),
-					normalize(float2(1.0, -1.0)), normalize(float2(-1.0, -1.0))
-				};
-
-				const int maxSteps = 32;
-				float2 stepUv = _Mask_TexelSize.xy;
-				float nearestNorm = 1.0;
-				float2 edgeDir = float2(0.0, 0.0);
-
-				for (int d = 0; d < 8; d++)
+				// Prebaked mask format:
+				// R,G = edge direction encoded from [-1,1] to [0,1]
+				// B   = distance-to-edge normalized [0,1] inside mask
+				float2 edgeDir = rawMask.rg * 2.0 - 1.0;
+				edgeDir.y = -edgeDir.y;
+				float dirLen = length(edgeDir);
+				if (dirLen > 1e-5)
 				{
-					for (int i = 1; i <= maxSteps; i++)
-					{
-						float2 suv = inp.texcoord2.xy + dirs[d] * stepUv * i;
-						float a = 1.0 - tex2D(_Mask, suv).a;
-						if (a <= 0.5)
-						{
-							float hitNorm = i / (float)maxSteps;
-							if (hitNorm < nearestNorm)
-							{
-								nearestNorm = hitNorm;
-								edgeDir = dirs[d];
-							}
-							break;
-						}
-					}
+					edgeDir /= dirLen;
+				}
+				else
+				{
+					edgeDir = float2(0.0, 0.0);
 				}
 
-				// _EdgeDistortionStart now directly controls the edge band width (0..1).
+				float edgeDistance = saturate(rawMask.b);
 				float edgeWidth = max(saturate(_EdgeDistortionStart), 0.001);
-				float edgeFactor = 1.0 - smoothstep(0.0, edgeWidth, nearestNorm);
-				float2 warpedUv = inp.texcoord.xy - edgeDir * (_EdgeDistortion * 0.1 * edgeFactor * mask.w);
+				float edgeBand = 1.0 - smoothstep(0.0, edgeWidth, edgeDistance);
+				float edgeBias = 1.0 - edgeDistance;
+				float edgeFactor = edgeBand * edgeBias * edgeBias;
+				float2 warpedUv = inp.texcoord.xy - edgeDir * (_EdgeDistortion * 0.1 * edgeFactor * maskAlpha);
 				warpedUv = clamp(warpedUv, 0.0, 1.0);
 				tmp0 = tex2D(_MainTex, warpedUv);
 				noise *= _NoiseIntensity.xxxx;
-				noise *= mask.w;
+				noise *= maskAlpha;
 				float4 tmp1 = tmp0;
 				tmp1.x += tmp1.y;
 				tmp1.x += tmp1.z;
 				tmp1 = noise + tmp1.xxxx * _Color;
 				tmp1 *= _Intensity.xxxx;
 				tmp1 = saturate(tmp1 * 0.45);
-				tmp0 = lerp(tmp0, tmp1, mask.w);
+				tmp0 = lerp(tmp0, tmp1, maskAlpha);
 				o.sv_target = tmp0;
 				return o;
 			}
