@@ -119,8 +119,10 @@ Shader "Hidden/CustomNightVision"
 				}
 				float4 noise = tex2D(_Noise, inp.texcoord1.xy);
 				float4 rawMask = tex2D(_Mask, inp.texcoord2.xy);
-				float maskAlpha = 1.0 - rawMask.a;
-				if (maskAlpha <= 0.5)
+				// 1) NVG application mask (hard cutoff).
+				const float nvgCutoff = 0.55;
+				float nvgMask = step(rawMask.a, nvgCutoff);
+				if (nvgMask <= 0.0)
 				{
 					o.sv_target = tmp0;
 					return o;
@@ -145,19 +147,20 @@ Shader "Hidden/CustomNightVision"
 				float edgeWidth = max(saturate(_EdgeDistortionStart), 0.001);
 				float edgeBand = 1.0 - smoothstep(0.0, edgeWidth, edgeDistance);
 				float edgeBias = 1.0 - edgeDistance;
-				float edgeFactor = edgeBand * edgeBias * edgeBias;
-				float2 warpedUv = inp.texcoord.xy - edgeDir * (_EdgeDistortion * 0.1 * edgeFactor * maskAlpha);
+				// 2) Distortion strength mask (smooth falloff).
+				float distMask = nvgMask * edgeBand * edgeBias * edgeBias;
+				float2 warpedUv = inp.texcoord.xy - edgeDir * (_EdgeDistortion * 0.1 * distMask);
 				warpedUv = clamp(warpedUv, 0.0, 1.0);
 				tmp0 = tex2D(_MainTex, warpedUv);
 				noise *= _NoiseIntensity.xxxx;
-				noise *= maskAlpha;
+				noise *= nvgMask;
 				float4 tmp1 = tmp0;
 				tmp1.x += tmp1.y;
 				tmp1.x += tmp1.z;
 				tmp1 = noise + tmp1.xxxx * _Color;
 				tmp1 *= _Intensity.xxxx;
 				tmp1 = saturate(tmp1 * 0.45);
-				tmp0 = lerp(tmp0, tmp1, maskAlpha);
+				tmp0 = lerp(tmp0, tmp1, nvgMask);
 				o.sv_target = tmp0;
 				return o;
 			}
