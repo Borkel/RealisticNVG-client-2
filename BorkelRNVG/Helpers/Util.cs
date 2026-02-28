@@ -30,6 +30,7 @@ namespace BorkelRNVG.Helpers
 
         public static EMuzzleDeviceType GetMuzzleDeviceType(Player.FirearmController controller)
         {
+            if (controller == null) return EMuzzleDeviceType.None;
             if (controller.IsSilenced) return EMuzzleDeviceType.Suppressor;
 
             Slot[] slots = controller.Weapon.Slots;

@@ -4,6 +4,7 @@ using EFT;
 using HarmonyLib;
 using SPT.Reflection.Patching;
 using System.Reflection;
+using UnityEngine;
 
 namespace BorkelRNVG.Patches
 {
@@ -18,6 +19,8 @@ namespace BorkelRNVG.Patches
         private static void PatchPostfix(GameWorld __instance)
         {
             AssetHelper.LoadAudioClips();
+            
+            CameraClass.Instance.NightVision.ApplySettings();
         }
     }
 }

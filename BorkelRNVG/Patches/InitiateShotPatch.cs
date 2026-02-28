@@ -29,7 +29,6 @@ namespace BorkelRNVG.Patches
             catch (Exception e)
             {
                 Plugin.Logger.LogError(e);
-                throw;
             }
         }
     }

@@ -2,6 +2,7 @@ using BorkelRNVG.Enum;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Models;
 using BSG.CameraEffects;
+using System;
 using UnityEngine;
 
 namespace BorkelRNVG.Controllers
@@ -45,10 +46,13 @@ namespace BorkelRNVG.Controllers
             }
             
             Plugin.Log("updating nvgs from nvgdata");
-            
-            bool gatingEnabled = Plugin.enableAutoGating.Value && nvgData.NightVisionConfig.AutoGatingType.Value != EGatingType.Off;
-            GatingController.ApplySettings(nvgData);
-            GatingController.enabled = gatingEnabled;
+
+            if (!IsNvgOn)
+            {
+                bool gatingEnabled = NvgHelper.ShouldEnableGating(nvgData);
+                GatingController.ApplySettings(nvgData);
+                GatingController.enabled = gatingEnabled;
+            }
             
             float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             float noiseIntensity = 2 * nvgData.NightVisionConfig.NoiseIntensity.Value;
@@ -105,6 +109,14 @@ namespace BorkelRNVG.Controllers
                 ThermalVision.IsFpsStuck = true;
                 stuckFpsUtilities.MaxFramerate = thermalData.ThermalConfig.MaxFps.Value;
                 stuckFpsUtilities.MinFramerate = thermalData.ThermalConfig.MinFps.Value;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
             }
         }
     }

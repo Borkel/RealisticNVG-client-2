@@ -1,3 +1,4 @@
+using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
 using EFT.InventoryLogic;
@@ -49,6 +50,11 @@ namespace BorkelRNVG.Helpers
                 NightVisionComponent.EMask.Thermal => GetNvgData(ItemIds.T7),
                 _ => GetNvgData(ItemIds.N15)
             };
+        }
+
+        public static bool ShouldEnableGating(NvgData nvgData)
+        {
+            return Plugin.enableAutoGating.Value && nvgData.NightVisionConfig.AutoGatingType.Value != EGatingType.Off;
         }
     }
 }

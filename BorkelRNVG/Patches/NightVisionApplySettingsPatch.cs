@@ -28,6 +28,7 @@ namespace BorkelRNVG.Patches
         private static void PatchPrefix(ref NightVision __instance, ref TextureMask ___TextureMask, ref Texture ___Mask)
         {
             string nvgID = PlayerHelper.GetCurrentNvgItemId();
+            Plugin.Log($"current nvg id: {nvgID}");
             NvgData nvgData = NvgHelper.GetNvgData(nvgID ?? "5c066e3a0db834001b7353f0");
             Material lensMaterial = __instance.Material_0;
             
@@ -48,7 +49,14 @@ namespace BorkelRNVG.Patches
 
         private static void ApplyModSettings(NvgData nvgData)
         {
-            RealisticNvgController.Instance?.UpdateFromNvgData(nvgData);
+            if (RealisticNvgController.Instance)
+            {
+                RealisticNvgController.Instance.UpdateFromNvgData(nvgData);
+            }
+            else
+            {
+                Plugin.Log("RealisticNvgController not found... cant apply settings!");
+            }
         }
     }
 }

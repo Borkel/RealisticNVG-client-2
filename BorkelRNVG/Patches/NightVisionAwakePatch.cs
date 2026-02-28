@@ -1,4 +1,5 @@
-﻿using SPT.Reflection.Patching;
+﻿using BorkelRNVG.Controllers;
+using SPT.Reflection.Patching;
 using BSG.CameraEffects;
 using HarmonyLib;
 using System.Reflection;

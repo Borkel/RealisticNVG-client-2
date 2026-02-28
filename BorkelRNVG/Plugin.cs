@@ -13,6 +13,8 @@ using BorkelRNVG.Helpers;
 using EFT;
 using EFT.CameraControl;
 using HarmonyLib;
+using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace BorkelRNVG
 {
@@ -92,7 +94,7 @@ namespace BorkelRNVG
             gatingLevel = Config.Bind(Category.gatingCategory, "3. Gating level", 0, "Will reset when the game opens. You are supposed to use the gating increase/decrease keys to change the gating level, but you are free to change it manually if you want to make sure you are at a specific gating level.");
             enableAutoGating = Config.Bind(Category.gatingCategory, "4. Enable Auto-Gating", false, "EXPERIMENTAL! WILL REDUCE FPS! Enables auto-gating (automatic brightness adjustment) for certain night vision devices. Auto-gating WILL NOT work without this enabled.");
             clampMinGating = Config.Bind(Category.gatingCategory, "5. Clamp Minimum Gating Multiplier", true, "Clamps the minimum brightness multiplier to the night vision device's minimum brightness multiplier. If disabled, night vision can become fully dark during automatic fire.");
-            gatingDebug = Config.Bind(Category.gatingCategory, "6. Enable Auto-Gating Debug Overlay", false, new ConfigDescription("Enables the debug overlay for auto-gating", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
+            gatingDebug = Config.Bind(Category.gatingCategory, "6. Enable Auto-Gating Debug Overlay", false, new ConfigDescription("DEV SETTING!!! Enables the debug overlay for auto-gating", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
 
             // Global
             globalMaskSize = Config.Bind(Category.globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
@@ -174,11 +176,11 @@ namespace BorkelRNVG
         public static void Log(string message)
         {
             if (!debugLogging.Value) return;
-            
+
             Logger.LogInfo(message);
         }
 
-        private static void OnCameraCreated(PlayerCameraController controller, Camera camera)
+        private void OnCameraCreated(PlayerCameraController cameraController, Camera camera)
         {
             camera.gameObject.AddComponent<RealisticNvgController>();
         }

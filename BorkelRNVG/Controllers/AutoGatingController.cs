@@ -4,6 +4,7 @@ using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
 using BSG.CameraEffects;
+using Comfort.Common;
 using EFT;
 using System.Collections;
 using System.IO;
@@ -76,18 +77,10 @@ namespace BorkelRNVG.Controllers
                 GatingMultiplier = newBrightness;
             }
         }
-        
-        public void SetEnabled(bool state)
-        {
-            enabled = state;
-            
-            if (enabled) return;
-            
-            ResetGating();
-        }
 
         public void ResetGating()
         {
+            Plugin.Log("resetting gating");
             _currentBrightness = 1f;
             GatingMultiplier = 1f;
         }
@@ -120,13 +113,13 @@ namespace BorkelRNVG.Controllers
             EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
             if (gatingType != EGatingType.AutoGating) return;
             
-            EMuzzleDeviceType muzzleType = Util.GetMuzzleDeviceType(fc);
-            
             Player fcOwner = fc?.GetComponent<Player>();
             Camera camera = CameraClass.Instance.Camera;
-
+            
+            EMuzzleDeviceType muzzleType = Util.GetMuzzleDeviceType(fc);
             float gatingLerp = Util.GatingLerpFromMuzzleType(muzzleType);
-
+            Plugin.Log($"{muzzleType} | {gatingLerp}");
+            
             if (fc && !fcOwner.IsYourPlayer)
             {
                 Vector3 cameraPos = camera.transform.position;
@@ -253,8 +246,6 @@ namespace BorkelRNVG.Controllers
         {
             if (!nvgController || !nvgController.IsNvgOn || !Plugin.enableAutoGating.Value)
             {
-                Plugin.Log("no nvgcontroller or autogating disabled");
-                ResetGating();
                 return;
             }
 
