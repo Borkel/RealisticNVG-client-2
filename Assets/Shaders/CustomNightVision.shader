@@ -13,6 +13,8 @@ Shader "Hidden/CustomNightVision"
 		_NightVisionOn ("_NightVisionOn", Float) = 1
 		_EdgeDistortion ("_EdgeDistortion", Float) = 0.1
 		_EdgeDistortionStart ("_EdgeDistortionStart", Float) = 0.28
+		_NearBlurIntensity ("_NearBlurIntensity", Float) = 20
+		_NearBlurMaxDistance ("_NearBlurMaxDistance", Float) = 4
 		// Texture mask properties
 		_Mask ("_Mask", 2D) = "white" {}
 		_InvMaskSize ("_InvMaskSize", Float) = 1
@@ -56,14 +58,25 @@ Shader "Hidden/CustomNightVision"
 			float _NightVisionOn;
 			float _EdgeDistortion;
 			float _EdgeDistortionStart;
+			float _NearBlurIntensity;
+			float _NearBlurMaxDistance;
 			float4 _Color;
 			float _Intensity;
+			float4 _MainTex_TexelSize;
 			float _InvMaskSize;
 			float _InvAspect;
 			float _CameraAspect;
 			sampler2D _MainTex;
 			sampler2D _Mask;
 			sampler2D _Noise;
+			UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
+
+			float ComputeNearFactor(float2 uv)
+			{
+				float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv);
+				float eyeDepth = LinearEyeDepth(rawDepth);
+				return saturate(1.0 - eyeDepth / max(_NearBlurMaxDistance, 0.001));
+			}
 
 			v2f vert(appdata_full v)
 			{
@@ -152,6 +165,54 @@ Shader "Hidden/CustomNightVision"
 				float2 warpedUv = inp.texcoord.xy - edgeDir * (_EdgeDistortion * 0.1 * distMask);
 				warpedUv = clamp(warpedUv, 0.0, 1.0);
 				tmp0 = tex2D(_MainTex, warpedUv);
+
+				// Depth-based near Gaussian blur (strong near camera, fades to zero at max distance).
+				float nearFactor = ComputeNearFactor(warpedUv);
+				float2 spreadUv = _MainTex_TexelSize.xy * max(1.0, _NearBlurIntensity * 0.35);
+				float nC  = nearFactor;
+				float nR  = ComputeNearFactor(clamp(warpedUv + float2( spreadUv.x, 0.0), 0.0, 1.0));
+				float nL  = ComputeNearFactor(clamp(warpedUv + float2(-spreadUv.x, 0.0), 0.0, 1.0));
+				float nU  = ComputeNearFactor(clamp(warpedUv + float2(0.0,  spreadUv.y), 0.0, 1.0));
+				float nD  = ComputeNearFactor(clamp(warpedUv + float2(0.0, -spreadUv.y), 0.0, 1.0));
+				float nUR = ComputeNearFactor(clamp(warpedUv + float2( spreadUv.x,  spreadUv.y), 0.0, 1.0));
+				float nUL = ComputeNearFactor(clamp(warpedUv + float2(-spreadUv.x,  spreadUv.y), 0.0, 1.0));
+				float nDR = ComputeNearFactor(clamp(warpedUv + float2( spreadUv.x, -spreadUv.y), 0.0, 1.0));
+				float nDL = ComputeNearFactor(clamp(warpedUv + float2(-spreadUv.x, -spreadUv.y), 0.0, 1.0));
+				float nearSoft = (
+					nUL + 2.0 * nU + nUR +
+					2.0 * nL + 4.0 * nC + 2.0 * nR +
+					nDL + 2.0 * nD + nDR
+				) / 16.0;
+				float nearPeak = max(max(max(nL, nR), max(nU, nD)), max(max(nUL, nUR), max(nDL, nDR)));
+				float nearFactorSpread = lerp(nearSoft, nearPeak, 0.35);
+				float blurRadiusPx = _NearBlurIntensity * nearFactorSpread * nvgMask;
+				if (blurRadiusPx > 0.001)
+				{
+					const int kernelRadius = 3; // 7x7 kernel
+					float2 texel = _MainTex_TexelSize.xy;
+					float sampleScale = blurRadiusPx / kernelRadius;
+					float sigma = max(blurRadiusPx * 0.5, 0.75);
+					float invTwoSigma2 = 0.5 / (sigma * sigma);
+					float4 g = 0;
+					float wsum = 0;
+					[unroll]
+					for (int ky = -kernelRadius; ky <= kernelRadius; ky++)
+					{
+						[unroll]
+						for (int kx = -kernelRadius; kx <= kernelRadius; kx++)
+						{
+							float2 k = float2(kx, ky);
+							float w = exp(-dot(k, k) * invTwoSigma2);
+							float2 suv = clamp(warpedUv + k * texel * sampleScale, 0.0, 1.0);
+							g += tex2D(_MainTex, suv) * w;
+							wsum += w;
+						}
+					}
+					float4 blurred = g / max(wsum, 1e-5);
+					float blurBlend = smoothstep(0.0, 0.35, nearFactorSpread);
+					tmp0 = lerp(tmp0, blurred, blurBlend);
+				}
+
 				noise *= _NoiseIntensity.xxxx;
 				noise *= nvgMask;
 				float4 tmp1 = tmp0;
