@@ -12,7 +12,7 @@ namespace BorkelRNVG.Patches
 {
     internal class NightVisionMethod_1 : ModulePatch //method_1 gets called when NVGs turn off or on, tells the reshade to activate
     {
-        private static async Task activateReshade(InputSimulator inputSimulator, VirtualKeyCode key)
+        private static async Task ActivateReshade(InputSimulator inputSimulator, VirtualKeyCode key)
         {
             inputSimulator.Keyboard.KeyDown(key);
             await Task.Delay(200);
@@ -21,18 +21,15 @@ namespace BorkelRNVG.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(NightVision), "method_1");
+            return AccessTools.Method(typeof(NightVision), nameof(NightVision.method_1));
         }
 
         [PatchPostfix]
         private static void PatchPostfix(bool __0) //if i use the name of the parameter it doesn't work, __0 works correctly
         {
-            RealisticNvgController nvgController = RealisticNvgController.Instance;
-            if (nvgController == null) return;
-            
             Plugin.Log($"toggling nvg overlay: {__0}");
-            
-            nvgController.IsNvgOn = __0;
+
+            NvgHelper.IsNvgOn = __0;
             
             if (!Plugin.enableReshade.Value) return;
             if (!Util.IsNvgValid()) return;
@@ -40,9 +37,9 @@ namespace BorkelRNVG.Patches
             InputSimulator inputSimulator = new InputSimulator();
             VirtualKeyCode key = Plugin.nvgKey;
             if (__0)
-                Task.Run(() => activateReshade(inputSimulator, Plugin.nvgKey));
+                Task.Run(() => ActivateReshade(inputSimulator, Plugin.nvgKey));
             else if (!__0)
-                Task.Run(() => activateReshade(inputSimulator, VirtualKeyCode.NUMPAD5));
+                Task.Run(() => ActivateReshade(inputSimulator, VirtualKeyCode.NUMPAD5));
         }
     }
 }

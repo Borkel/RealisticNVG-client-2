@@ -8,8 +8,6 @@ using System;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
 using BorkelRNVG.Struct;
-using EFT;
-using System.Threading.Tasks;
 
 namespace BorkelRNVG.Helpers
 {

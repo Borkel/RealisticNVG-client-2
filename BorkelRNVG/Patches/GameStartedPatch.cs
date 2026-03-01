@@ -19,8 +19,6 @@ namespace BorkelRNVG.Patches
         private static void PatchPostfix(GameWorld __instance)
         {
             AssetHelper.LoadAudioClips();
-            
-            CameraClass.Instance.NightVision.ApplySettings();
         }
     }
 }

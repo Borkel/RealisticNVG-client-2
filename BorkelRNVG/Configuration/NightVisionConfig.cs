@@ -45,20 +45,20 @@ namespace BorkelRNVG.Configuration
             MinBrightnessThreshold = config.Bind(category, "12. Min Brightness Threshold", configStruct.MinBrightnessThreshold, new ConfigDescription("Changes the minimum brightness level for auto-gating", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
             MaxBrightnessThreshold = config.Bind(category, "13. Max Brightness Threshold", configStruct.MaxBrightnessThreshold, new ConfigDescription("Changes the maximum brightness level for auto-gating.", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
 
-            Gain.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
-            NoiseIntensity.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
-            NoiseSize.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
-            MaskSize.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
-            Red.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
-            Green.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
-            Blue.SettingChanged += (_, _) => Util.ApplyNightVisionSettings();
+            Gain.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            NoiseIntensity.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            NoiseSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            MaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            Red.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            Green.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            Blue.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
 
-            AutoGatingType.SettingChanged += (_, _) => Util.ApplyGatingSettings();
-            GatingSpeed.SettingChanged += (_, _) => Util.ApplyGatingSettings();
-            MaxBrightness.SettingChanged += (_, _) => Util.ApplyGatingSettings();
-            MinBrightness.SettingChanged += (_, _) => Util.ApplyGatingSettings();
-            MinBrightnessThreshold.SettingChanged += (_, _) => Util.ApplyGatingSettings();
-            MaxBrightnessThreshold.SettingChanged += (_, _) => Util.ApplyGatingSettings();
+            AutoGatingType.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
+            GatingSpeed.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
+            MaxBrightness.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
+            MinBrightness.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
+            MinBrightnessThreshold.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
+            MaxBrightnessThreshold.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
         }
     }
 }

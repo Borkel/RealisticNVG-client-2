@@ -32,20 +32,19 @@ namespace BorkelRNVG.Patches
             if (!Util.IsNvgValid()) return;
 
             InputSimulator inputSimulator = new InputSimulator();
-            RealisticNvgController nvgController = RealisticNvgController.Instance;
             
             switch (eftScreenType)
             {
                 case EEftScreenType.None:
                     break;
                 case EEftScreenType.BattleUI:
-                    if (nvgController.IsNvgOn)
+                    if (NvgHelper.IsNvgOn)
                     {
                         Task.Run(() => ToggleReshadeAsync(inputSimulator, Plugin.nvgKey));
                     }
                     break;
                 default:
-                    if (nvgController.IsNvgOn)
+                    if (NvgHelper.IsNvgOn)
                     {
                         Task.Run(() => ToggleReshadeAsync(inputSimulator, VirtualKeyCode.NUMPAD5));
                     }

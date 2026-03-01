@@ -6,56 +6,79 @@ using UnityEngine;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Controllers;
 using BorkelRNVG.Enum;
+using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
 
 namespace BorkelRNVG.Patches
 {
     internal class NightVisionApplySettingsPatch : ModulePatch
     {
-        private static int maskId = Shader.PropertyToID("_Mask");
-        private static int invMaskSizeId = Shader.PropertyToID("_InvMaskSize");
-        private static int invAspectId = Shader.PropertyToID("_InvAspect");
-        private static int cameraAspectId = Shader.PropertyToID("_CameraAspect");
-        private static FieldInfo materialCameraField;
+        private static FieldInfo _materialCameraField;
         
         protected override MethodBase GetTargetMethod()
         {
-            materialCameraField = AccessTools.Field(typeof(TextureMask), "camera_0");
+            _materialCameraField = AccessTools.Field(typeof(TextureMask), "camera_0");
             return AccessTools.Method(typeof(NightVision), nameof(NightVision.ApplySettings));
         }
 
         [PatchPrefix]
         private static void PatchPrefix(ref NightVision __instance, ref TextureMask ___TextureMask, ref Texture ___Mask)
         {
-            string nvgID = PlayerHelper.GetCurrentNvgItemId();
-            Plugin.Log($"current nvg id: {nvgID}");
-            NvgData nvgData = NvgHelper.GetNvgData(nvgID ?? "5c066e3a0db834001b7353f0");
-            Material lensMaterial = __instance.Material_0;
+            ApplyModSettings(__instance);
             
-            ApplyModSettings(nvgData);
-
             if (___TextureMask == null) return;
-
-            lensMaterial.SetTexture(maskId, nvgData.LensTexture);
-            lensMaterial.SetFloat(invMaskSizeId, 1f / __instance.MaskSize);
+            
+            Material lensMaterial = __instance.Material_0;
+            lensMaterial.SetFloat(ShaderProperties.InvMaskSizeId, 1f / __instance.MaskSize);
             
             float invAspectValue = ___Mask ? ___Mask.height / (float)___Mask.width : 1f;
-            lensMaterial.SetFloat(invAspectId, invAspectValue);
+            lensMaterial.SetFloat(ShaderProperties.InvAspectId, invAspectValue);
 
-            Camera textureMaskCamera = (Camera)materialCameraField.GetValue(___TextureMask);
+            Camera textureMaskCamera = (Camera)_materialCameraField.GetValue(___TextureMask);
             float cameraAspectValue = textureMaskCamera != null ? textureMaskCamera.aspect : Screen.width / (float)Screen.height;
-            lensMaterial.SetFloat(cameraAspectId, cameraAspectValue);
+            lensMaterial.SetFloat(ShaderProperties.CameraAspectId, cameraAspectValue);
         }
 
-        private static void ApplyModSettings(NvgData nvgData)
+        private static void ApplyModSettings(NightVision nightVision)
         {
-            if (RealisticNvgController.Instance)
+            Plugin.Logger.LogWarning("APPLYING MOD SETTINGS TO NIGHTVISION");
+            
+            string nvgId = PlayerHelper.GetCurrentNvgItemId();
+            NvgData nvgData = NvgHelper.FindNvgData(nvgId);
+            
+            float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
+            float noiseIntensity = 2 * nvgData.NightVisionConfig.NoiseIntensity.Value;
+            float noiseSize = 2f - 2 * nvgData.NightVisionConfig.NoiseSize.Value;
+            float maskSize = nvgData.NightVisionConfig.MaskSize.Value * Plugin.globalMaskSize.Value;
+
+            nightVision.Color.a = 1f;
+            nightVision.Intensity = intensity;
+            nightVision.NoiseIntensity = noiseIntensity;
+            nightVision.NoiseScale = noiseSize;
+            nightVision.Mask = nvgData.MaskTexture;
+            nightVision.MaskSize = maskSize;
+            nightVision.Color.r = nvgData.NightVisionConfig.Red.Value / 255f;
+            nightVision.Color.g = nvgData.NightVisionConfig.Green.Value / 255f;
+            nightVision.Color.b = nvgData.NightVisionConfig.Blue.Value / 255f;
+            
+            Material lensMaterial = nightVision.Material_0;
+            lensMaterial.SetTexture(ShaderProperties.MaskId, nvgData.LensTexture);
+
+            AutoGatingController autoGating = AutoGatingController.Instance;
+            
+            if (autoGating != null)
             {
-                RealisticNvgController.Instance.UpdateFromNvgData(nvgData);
-            }
-            else
-            {
-                Plugin.Log("RealisticNvgController not found... cant apply settings!");
+                bool isAutoGating = NvgHelper.ShouldEnableGating(nvgData);
+                
+                if (isAutoGating)
+                {
+                    autoGating.ApplySettings(nvgData);
+                    autoGating.enabled = true;
+                }
+                else
+                {
+                    autoGating.enabled = false;
+                }
             }
         }
     }

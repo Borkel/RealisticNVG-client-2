@@ -26,7 +26,7 @@ namespace BorkelRNVG.Patches
         {
             try
             {
-                RealisticNvgController.Instance?.GatingController?.AdjustGatingFromFlash(position, null);
+                AutoGatingController.Instance.AdjustGatingFromFlash(position, null);
             }
             catch (Exception e)
             {

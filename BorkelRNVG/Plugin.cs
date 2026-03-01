@@ -120,7 +120,7 @@ namespace BorkelRNVG
                 new NightVisionAwakePatch().Enable();
                 new NightVisionApplySettingsPatch().Enable();
                 new NightVisionSetMaskPatch().Enable();
-                new ThermalVisionSetMaskPatch().Enable();
+                new ThermalVisionSetMaterialPatch().Enable();
                 new SprintPatch().Enable();
                 new NightVisionMethod_1().Enable(); //reshade
                 new MenuPatch().Enable(); //reshade
@@ -153,10 +153,7 @@ namespace BorkelRNVG
 
         void Update()
         {
-            RealisticNvgController controller = RealisticNvgController.Instance;
-            if (!controller) return;
-            
-            bool nvgOn = controller.IsNvgOn;
+            bool nvgOn = NvgHelper.IsNvgOn;
             if (!nvgOn) return;
             
             if (Input.GetKeyDown(gatingInc.Value) && gatingLevel.Value < 2)
@@ -182,7 +179,7 @@ namespace BorkelRNVG
 
         private void OnCameraCreated(PlayerCameraController cameraController, Camera camera)
         {
-            camera.gameObject.AddComponent<RealisticNvgController>();
+            camera.gameObject.AddComponent<AutoGatingController>();
         }
     }
 }

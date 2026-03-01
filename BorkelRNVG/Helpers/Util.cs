@@ -16,27 +16,15 @@ namespace BorkelRNVG.Helpers
             return Singleton<GameWorld>.Instance.MainPlayer?.NightVisionObserver?.Component?.Item?.StringTemplateId != null;
         }
 
-        public static void ApplyNightVisionSettings()
-        {
-            NightVision nightVision = CameraClass.Instance.NightVision;
-            nightVision.ApplySettings();
-        }
-
-        public static void ApplyGatingSettings()
-        {
-            NvgData nvgData = RealisticNvgController.Instance.CurrentNvgData;
-            RealisticNvgController.Instance.GatingController.ApplySettings(nvgData);
-        }
-
         public static EMuzzleDeviceType GetMuzzleDeviceType(Player.FirearmController controller)
         {
             if (controller == null) return EMuzzleDeviceType.None;
             if (controller.IsSilenced) return EMuzzleDeviceType.Suppressor;
 
             Slot[] slots = controller.Weapon.Slots;
-            for (int i = 0; i < slots.Length; i++)
+            foreach (Slot slot in slots)
             {
-                if (slots[i].ContainedItem is FlashHiderItemClass)
+                if (slot.ContainedItem is FlashHiderItemClass)
                 {
                     return EMuzzleDeviceType.FlashHider;
                 }

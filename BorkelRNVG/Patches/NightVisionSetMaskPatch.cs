@@ -14,7 +14,7 @@ namespace BorkelRNVG.Patches
     internal class NightVisionSetMaskPatch : ModulePatch
     {
         // This will patch the instance of the NightVision class
-        // Thanks Fontaine, Mirni, Cj, GrooveypenguinX, Choccster, kiobu-kouhai, GrakiaXYZ, kiki, Props (sorry if i forget someone)
+        // Thanks Fontaine, Mirni, Cj, GrooveypenguinX, Choccster, kiobu-kouhai, DrakiaXYZ, kiki, Props (sorry if i forget someone)
 
         protected override MethodBase GetTargetMethod()
         {
@@ -27,7 +27,7 @@ namespace BorkelRNVG.Patches
             string itemId = PlayerHelper.GetCurrentNvgItemId();
             if (itemId == null) return true;
 
-            NvgData nvgData = NvgHelper.GetNvgData(itemId);
+            NvgData nvgData = NvgHelper.FindNvgData(itemId);
             if (nvgData == null) return true;
             
             __instance.Mask = nvgData.MaskTexture;

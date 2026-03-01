@@ -1,11 +1,14 @@
 ﻿using BorkelRNVG.Helpers;
 using BorkelRNVG.Configuration;
+using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
+using BorkelRNVG.Patches;
 using BSG.CameraEffects;
 using Comfort.Common;
 using EFT;
+using EFT.Quests;
 using System.Collections;
 using System.IO;
 using Unity.Collections;
@@ -17,12 +20,13 @@ namespace BorkelRNVG.Controllers
 {
     public class AutoGatingController : MonoBehaviour
     {
+        public static AutoGatingController Instance;
+        
         public float GatingMultiplier = 1.0f;
 
         // component vars
         public Camera mainCamera;
         public NightVision nightVision;
-        public RealisticNvgController nvgController;
 
         // computeshader vars
         public ComputeShader computeShader = FileHelper.LoadComputeShader("assets/shaders/pein/shaders/brightnessshader.compute", Path.Combine(ModDirectories.ShadersPath, "pein_shaders"));
@@ -87,6 +91,12 @@ namespace BorkelRNVG.Controllers
 
         public void ApplySettings(NvgData nvgData)
         {
+            if (nvgData == null)
+            {
+                Plugin.Logger.LogWarning("nvg data is null!");
+                return;
+            }
+            
             NightVisionConfig config = nvgData.NightVisionConfig;
             EGatingType gatingType = config.AutoGatingType.Value;
             if (gatingType != EGatingType.Off)
@@ -105,9 +115,9 @@ namespace BorkelRNVG.Controllers
 
         public void AdjustGatingFromFlash(Vector3 pos, Player.FirearmController fc, float maxDistance = 15f, float delay = 0.05f)
         {
-            if (nvgController == null) return;
+            if (!enabled) return;
             
-            NvgData nvgData = nvgController.CurrentNvgData;
+            NvgData nvgData = NvgHelper.CurrentNvgData;
             if (nvgData == null) return;
             
             EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
@@ -147,7 +157,6 @@ namespace BorkelRNVG.Controllers
         {
             mainCamera = CameraClass.Instance.Camera;
             nightVision = CameraClass.Instance.NightVision;
-            nvgController = GetComponent<RealisticNvgController>();
 
             // everything beyond this point makes my head hurt
             renderTexture = CreateRenderTexture();
@@ -188,6 +197,8 @@ namespace BorkelRNVG.Controllers
 
                 rawImage.texture = renderTexture;
             }
+
+            enabled = false;
         }
 
         private void SetupCommandBuffer()
@@ -244,12 +255,19 @@ namespace BorkelRNVG.Controllers
 
         private void FixedUpdate()
         {
-            if (!nvgController || !nvgController.IsNvgOn || !Plugin.enableAutoGating.Value)
+            NightVision nightVision = CameraClass.Instance.NightVision;
+            
+            if (!NvgHelper.IsNvgOn || !Plugin.enableAutoGating.Value)
             {
                 return;
             }
 
-            NvgData nvgData = nvgController.CurrentNvgData;
+            NvgData nvgData = NvgHelper.CurrentNvgData;
+            if (nvgData == null)
+            {
+                return;
+            }
+            
             EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
             bool nvgGatingEnabled = gatingType != EGatingType.Off;
 
@@ -276,8 +294,8 @@ namespace BorkelRNVG.Controllers
             float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             
             GatingMultiplier = Mathf.Lerp(GatingMultiplier, gatingTarget, gateSpeed);
-            nvgController.NightVision.Intensity = intensity * GatingMultiplier;
-            nvgController.UpdateNvgMaterialIntensity();
+            nightVision.Intensity = intensity * GatingMultiplier;
+            nightVision.UpdateIntensity();
         }
 
         private RenderTexture CreateRenderTexture()
