@@ -35,6 +35,8 @@ namespace BorkelRNVG.Patches
             int invMaskSizeId = Shader.PropertyToID("_InvMaskSize");
             int invAspectId = Shader.PropertyToID("_InvAspect");
             int cameraAspectId = Shader.PropertyToID("_CameraAspect");
+            int lensDistortionOnId = Shader.PropertyToID("_LensDistortionOn");
+            int nearBlurOnId = Shader.PropertyToID("_NearBlurOn");
 
             var material = (Material)AccessTools.Property(__instance.GetType(), "Material_0").GetValue(__instance);
 
@@ -47,6 +49,8 @@ namespace BorkelRNVG.Patches
                 {
                     material.SetFloat("_EdgeDistortion", (nvgItemConfig.EdgeDistortion));
                     material.SetFloat("_EdgeDistortionStart", (nvgItemConfig.EdgeDistortionStart));
+                    material.SetFloat(lensDistortionOnId, Plugin.globalLensDistortion.Value ? 1f : 0f);
+                    material.SetFloat(nearBlurOnId, Plugin.globalNearBlur.Value ? 1f : 0f);
                 }
                 Texture lens = nvgItemConfig.LensTexture;
 

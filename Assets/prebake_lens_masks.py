@@ -18,10 +18,8 @@ This script reproduces the old shader-style directional scan:
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import json
 import math
-import os
 from pathlib import Path
 from typing import Iterable, List, Sequence, Tuple
 # pip install pillow
@@ -53,12 +51,6 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=16,
         help="Direction count. Use 8 for old behavior, 16+ for higher quality.",
-    )
-    parser.add_argument(
-        "--workers",
-        type=int,
-        default=1,
-        help="Number of worker processes. 1 = sequential.",
     )
     return parser.parse_args()
 
@@ -129,7 +121,7 @@ def prebake_one(
     invert_alpha: bool,
     max_steps: int,
     dirs: Sequence[Tuple[float, float]],
-) -> str:
+) -> None:
     try:
         from PIL import Image
     except ImportError as exc:
@@ -151,6 +143,7 @@ def prebake_one(
 
     du = 1.0 / w
     dv = 1.0 / h
+    dir_count = len(dirs)
     n = w * h
     out: List[Tuple[int, int, int, int]] = [(0, 0, 0, 0)] * n
 
@@ -224,6 +217,10 @@ def prebake_one(
             b = to_u8(clamp01(nearest_norm) * 255.0)
             out[i] = (r, g, b, a_u8)
 
+        print(f"[{src_path.name}] row {y + 1}/{h}", end="\r")
+
+    print(f"[{src_path.name}] rows done: {h}/{h}          ")
+
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{src_path.stem}.png"
     out_img = Image.new("RGBA", (w, h))
@@ -250,7 +247,7 @@ def prebake_one(
         json.dumps(meta, indent=2), encoding="utf-8"
     )
     """
-    return str(out_path)
+    print(f"[OK] {src_path.name} -> {out_path.name}")
 
 
 def iter_pngs(folder: Path) -> Iterable[Path]:
@@ -267,7 +264,6 @@ def main() -> int:
     invert_alpha: bool = not args.no_invert_alpha
     max_steps: int = int(args.max_steps)
     num_directions: int = int(args.num_directions)
-    workers: int = int(args.workers)
 
     if not input_dir.exists():
         raise FileNotFoundError(f"Input dir not found: {input_dir}")
@@ -277,8 +273,6 @@ def main() -> int:
         raise ValueError("--max-steps must be > 0")
     if num_directions < 4:
         raise ValueError("--num-directions must be >= 4")
-    if workers <= 0:
-        raise ValueError("--workers must be > 0")
 
     dirs = generate_dirs(num_directions)
     pngs = list(iter_pngs(input_dir))
@@ -288,46 +282,18 @@ def main() -> int:
 
     print(
         f"Prebake config: dirs={len(dirs)}, max_steps={max_steps}, "
-        f"threshold={threshold}, invert_alpha={invert_alpha}, workers={workers}"
+        f"threshold={threshold}, invert_alpha={invert_alpha}"
     )
 
-    if workers == 1:
-        for src in pngs:
-            out_path = prebake_one(
-                src_path=src,
-                out_dir=output_dir,
-                threshold=threshold,
-                invert_alpha=invert_alpha,
-                max_steps=max_steps,
-                dirs=dirs,
-            )
-            print(f"[OK] {src.name} -> {Path(out_path).name}")
-    else:
-        max_workers = min(workers, len(pngs), os.cpu_count() or workers)
-        failures = 0
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            future_to_src = {
-                executor.submit(
-                    prebake_one,
-                    src,
-                    output_dir,
-                    threshold,
-                    invert_alpha,
-                    max_steps,
-                    dirs,
-                ): src
-                for src in pngs
-            }
-            for future in as_completed(future_to_src):
-                src = future_to_src[future]
-                try:
-                    out_path = future.result()
-                    print(f"[OK] {src.name} -> {Path(out_path).name}")
-                except Exception as ex:
-                    failures += 1
-                    print(f"[ERR] {src.name}: {ex}")
-        if failures:
-            raise RuntimeError(f"Failed processing {failures} image(s).")
+    for src in pngs:
+        prebake_one(
+            src_path=src,
+            out_dir=output_dir,
+            threshold=threshold,
+            invert_alpha=invert_alpha,
+            max_steps=max_steps,
+            dirs=dirs,
+        )
 
     print(f"Done. Wrote {len(pngs)} textures to: {output_dir}")
     return 0

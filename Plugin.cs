@@ -36,6 +36,8 @@ namespace BorkelRNVG
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
+        public static ConfigEntry<bool> globalLensDistortion;
+        public static ConfigEntry<bool> globalNearBlur;
 
         // T-7 specific
         public static ConfigEntry<bool> t7Pixelation;
@@ -112,7 +114,11 @@ namespace BorkelRNVG
             globalMaskSize = Config.Bind(globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
             globalGain = Config.Bind(globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
             allowAmbientChange = Config.Bind(globalCategory, "3. Allow ambient change", true, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
+            globalLensDistortion = Config.Bind(globalCategory, "4. Enable lens distortion", true, new ConfigDescription("Toggles lens distortion for all NVGs.", null));
+            globalNearBlur = Config.Bind(globalCategory, "5. Enable near blur", true, new ConfigDescription("Toggles near blur for all NVGs.", null));
             allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
+            globalLensDistortion.SettingChanged += Util.ApplyNightVisionSettings;
+            globalNearBlur.SettingChanged += Util.ApplyNightVisionSettings;
 
             // other variables.. idk
             gatingLevel.Value = 0;
