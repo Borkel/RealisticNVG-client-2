@@ -166,7 +166,7 @@ namespace BorkelRNVG.Helpers.Configuration
                     configFile, Plugin.gpnvgCategory,
                     2.5f, 0.2f, 0.1f, 0.96f, 152f, 214f, 252f,
                     EGatingType.AutoGating, 0.3f, 1f, 0.2f, 0f, 0.15f,
-                    0.01f, 0.72f
+                    0.02f, 0.04f
                 );
             Add(gpnvg18, new NightVisionItemConfig(
                 gpnvgConfig,
@@ -197,7 +197,7 @@ namespace BorkelRNVG.Helpers.Configuration
                     configFile, Plugin.pvsCategory,
                     2.4f, 0.2f, 0.1f, 1f, 95f, 210f, 255f,
                     EGatingType.AutoGating, 0.3f, 1f, 0.2f, 0f, 0.15f,
-                    0.01f, 0.72f
+                    0.02f, 0.04f
                 );
             Add(pvs14, new NightVisionItemConfig(
                 pvs14Config,
@@ -220,7 +220,7 @@ namespace BorkelRNVG.Helpers.Configuration
                     configFile, Plugin.nCategory,
                     2.1f, 0.25f, 0.15f, 1f, 60f, 235f, 100f,
                     EGatingType.AutoGain, 0.3f, 1f, 0.2f, 0f, 0.15f,
-                    0.01f, 0.72f
+                    0.1f, 0.2f
                 );
             Add(n15, new NightVisionItemConfig(
                 n15Config,
@@ -245,9 +245,9 @@ namespace BorkelRNVG.Helpers.Configuration
             string pnv10t = "5c0696830db834001d23f5da";
             NightVisionConfig pnv10Config = new NightVisionConfig(
                     configFile, Plugin.pnvCategory,
-                    1.8f, 0.3f, 0.2f, 1f, 60f, 210f, 60f,
+                    1.6f, 0.3f, 0.2f, 1f, 60f, 210f, 60f,
                     EGatingType.Off, 0.3f, 1f, 0.2f, 0f, 0.15f,
-                    0.01f, 0.72f
+                    0.15f, 0.3f
                 );
             Add(pnv10t, new NightVisionItemConfig(
                 pnv10Config,
@@ -268,9 +268,9 @@ namespace BorkelRNVG.Helpers.Configuration
             string pnv57 = "67506ca81f18589016006aa6";
             NightVisionConfig pnv57Config = new NightVisionConfig(
                     configFile, Plugin.pnv57Category,
-                    1.2f, 0.35f, 0.2f, 1f, 60f, 215f, 80f,
+                    1.2f, 0.35f, 0.2f, 1f, 80f, 215f, 60f,
                     EGatingType.Off, 0.3f, 1f, 0.2f, 0f, 0.15f,
-                    0.01f, 0.72f
+                    0.55f, 0.5f
                 );
             Add(pnv57, new NightVisionItemConfig(
                 pnv57Config,

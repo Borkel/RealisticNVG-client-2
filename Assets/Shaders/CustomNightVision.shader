@@ -17,6 +17,7 @@ Shader "Hidden/CustomNightVision"
 		_NearBlurOn ("_NearBlurOn", Float) = 1
 		_NearBlurIntensity ("_NearBlurIntensity", Float) = 20
 		_NearBlurMaxDistance ("_NearBlurMaxDistance", Float) = 4
+		_NearBlurKernel ("_NearBlurKernel", Range(1,3)) = 3
 		// Texture mask properties
 		_Mask ("_Mask", 2D) = "white" {}
 		_InvMaskSize ("_InvMaskSize", Float) = 1
@@ -64,6 +65,7 @@ Shader "Hidden/CustomNightVision"
 			float _NearBlurOn;
 			float _NearBlurIntensity;
 			float _NearBlurMaxDistance;
+			float _NearBlurKernel;
 			float4 _Color;
 			float _Intensity;
 			float4 _MainTex_TexelSize;
@@ -198,7 +200,8 @@ Shader "Hidden/CustomNightVision"
 					float blurRadiusPx = _NearBlurIntensity * nearFactorSpread * nvgMask;
 					if (blurRadiusPx > 0.001)
 					{
-						const int kernelRadius = 3; // 7x7 kernel
+						const int maxKernelRadius = 4; // 7x7 max
+						int kernelRadius = clamp((int)round(_NearBlurKernel), 1, maxKernelRadius);
 						float2 texel = _MainTex_TexelSize.xy;
 						float sampleScale = blurRadiusPx / kernelRadius;
 						float sigma = max(blurRadiusPx * 0.5, 0.75);
@@ -206,11 +209,15 @@ Shader "Hidden/CustomNightVision"
 						float4 g = 0;
 						float wsum = 0;
 						[unroll]
-						for (int ky = -kernelRadius; ky <= kernelRadius; ky++)
+						for (int ky = -maxKernelRadius; ky <= maxKernelRadius; ky++)
 						{
 							[unroll]
-							for (int kx = -kernelRadius; kx <= kernelRadius; kx++)
+							for (int kx = -maxKernelRadius; kx <= maxKernelRadius; kx++)
 							{
+								if (abs(kx) > kernelRadius || abs(ky) > kernelRadius)
+								{
+									continue;
+								}
 								float2 k = float2(kx, ky);
 								float w = exp(-dot(k, k) * invTwoSigma2);
 								float2 suv = clamp(warpedUv + k * texel * sampleScale, 0.0, 1.0);
@@ -241,3 +248,4 @@ Shader "Hidden/CustomNightVision"
 	}
 	Fallback "Hidden/Internal-BlackError"
 }
+

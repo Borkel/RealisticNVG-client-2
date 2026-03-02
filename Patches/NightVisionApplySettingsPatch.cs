@@ -51,6 +51,9 @@ namespace BorkelRNVG.Patches
                     material.SetFloat("_EdgeDistortionStart", (nvgItemConfig.EdgeDistortionStart));
                     material.SetFloat(lensDistortionOnId, Plugin.globalLensDistortion.Value ? 1f : 0f);
                     material.SetFloat(nearBlurOnId, Plugin.globalNearBlur.Value ? 1f : 0f);
+                    material.SetFloat("_NearBlurIntensity", (Plugin.globalBlurIntensity.Value));
+                    material.SetFloat("_NearBlurMaxDistance", (Plugin.globalBlurDistance.Value));
+                    material.SetFloat("_NearBlurKernel", ((float)Plugin.globalBlurQuality.Value));
                 }
                 Texture lens = nvgItemConfig.LensTexture;
 
