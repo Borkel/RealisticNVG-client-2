@@ -72,7 +72,9 @@ namespace BorkelRNVG.Helpers
                     MaxBrightness = nvgConfig.MaxBrightness,
                     MinBrightness = nvgConfig.MinBrightness,
                     MaxBrightnessThreshold = nvgConfig.MaxBrightnessThreshold,
-                    MinBrightnessThreshold = nvgConfig.MinBrightnessThreshold
+                    MinBrightnessThreshold = nvgConfig.MinBrightnessThreshold,
+                    EdgeDistortion = nvgConfig.EdgeDistortion,
+                    EdgeDistortionStart = nvgConfig.EdgeDistortionStart
                 };
                 
                 if (nvgConfig.ItemId != null)

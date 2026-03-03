@@ -55,5 +55,11 @@ namespace BorkelRNVG.Models
         
         [JsonProperty("maxBrightnessThreshold")]
         public float MaxBrightnessThreshold { get; set; } = 0.15f;
+
+        [JsonProperty("edgeDistortion")]
+        public float EdgeDistortion { get; set; } = 0.1f;
+        
+        [JsonProperty("edgeDistortionStart")]
+        public float EdgeDistortionStart { get; set; } = 0.2f;
     }
 }

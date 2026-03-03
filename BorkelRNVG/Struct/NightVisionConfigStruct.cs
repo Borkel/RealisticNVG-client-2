@@ -17,5 +17,7 @@ namespace BorkelRNVG.Struct
         public float MinBrightness;
         public float MinBrightnessThreshold;
         public float MaxBrightnessThreshold;
+        public float EdgeDistortion;
+        public float EdgeDistortionStart;
     }
 }

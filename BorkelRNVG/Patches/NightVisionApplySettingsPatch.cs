@@ -51,6 +51,7 @@ namespace BorkelRNVG.Patches
             float noiseSize = 2f - 2 * nvgData.NightVisionConfig.NoiseSize.Value;
             float maskSize = nvgData.NightVisionConfig.MaskSize.Value * Plugin.globalMaskSize.Value;
 
+            // update nvg properties
             nightVision.Color.a = 1f;
             nightVision.Intensity = intensity;
             nightVision.NoiseIntensity = noiseIntensity;
@@ -61,11 +62,23 @@ namespace BorkelRNVG.Patches
             nightVision.Color.g = nvgData.NightVisionConfig.Green.Value / 255f;
             nightVision.Color.b = nvgData.NightVisionConfig.Blue.Value / 255f;
             
+            // update nvg lens texture
             Material lensMaterial = nightVision.Material_0;
             lensMaterial.SetTexture(ShaderProperties.MaskId, nvgData.LensTexture);
-
-            AutoGatingController autoGating = AutoGatingController.Instance;
             
+            // update lens distortion from nvgData
+            lensMaterial.SetFloat(ShaderProperties.EdgeDistortionId, nvgData.NightVisionConfig.EdgeDistortion.Value);
+            lensMaterial.SetFloat(ShaderProperties.EdgeDistortionStartId, nvgData.NightVisionConfig.EdgeDistortion.Value);
+            
+            // update lens distortion from global config
+            lensMaterial.SetFloat(ShaderProperties.LensDistortionOnId, Plugin.globalLensDistortion.Value ? 1f : 0f);
+            lensMaterial.SetFloat(ShaderProperties.NearBlurOnId, Plugin.globalNearBlur.Value ? 1f : 0f);
+            lensMaterial.SetFloat(ShaderProperties.NearBlurIntensityId, Plugin.globalBlurIntensity.Value);
+            lensMaterial.SetFloat(ShaderProperties.NearBlurMaxDistanceId, Plugin.globalBlurDistance.Value);
+            lensMaterial.SetFloat(ShaderProperties.NearBlurKernelId, Plugin.globalBlurQuality.Value);
+
+            // apply autogating settings
+            AutoGatingController autoGating = AutoGatingController.Instance;
             if (autoGating != null)
             {
                 bool isAutoGating = NvgHelper.ShouldEnableGating(nvgData);

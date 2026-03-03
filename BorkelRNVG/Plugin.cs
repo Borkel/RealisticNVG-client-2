@@ -23,12 +23,18 @@ namespace BorkelRNVG
     {
         public static new ManualLogSource Logger;
         public static Harmony harmony = new Harmony("com.borkel.nvgmasks");
+        
+        public static ConfigEntry<bool> debugLogging;
 
         // global
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
-        public static ConfigEntry<bool> debugLogging;
+        public static ConfigEntry<bool> globalLensDistortion;
+        public static ConfigEntry<bool> globalNearBlur;
+        public static ConfigEntry<float> globalBlurIntensity;
+        public static ConfigEntry<float> globalBlurDistance;
+        public static ConfigEntry<int> globalBlurQuality;
 
         //sprint patch stuff
         public static ConfigEntry<bool> enableSprintPatch;
@@ -101,6 +107,18 @@ namespace BorkelRNVG
             globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
             allowAmbientChange = Config.Bind(Category.globalCategory, "3. Allow ambient change", true, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
             allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
+            
+            // Global, lens distortion settings
+            globalLensDistortion = Config.Bind(Category.globalCategory, "4. Enable lens distortion", true, new ConfigDescription("Toggles lens distortion for all NVGs.", null));
+            globalLensDistortion.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalNearBlur = Config.Bind(Category.globalCategory, "5. Enable near blur", true, new ConfigDescription("Toggles near blur for all NVGs.", null));
+            globalNearBlur.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalBlurIntensity = Config.Bind(Category.globalCategory, "6. Near blur intensity", 20f, new ConfigDescription("Increases intensity of blur.", new AcceptableValueRange<float>(0f, 100f)));
+            globalBlurIntensity.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalBlurDistance = Config.Bind(Category.globalCategory, "7. Near blur distance", 4f, new ConfigDescription("Distance at which the blur disappears.", new AcceptableValueRange<float>(0f, 20f)));
+            globalBlurDistance.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalBlurQuality = Config.Bind(Category.globalCategory, "8. Near blur quality", 4, new ConfigDescription("Changes the size of the gauss kernel, affecting quality.", new AcceptableValueRange<int>(1, 4)));
+            globalBlurQuality.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
 
             // other variables.. idk
             gatingLevel.Value = 0;
