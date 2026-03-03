@@ -127,8 +127,8 @@ namespace BorkelRNVG.Configuration
             MinBrightnessThreshold.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
             MaxBrightnessThreshold.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
             
-            EdgeDistortion.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
-            EdgeDistortionStart.SettingChanged += (_, _) => NvgHelper.ApplyGatingSettings();
+            EdgeDistortion.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            EdgeDistortionStart.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
         }
     }
 }
