@@ -18,7 +18,7 @@ using System.Runtime.CompilerServices;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.0.4")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.1.0")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
