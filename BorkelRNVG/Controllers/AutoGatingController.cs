@@ -82,6 +82,7 @@ namespace BorkelRNVG.Controllers
             Plugin.Log("resetting gating");
             _currentBrightness = 1f;
             BrightnessGatingFactor = 1f;
+            FlashGatingFactor = 1f;
         }
 
         public void ApplySettings(NvgData nvgData)
@@ -143,7 +144,7 @@ namespace BorkelRNVG.Controllers
             }
             else
             {
-                StartCoroutine(AdjustAutoGating(delay, 1f - flashAmount));
+                StartCoroutine(AdjustAutoGating(delay, flashAmount));
             }
         }
 
