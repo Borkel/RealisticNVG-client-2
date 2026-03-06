@@ -4,17 +4,10 @@ using BorkelRNVG.Patches;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using WindowsInput.Native;
 using Comfort.Common;
 using BepInEx.Logging;
-using BorkelRNVG.Configuration;
-using BorkelRNVG.Controllers;
 using BorkelRNVG.Helpers;
-using EFT;
-using EFT.CameraControl;
 using HarmonyLib;
-using System.IO;
-using System.Runtime.CompilerServices;
 
 namespace BorkelRNVG
 {
