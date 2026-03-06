@@ -32,21 +32,25 @@ namespace BorkelRNVG.Patches
             Material lensMaterial = __instance.Material_0;
             lensMaterial.SetFloat(ShaderProperties.InvMaskSizeId, 1f / __instance.MaskSize);
             
-            float invAspectValue = __instance.Mask ? __instance.Mask.height / (float)Screen.width : 1f;
+            float invAspectValue = __instance.Mask ? __instance.Mask.height / (float)__instance.Mask.width : 1f;
             lensMaterial.SetFloat(ShaderProperties.InvAspectId, invAspectValue);
 
             Camera textureMaskCamera = (Camera)_materialCameraField.GetValue(__instance.TextureMask);
             float cameraAspectValue = textureMaskCamera != null ? textureMaskCamera.aspect : Screen.width / (float)Screen.height;
             lensMaterial.SetFloat(ShaderProperties.CameraAspectId, cameraAspectValue);
 
-            float num = __instance.NoiseScale * Screen.height / __instance.Noise.height;
-            ___vector4_0 = new Vector4(num * Screen.width / Screen.height, num, 0f, 0f);
+            float num = __instance.NoiseScale * (float)Screen.height / (float)__instance.Noise.height;
+            ___vector4_0 = new Vector4(num * (float)Screen.width / (float)Screen.height, num, 0f, 0f);
             
-            __instance.Material_0.SetColor(ShaderProperties.ColorId, __instance.Color);
+            __instance.Material_0.SetColor(ShaderProperties.ColorId, __instance.Color_0);
             __instance.Material_0.SetFloat(ShaderProperties.NoiseIntensityId, __instance.NoiseIntensity);
             __instance.Material_0.SetVector(ShaderProperties.NoiseScaleId, ___vector4_0);
             __instance.Material_0.SetTexture(ShaderProperties.NoiseId, __instance.Noise);
-            __instance.Material_0.EnableKeyword(ShaderProperties.NightVisionNoiseKeyword);
+
+            if (___bool_1)
+            {
+                __instance.Material_0.EnableKeyword(ShaderProperties.NightVisionNoiseKeyword);
+            }
             
             if (nvgData.NightVisionConfig.AutoGatingType.Value == EGatingType.Off)
             {
