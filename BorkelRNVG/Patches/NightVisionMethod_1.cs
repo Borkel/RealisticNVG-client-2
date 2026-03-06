@@ -30,16 +30,6 @@ namespace BorkelRNVG.Patches
             Plugin.Log($"toggling nvg overlay: {__0}");
 
             NvgHelper.IsNvgOn = __0;
-            
-            if (!Plugin.enableReshade.Value) return;
-            if (!Util.IsNvgValid()) return;
-
-            InputSimulator inputSimulator = new InputSimulator();
-            VirtualKeyCode key = Plugin.nvgKey;
-            if (__0)
-                Task.Run(() => ActivateReshade(inputSimulator, Plugin.nvgKey));
-            else if (!__0)
-                Task.Run(() => ActivateReshade(inputSimulator, VirtualKeyCode.NUMPAD5));
         }
     }
 }

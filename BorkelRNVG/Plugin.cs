@@ -46,11 +46,6 @@ namespace BorkelRNVG
         //public static BloomAndFlares BloomAndFlaresInstance;
         //public static UltimateBloom UltimateBloomInstance;
 
-        // Reshade stuff
-        public static VirtualKeyCode nvgKey = VirtualKeyCode.NUMPAD0;
-        public static ConfigEntry<bool> enableReshade;
-        public static ConfigEntry<bool> disableReshadeInMenus;
-
         // IR illumination
         public static ConfigEntry<float> irFlashlightBrightnessMult;
         public static ConfigEntry<float> irFlashlightRangeMult;
@@ -75,8 +70,6 @@ namespace BorkelRNVG
 
             // Miscellaneous
             enableSprintPatch = Config.Bind(Category.miscCategory, "Sprint toggles tactical devices. DO NOT USE WITH FIKA.", false, "Sprinting will toggle tactical devices until you stop sprinting, this mitigates the IR lights being visible outside of the NVGs. I recommend enabling this feature.");
-            enableReshade = Config.Bind(Category.miscCategory, "Enable ReShade input simulation", false, "Will enable the input simulation to enable the ReShade, will use numpad keys. GPNVG-18 -> numpad 9. PVS-14 -> numpad 8. N-15 -> numpad 7. PNV-10T -> numpad 6. Off -> numpad 5. Only enable if you've installed the ReShade.");
-            disableReshadeInMenus = Config.Bind(Category.miscCategory, "Disable ReShade when in menus", true, "Is a bit wonky in the hideout, but works well in-raid.");
             debugLogging = Config.Bind(Category.miscCategory, "Enable Debug Logging", false, "Enables debug logging.");
             
             // Global
@@ -141,7 +134,6 @@ namespace BorkelRNVG
                 new ThermalVisionSetMaterialPatch().Enable();
                 new SprintPatch().Enable();
                 new NightVisionMethod_1().Enable(); //reshade
-                new MenuPatch().Enable(); //reshade
                 new InitiateShotPatch().Enable();
                 new IkLightAwakePatch().Enable();
                 new LaserBeamAwakePatch().Enable();
