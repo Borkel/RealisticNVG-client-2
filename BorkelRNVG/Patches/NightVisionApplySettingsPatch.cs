@@ -68,7 +68,7 @@ namespace BorkelRNVG.Patches
             
             // update lens distortion from nvgData
             lensMaterial.SetFloat(ShaderProperties.EdgeDistortionId, nvgData.NightVisionConfig.EdgeDistortion.Value);
-            lensMaterial.SetFloat(ShaderProperties.EdgeDistortionStartId, nvgData.NightVisionConfig.EdgeDistortion.Value);
+            lensMaterial.SetFloat(ShaderProperties.EdgeDistortionStartId, nvgData.NightVisionConfig.EdgeDistortionStart.Value);
             
             // update lens distortion from global config
             lensMaterial.SetFloat(ShaderProperties.LensDistortionOnId, Plugin.globalLensDistortion.Value ? 1f : 0f);
@@ -81,16 +81,14 @@ namespace BorkelRNVG.Patches
             AutoGatingController autoGating = AutoGatingController.Instance;
             if (autoGating != null)
             {
-                bool isAutoGating = NvgHelper.ShouldEnableGating(nvgData);
+                bool enableGating = NvgHelper.ShouldEnableGating(nvgData);
                 
-                if (isAutoGating)
+                autoGating.enabled = enableGating;
+
+                // only apply settings when enabling night vision
+                if (!NvgHelper.IsNvgOn)
                 {
                     autoGating.ApplySettings(nvgData);
-                    autoGating.enabled = true;
-                }
-                else
-                {
-                    autoGating.enabled = false;
                 }
             }
         }

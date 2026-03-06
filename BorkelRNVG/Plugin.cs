@@ -104,7 +104,9 @@ namespace BorkelRNVG
 
             // Global
             globalMaskSize = Config.Bind(Category.globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
+            globalMaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
+            globalGain.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             allowAmbientChange = Config.Bind(Category.globalCategory, "3. Allow ambient change", true, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
             allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
             
@@ -117,7 +119,7 @@ namespace BorkelRNVG
             globalBlurIntensity.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalBlurDistance = Config.Bind(Category.globalCategory, "7. Near blur distance", 4f, new ConfigDescription("Distance at which the blur disappears.", new AcceptableValueRange<float>(0f, 20f)));
             globalBlurDistance.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
-            globalBlurQuality = Config.Bind(Category.globalCategory, "8. Near blur quality", 4, new ConfigDescription("Changes the size of the gauss kernel, affecting quality.", new AcceptableValueRange<int>(1, 4)));
+            globalBlurQuality = Config.Bind(Category.globalCategory, "8. Near blur quality", 4, new ConfigDescription("Changes the size of the gauss kernel, affecting quality.", new AcceptableValueRange<int>(1, 12)));
             globalBlurQuality.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
 
             // other variables.. idk
@@ -128,8 +130,6 @@ namespace BorkelRNVG
             AssetHelper.LoadNvgs(Config);
             AssetHelper.LoadThermals(Config);
             AssetHelper.LoadAudioClips();
-
-            PlayerCameraController.OnPlayerCameraControllerCreated += OnCameraCreated;
             
             try
             {
@@ -193,11 +193,6 @@ namespace BorkelRNVG
             if (!debugLogging.Value) return;
 
             Logger.LogInfo(message);
-        }
-
-        private void OnCameraCreated(PlayerCameraController cameraController, Camera camera)
-        {
-            camera.gameObject.AddComponent<AutoGatingController>();
         }
     }
 }

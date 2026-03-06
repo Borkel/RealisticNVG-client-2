@@ -21,6 +21,11 @@ namespace BorkelRNVG.Patches
         [PatchPrefix]
         private static void PatchPrefix(NightVision __instance)
         {
+            if (AutoGatingController.Instance == null)
+            {
+                __instance.gameObject.AddComponent<AutoGatingController>();
+            }
+            
             __instance.Noise = AssetHelper.noiseTexture;
             __instance.Shader = AssetHelper.nightVisionShader;
         }

@@ -4,25 +4,25 @@ using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
-using BorkelRNVG.Patches;
 using BSG.CameraEffects;
-using Comfort.Common;
 using EFT;
-using EFT.Quests;
 using System.Collections;
 using System.IO;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace BorkelRNVG.Controllers
 {
+    [RequireComponent(typeof(Camera), typeof(NightVision))]
     public class AutoGatingController : MonoBehaviour
     {
         public static AutoGatingController Instance;
         
-        public float GatingMultiplier = 1.0f;
+        public float BrightnessGatingFactor = 1.0f;
+        public float FlashGatingFactor = 1.0f;
 
         // component vars
         public Camera mainCamera;
@@ -66,27 +66,22 @@ namespace BorkelRNVG.Controllers
         public float contrastLevel = 3f;
         public float exposureAmount = 4f;
 
-        public IEnumerator AdjustAutoGating(float delay, float multiplier, NvgData nvgData)
+        public EGatingType gatingType;
+
+        private IEnumerator AdjustAutoGating(float delay, float multiplier)
         {
             yield return new WaitForSeconds(delay);
+            
+            Plugin.Logger.LogInfo($"autogating multiplier {multiplier}");
 
-            if (Plugin.clampMinGating.Value)
-            {
-                float newBrightness = Mathf.Clamp(GatingMultiplier * multiplier, nvgData.NightVisionConfig.MinBrightness.Value, nvgData.NightVisionConfig.MaxBrightness.Value);
-                GatingMultiplier = newBrightness;
-            }
-            else
-            {
-                float newBrightness = Mathf.Clamp(GatingMultiplier * multiplier, 0f, nvgData.NightVisionConfig.MaxBrightness.Value);
-                GatingMultiplier = newBrightness;
-            }
+            FlashGatingFactor = multiplier;
         }
 
         public void ResetGating()
         {
             Plugin.Log("resetting gating");
             _currentBrightness = 1f;
-            GatingMultiplier = 1f;
+            BrightnessGatingFactor = 1f;
         }
 
         public void ApplySettings(NvgData nvgData)
@@ -98,7 +93,9 @@ namespace BorkelRNVG.Controllers
             }
             
             NightVisionConfig config = nvgData.NightVisionConfig;
-            EGatingType gatingType = config.AutoGatingType.Value;
+            
+            gatingType = config.AutoGatingType.Value;
+            
             if (gatingType != EGatingType.Off)
             {
                 gateSpeed = config.GatingSpeed.Value;
@@ -115,20 +112,17 @@ namespace BorkelRNVG.Controllers
 
         public void AdjustGatingFromFlash(Vector3 pos, Player.FirearmController fc, float maxDistance = 15f, float delay = 0.05f)
         {
-            if (!enabled) return;
+            if (!enabled || gatingType != EGatingType.AutoGating) return;
             
             NvgData nvgData = NvgHelper.CurrentNvgData;
             if (nvgData == null) return;
-            
-            EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
-            if (gatingType != EGatingType.AutoGating) return;
             
             Player fcOwner = fc?.GetComponent<Player>();
             Camera camera = CameraClass.Instance.Camera;
             
             EMuzzleDeviceType muzzleType = Util.GetMuzzleDeviceType(fc);
-            float gatingLerp = Util.GatingLerpFromMuzzleType(muzzleType);
-            Plugin.Log($"{muzzleType} | {gatingLerp}");
+            float flashAmount = Util.FlashAmountFromMuzzleType(muzzleType);
+            Plugin.Log($"{muzzleType} | {flashAmount}");
             
             if (fc && !fcOwner.IsYourPlayer)
             {
@@ -143,20 +137,27 @@ namespace BorkelRNVG.Controllers
                     float shotDist = shotDir.magnitude;
                     float shotDistMult = Mathf.Clamp01(shotDist / maxDistance);
 
-                    float finalGatingMult = Mathf.Lerp(0f, shotDistMult, gatingLerp);
-                    StartCoroutine(AdjustAutoGating(delay, finalGatingMult, nvgData));
+                    float finalGatingMult = Mathf.Lerp(0f, shotDistMult, flashAmount);
+                    StartCoroutine(AdjustAutoGating(delay, finalGatingMult));
                 }
             }
             else
             {
-                StartCoroutine(AdjustAutoGating(delay, gatingLerp, nvgData));
+                StartCoroutine(AdjustAutoGating(delay, 1f - flashAmount));
             }
         }
 
         private void Awake()
         {
-            mainCamera = CameraClass.Instance.Camera;
-            nightVision = CameraClass.Instance.NightVision;
+            if (Instance != null)
+            {
+                Destroy(this);
+            }
+            
+            Instance = this;
+            
+            mainCamera = GetComponent<Camera>();
+            nightVision = GetComponent<NightVision>();
 
             // everything beyond this point makes my head hurt
             renderTexture = CreateRenderTexture();
@@ -255,8 +256,6 @@ namespace BorkelRNVG.Controllers
 
         private void FixedUpdate()
         {
-            NightVision nightVision = CameraClass.Instance.NightVision;
-            
             if (!NvgHelper.IsNvgOn || !Plugin.enableAutoGating.Value)
             {
                 return;
@@ -268,10 +267,8 @@ namespace BorkelRNVG.Controllers
                 return;
             }
             
-            EGatingType gatingType = nvgData.NightVisionConfig.AutoGatingType.Value;
-            bool nvgGatingEnabled = gatingType != EGatingType.Off;
-
-            if (!nvgGatingEnabled)
+            bool gatingDisabled = gatingType == EGatingType.Off;
+            if (gatingDisabled)
             {
                 Plugin.Log("nvg has gating disabled (is set to Off)");
                 ResetGating();
@@ -293,8 +290,11 @@ namespace BorkelRNVG.Controllers
             float gatingTarget = Mathf.Lerp(maxBrightnessMult, minBrightnessMult, Mathf.Clamp((_currentBrightness - minInput) / (maxInput - minInput), 0.0f, 1.0f));
             float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             
-            GatingMultiplier = Mathf.Lerp(GatingMultiplier, gatingTarget, gateSpeed);
-            nightVision.Intensity = intensity * GatingMultiplier;
+            BrightnessGatingFactor = Mathf.Lerp(BrightnessGatingFactor, gatingTarget, gateSpeed);
+            FlashGatingFactor = Mathf.Lerp(FlashGatingFactor, 1f, gateSpeed);
+            float clampIntensity = Plugin.clampMinGating.Value ? nvgData.NightVisionConfig.MinBrightness.Value : 0f;
+            float finalIntensity = intensity * BrightnessGatingFactor * FlashGatingFactor;
+            nightVision.Intensity = Mathf.Max(finalIntensity, clampIntensity);
             nightVision.UpdateIntensity();
         }
 

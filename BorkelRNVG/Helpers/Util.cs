@@ -33,7 +33,7 @@ namespace BorkelRNVG.Helpers
             return EMuzzleDeviceType.None;
         }
 
-        public static float GatingLerpFromMuzzleType(EMuzzleDeviceType muzzleType)
+        public static float FlashAmountFromMuzzleType(EMuzzleDeviceType muzzleType)
         {
             return muzzleType switch
             {

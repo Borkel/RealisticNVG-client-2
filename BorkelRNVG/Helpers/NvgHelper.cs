@@ -29,9 +29,13 @@ namespace BorkelRNVG.Helpers
                 NvgData fallback = GetFallbackData(mask);
                 
                 Plugin.Log($"Loaded fallback NVG data for nvg mask: {mask.ToString()}");
+
+                CurrentNvgData = fallback;
                 
                 return fallback;
             }
+            
+            CurrentNvgData = data;
             
             return data;
         }
@@ -45,6 +49,8 @@ namespace BorkelRNVG.Helpers
             {
                 Plugin.Log($"Thermal data not found for item {itemId}. using default data (T7)");
             }
+
+            CurrentThermalData = data;
             
             return data;
         }
@@ -74,7 +80,7 @@ namespace BorkelRNVG.Helpers
 
         public static void ApplyGatingSettings()
         {
-            NvgData nvgData = NvgHelper.CurrentNvgData;
+            NvgData nvgData = CurrentNvgData;
             AutoGatingController.Instance.ApplySettings(nvgData);
         }
     }
