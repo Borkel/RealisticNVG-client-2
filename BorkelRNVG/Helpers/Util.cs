@@ -24,9 +24,12 @@ namespace BorkelRNVG.Helpers
             Slot[] slots = controller.Weapon.Slots;
             foreach (Slot slot in slots)
             {
-                if (slot.ContainedItem is FlashHiderItemClass)
+                switch (slot.ContainedItem)
                 {
-                    return EMuzzleDeviceType.FlashHider;
+                    case FlashHiderItemClass:
+                        return EMuzzleDeviceType.FlashHider;
+                    case SilencerItemClass:
+                        return EMuzzleDeviceType.Suppressor;
                 }
             }
 
@@ -39,8 +42,8 @@ namespace BorkelRNVG.Helpers
             {
                 EMuzzleDeviceType.Suppressor => 1f,
                 EMuzzleDeviceType.FlashHider => 0.3f,
-                EMuzzleDeviceType.None => 1f,
-                _ => 1f
+                EMuzzleDeviceType.None => 0f,
+                _ => 0f
             };
         }
 

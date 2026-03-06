@@ -1,4 +1,5 @@
 using BorkelRNVG.Controllers;
+using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
@@ -10,6 +11,7 @@ namespace BorkelRNVG.Helpers
     public static class NvgHelper
     {
         public static bool IsNvgOn = false;
+        public static int GatingLevel = 0;
 
         public static NvgData CurrentNvgData = null;
         public static ThermalData CurrentThermalData = null;
@@ -82,6 +84,12 @@ namespace BorkelRNVG.Helpers
         {
             NvgData nvgData = CurrentNvgData;
             AutoGatingController.Instance.ApplySettings(nvgData);
+        }
+
+        public static void IncrementManualGating(int amount)
+        {
+            GatingLevel += amount;
+            CameraClass.Instance.NightVision.UpdateIntensity();
         }
     }
 }

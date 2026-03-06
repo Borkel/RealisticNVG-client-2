@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Comfort.Common;
 using BepInEx.Logging;
+using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Helpers;
 using HarmonyLib;
 
@@ -159,13 +160,13 @@ namespace BorkelRNVG
             {
                 gatingLevel.Value++;
                 Singleton<BetterAudio>.Instance.PlayAtPoint(new Vector3(0, 0, 0), AssetHelper.LoadedAudioClips["gatingKnob.wav"], 0, BetterAudio.AudioSourceGroupType.Nonspatial, 100);
-                CameraClass.Instance.NightVision.ApplySettings();
+                CameraClass.Instance.NightVision.UpdateIntensity();
             }
             else if (Input.GetKeyUp(gatingDec.Value) && gatingLevel.Value > -2)
             {
                 gatingLevel.Value--;
                 Singleton<BetterAudio>.Instance.PlayAtPoint(new Vector3(0, 0, 0), AssetHelper.LoadedAudioClips["gatingKnob.wav"], 0, BetterAudio.AudioSourceGroupType.Nonspatial, 100);
-                CameraClass.Instance.NightVision.ApplySettings();
+                CameraClass.Instance.NightVision.UpdateIntensity();
             }
         }
 

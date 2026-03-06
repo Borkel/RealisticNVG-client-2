@@ -287,16 +287,13 @@ namespace BorkelRNVG.Controllers
             blurMaterial.SetFloat("_BlurSize", blurSize);
             exposureMaterial.SetFloat("_Exposure", exposureAmount);
             maskMaterial.SetTexture("_OverlayTex", nightVision.Material_0.GetTexture(Shader.PropertyToID("_Mask")));
-
+            
             float gatingTarget = Mathf.Lerp(maxBrightnessMult, minBrightnessMult, Mathf.Clamp((_currentBrightness - minInput) / (maxInput - minInput), 0.0f, 1.0f));
-            float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             
             BrightnessGatingFactor = Mathf.Lerp(BrightnessGatingFactor, gatingTarget, gateSpeed);
             FlashGatingFactor = Mathf.Lerp(FlashGatingFactor, 1f, gateSpeed);
-            float clampIntensity = Plugin.clampMinGating.Value ? nvgData.NightVisionConfig.MinBrightness.Value : 0f;
-            float finalIntensity = intensity * BrightnessGatingFactor * FlashGatingFactor;
-            nightVision.Intensity = Mathf.Max(finalIntensity, clampIntensity);
-            nightVision.UpdateIntensity();
+            
+            nightVision.MultiplyIntensity(BrightnessGatingFactor, FlashGatingFactor);
         }
 
         private RenderTexture CreateRenderTexture()
