@@ -320,6 +320,11 @@ namespace BorkelRNVG.Controllers
             _brightnessBuffer?.Release();
             mainCamera.RemoveCommandBuffer(CameraEvent.BeforeImageEffects, _commandBuffer);
             _commandBuffer?.Release();
+            
+            if (Instance == this)
+            {
+                Instance = null;
+            }
         }
     }
 }

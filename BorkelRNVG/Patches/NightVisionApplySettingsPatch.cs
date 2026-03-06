@@ -5,6 +5,7 @@ using System.Reflection;
 using UnityEngine;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Controllers;
+using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
@@ -22,24 +23,44 @@ namespace BorkelRNVG.Patches
         }
 
         [PatchPrefix]
-        private static void PatchPrefix(ref NightVision __instance, ref TextureMask ___TextureMask, ref Texture ___Mask)
+        private static bool PatchPrefix(ref NightVision __instance, ref Vector4 ___vector4_0, ref bool ___bool_1)
         {
-            ApplyModSettings(__instance);
+            NvgData nvgData = ApplyModSettings(__instance);
             
-            if (___TextureMask == null) return;
+            if (__instance.TextureMask == null) return true;
             
             Material lensMaterial = __instance.Material_0;
             lensMaterial.SetFloat(ShaderProperties.InvMaskSizeId, 1f / __instance.MaskSize);
             
-            float invAspectValue = ___Mask ? ___Mask.height / (float)___Mask.width : 1f;
+            float invAspectValue = __instance.Mask ? __instance.Mask.height / (float)Screen.width : 1f;
             lensMaterial.SetFloat(ShaderProperties.InvAspectId, invAspectValue);
 
-            Camera textureMaskCamera = (Camera)_materialCameraField.GetValue(___TextureMask);
+            Camera textureMaskCamera = (Camera)_materialCameraField.GetValue(__instance.TextureMask);
             float cameraAspectValue = textureMaskCamera != null ? textureMaskCamera.aspect : Screen.width / (float)Screen.height;
             lensMaterial.SetFloat(ShaderProperties.CameraAspectId, cameraAspectValue);
+
+            float num = __instance.NoiseScale * Screen.height / __instance.Noise.height;
+            ___vector4_0 = new Vector4(num * Screen.width / Screen.height, num, 0f, 0f);
+            
+            __instance.Material_0.SetColor(ShaderProperties.ColorId, __instance.Color);
+            __instance.Material_0.SetFloat(ShaderProperties.NoiseIntensityId, __instance.NoiseIntensity);
+            __instance.Material_0.SetVector(ShaderProperties.NoiseScaleId, ___vector4_0);
+            __instance.Material_0.SetTexture(ShaderProperties.NoiseId, __instance.Noise);
+            __instance.Material_0.EnableKeyword(ShaderProperties.NightVisionNoiseKeyword);
+            
+            if (nvgData.NightVisionConfig.AutoGatingType.Value == EGatingType.Off)
+            {
+                __instance.UpdateMaterialIntensity(__instance.Intensity);    
+            }
+
+            __instance.TextureMask.Mask = __instance.Mask;
+            __instance.TextureMask.Size = __instance.MaskSize;
+            __instance.TextureMask.ApplySettings();
+            
+            return false;
         }
 
-        private static void ApplyModSettings(NightVision nightVision)
+        private static NvgData ApplyModSettings(NightVision nightVision)
         {
             Plugin.Logger.LogWarning("APPLYING MOD SETTINGS TO NIGHTVISION");
             
@@ -84,13 +105,10 @@ namespace BorkelRNVG.Patches
                 bool enableGating = NvgHelper.ShouldEnableGating(nvgData);
                 
                 autoGating.enabled = enableGating;
-
-                // only apply settings when enabling night vision
-                if (!NvgHelper.IsNvgOn)
-                {
-                    autoGating.ApplySettings(nvgData);
-                }
+                autoGating.ApplySettings(nvgData);
             }
+
+            return nvgData;
         }
     }
 }
