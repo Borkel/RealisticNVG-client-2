@@ -8,7 +8,7 @@ namespace BorkelRNVG.Patches
 {
     public class AmbientPatch
     {
-        private static MethodInfo ambientField = AccessTools.PropertySetter(typeof(LevelSettings), nameof(LevelSettings.AmbientType));
+        private static MethodInfo _ambientField = AccessTools.PropertySetter(typeof(LevelSettings), nameof(LevelSettings.AmbientType));
 
         public static void TogglePatch(bool enabled)
         {
@@ -32,7 +32,7 @@ namespace BorkelRNVG.Patches
 
             for (int i = 0; i < codes.Count; i++)
             {
-                if (codes[i].Calls(ambientField))
+                if (codes[i].Calls(_ambientField))
                 {
                     codes.RemoveRange(i - 2, 3);
                     break;

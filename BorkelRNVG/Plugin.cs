@@ -79,29 +79,6 @@ namespace BorkelRNVG
             disableReshadeInMenus = Config.Bind(Category.miscCategory, "Disable ReShade when in menus", true, "Is a bit wonky in the hideout, but works well in-raid.");
             debugLogging = Config.Bind(Category.miscCategory, "Enable Debug Logging", false, "Enables debug logging.");
             
-            // IR illumination
-            irFlashlightBrightnessMult = Config.Bind(Category.illuminationCategory, "IR flashlight brightness multiplier", 1.5f, new ConfigDescription("Brightness multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 5f)));
-            irFlashlightRangeMult = Config.Bind(Category.illuminationCategory, "IR flashlight range multiplier", 2f, new ConfigDescription("Range multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 10f)));
-            irLaserBrightnessMult = Config.Bind(Category.illuminationCategory, "IR laser brightness multiplier", 1f, new ConfigDescription("Brightness multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
-            irLaserRangeMult = Config.Bind(Category.illuminationCategory, "IR laser range multiplier", 1f, new ConfigDescription("Range multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
-            irLaserPointClose = Config.Bind(Category.illuminationCategory, "IR laser point close size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
-            irLaserPointFar = Config.Bind(Category.illuminationCategory, "IR laser point far size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
-
-            irFlashlightBrightnessMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
-            irFlashlightRangeMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
-            irLaserBrightnessMult.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
-            irLaserRangeMult.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
-            irLaserPointClose.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
-            irLaserPointFar.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
-
-            // Gating
-            gatingInc = Config.Bind(Category.gatingCategory, "1. Manual gating increase", KeyCode.None, "Increases the gain by 1 step. There's 5 levels (-2...2), default level is the third level (0).");
-            gatingDec = Config.Bind(Category.gatingCategory, "2. Manual gating decrease", KeyCode.None, "Decreases the gain by 1 step. There's 5 levels (-2...2), default level is the third level (0).");
-            gatingLevel = Config.Bind(Category.gatingCategory, "3. Gating level", 0, "Will reset when the game opens. You are supposed to use the gating increase/decrease keys to change the gating level, but you are free to change it manually if you want to make sure you are at a specific gating level.");
-            enableAutoGating = Config.Bind(Category.gatingCategory, "4. Enable Auto-Gating", false, "EXPERIMENTAL! WILL REDUCE FPS! Enables auto-gating (automatic brightness adjustment) for certain night vision devices. Auto-gating WILL NOT work without this enabled.");
-            clampMinGating = Config.Bind(Category.gatingCategory, "5. Clamp Minimum Gating Multiplier", true, "Clamps the minimum brightness multiplier to the night vision device's minimum brightness multiplier. If disabled, night vision can become fully dark during automatic fire.");
-            gatingDebug = Config.Bind(Category.gatingCategory, "6. Enable Auto-Gating Debug Overlay", false, new ConfigDescription("DEV SETTING!!! Enables the debug overlay for auto-gating", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
-
             // Global
             globalMaskSize = Config.Bind(Category.globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
             globalMaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
@@ -121,6 +98,29 @@ namespace BorkelRNVG
             globalBlurDistance.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalBlurQuality = Config.Bind(Category.globalCategory, "8. Near blur quality", 4, new ConfigDescription("Changes the size of the gauss kernel, affecting quality.", new AcceptableValueRange<int>(1, 12)));
             globalBlurQuality.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+
+            // Gating
+            gatingInc = Config.Bind(Category.gatingCategory, "1. Manual gating increase", KeyCode.None, "Increases the gain by 1 step. There's 5 levels (-2...2), default level is the third level (0).");
+            gatingDec = Config.Bind(Category.gatingCategory, "2. Manual gating decrease", KeyCode.None, "Decreases the gain by 1 step. There's 5 levels (-2...2), default level is the third level (0).");
+            gatingLevel = Config.Bind(Category.gatingCategory, "3. Gating level", 0, "Will reset when the game opens. You are supposed to use the gating increase/decrease keys to change the gating level, but you are free to change it manually if you want to make sure you are at a specific gating level.");
+            enableAutoGating = Config.Bind(Category.gatingCategory, "4. Enable Auto-Gating", false, "EXPERIMENTAL! WILL REDUCE FPS! Enables auto-gating (automatic brightness adjustment) for certain night vision devices. Auto-gating WILL NOT work without this enabled.");
+            clampMinGating = Config.Bind(Category.gatingCategory, "5. Clamp Minimum Gating Multiplier", true, "Clamps the minimum brightness multiplier to the night vision device's minimum brightness multiplier. If disabled, night vision can become fully dark during automatic fire.");
+            gatingDebug = Config.Bind(Category.gatingCategory, "6. Enable Auto-Gating Debug Overlay", false, new ConfigDescription("DEV SETTING!!! Enables the debug overlay for auto-gating", null, new ConfigurationManagerAttributes() { IsAdvanced = true }));
+            
+            // IR illumination
+            irFlashlightBrightnessMult = Config.Bind(Category.illuminationCategory, "IR flashlight brightness multiplier", 1.5f, new ConfigDescription("Brightness multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 5f)));
+            irFlashlightRangeMult = Config.Bind(Category.illuminationCategory, "IR flashlight range multiplier", 2f, new ConfigDescription("Range multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 10f)));
+            irLaserBrightnessMult = Config.Bind(Category.illuminationCategory, "IR laser brightness multiplier", 1f, new ConfigDescription("Brightness multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
+            irLaserRangeMult = Config.Bind(Category.illuminationCategory, "IR laser range multiplier", 1f, new ConfigDescription("Range multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
+            irLaserPointClose = Config.Bind(Category.illuminationCategory, "IR laser point close size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
+            irLaserPointFar = Config.Bind(Category.illuminationCategory, "IR laser point far size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
+
+            irFlashlightBrightnessMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
+            irFlashlightRangeMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
+            irLaserBrightnessMult.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
+            irLaserRangeMult.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
+            irLaserPointClose.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
+            irLaserPointFar.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
 
             // other variables.. idk
             gatingLevel.Value = 0;
@@ -148,11 +148,7 @@ namespace BorkelRNVG
                 new LaserBeamLateUpdatePatch().Enable();
                 new EmitGrenadePatch().Enable();
                 new GameStartedPatch().Enable();
-                
-                if (allowAmbientChange.Value)
-                {
-                    AmbientPatch.TogglePatch(true);
-                }
+                AmbientPatch.TogglePatch(!allowAmbientChange.Value);
 
                 Logger.LogInfo("Patches enabled successfully!");
             }
