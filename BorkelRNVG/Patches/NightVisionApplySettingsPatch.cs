@@ -39,8 +39,8 @@ namespace BorkelRNVG.Patches
             float cameraAspectValue = textureMaskCamera != null ? textureMaskCamera.aspect : Screen.width / (float)Screen.height;
             lensMaterial.SetFloat(ShaderProperties.CameraAspectId, cameraAspectValue);
 
-            float num = __instance.NoiseScale * (float)Screen.height / (float)__instance.Noise.height;
-            ___vector4_0 = new Vector4(num * (float)Screen.width / (float)Screen.height, num, 0f, 0f);
+            float num = __instance.NoiseScale * Screen.height / __instance.Noise.height;
+            ___vector4_0 = new Vector4(num * Screen.width / Screen.height, num, 0f, 0f);
             
             __instance.Material_0.SetColor(ShaderProperties.ColorId, __instance.Color_0);
             __instance.Material_0.SetFloat(ShaderProperties.NoiseIntensityId, __instance.NoiseIntensity);
