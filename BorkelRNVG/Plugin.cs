@@ -83,7 +83,7 @@ namespace BorkelRNVG
             globalBlurIntensity.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalBlurDistance = Config.Bind(Category.globalCategory, "7. Near blur distance", 4f, new ConfigDescription("Distance at which the blur disappears.", new AcceptableValueRange<float>(0f, 20f)));
             globalBlurDistance.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
-            globalBlurQuality = Config.Bind(Category.globalCategory, "8. Near blur quality", 4, new ConfigDescription("Changes the size of the gauss kernel, affecting quality.", new AcceptableValueRange<int>(1, 12)));
+            globalBlurQuality = Config.Bind(Category.globalCategory, "8. Near blur quality", 4, new ConfigDescription("Changes the size of the gauss kernel, affecting quality.", new AcceptableValueRange<int>(1, 4)));
             globalBlurQuality.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
 
             // Gating
