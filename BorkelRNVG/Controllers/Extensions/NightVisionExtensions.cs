@@ -10,14 +10,14 @@ namespace BorkelRNVG.Controllers.Extensions
     {
         public static void UpdateIntensity(this NightVision nightVision)
         {
-            float intensity = NvgHelper.CurrentNvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * NvgHelper.GatingLevel);
+            float intensity = NvgHelper.CurrentNvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             nightVision.Intensity = intensity;
             nightVision.UpdateMaterialIntensity(intensity);
         }
 
         public static void MultiplyIntensity(this NightVision nightVision, params float[] multipliers)
         {
-            float intensity = NvgHelper.CurrentNvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * NvgHelper.GatingLevel);
+            float intensity = NvgHelper.CurrentNvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             float minIntensity = Plugin.clampMinGating.Value ? NvgHelper.CurrentNvgData.NightVisionConfig.MinBrightness.Value : 0f;
 
             foreach (float mult in multipliers)

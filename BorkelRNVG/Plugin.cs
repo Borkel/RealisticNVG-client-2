@@ -158,15 +158,14 @@ namespace BorkelRNVG
             
             if (Input.GetKeyDown(gatingInc.Value) && gatingLevel.Value < 2)
             {
-                gatingLevel.Value++;
+                NvgHelper.IncrementManualGating(1);
                 Singleton<BetterAudio>.Instance.PlayAtPoint(new Vector3(0, 0, 0), AssetHelper.LoadedAudioClips["gatingKnob.wav"], 0, BetterAudio.AudioSourceGroupType.Nonspatial, 100);
                 CameraClass.Instance.NightVision.UpdateIntensity();
             }
-            else if (Input.GetKeyUp(gatingDec.Value) && gatingLevel.Value > -2)
+            else if (Input.GetKeyDown(gatingDec.Value) && gatingLevel.Value > -2)
             {
-                gatingLevel.Value--;
+                NvgHelper.IncrementManualGating(-1);
                 Singleton<BetterAudio>.Instance.PlayAtPoint(new Vector3(0, 0, 0), AssetHelper.LoadedAudioClips["gatingKnob.wav"], 0, BetterAudio.AudioSourceGroupType.Nonspatial, 100);
-                CameraClass.Instance.NightVision.UpdateIntensity();
             }
         }
 

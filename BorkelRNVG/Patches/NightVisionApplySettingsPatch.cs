@@ -71,7 +71,7 @@ namespace BorkelRNVG.Patches
             string nvgId = PlayerHelper.GetCurrentNvgItemId();
             NvgData nvgData = NvgHelper.FindNvgData(nvgId);
             
-            float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * NvgHelper.GatingLevel);
+            float intensity = nvgData.NightVisionConfig.Gain.Value * Plugin.globalGain.Value * (1f + 0.15f * Plugin.gatingLevel.Value);
             float noiseIntensity = 2 * nvgData.NightVisionConfig.NoiseIntensity.Value;
             float noiseSize = 2f - 2 * nvgData.NightVisionConfig.NoiseSize.Value;
             float maskSize = nvgData.NightVisionConfig.MaskSize.Value * Plugin.globalMaskSize.Value;

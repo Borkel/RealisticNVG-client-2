@@ -11,7 +11,6 @@ namespace BorkelRNVG.Helpers
     public static class NvgHelper
     {
         public static bool IsNvgOn = false;
-        public static int GatingLevel = 0;
 
         public static NvgData CurrentNvgData = null;
         public static ThermalData CurrentThermalData = null;
@@ -88,7 +87,7 @@ namespace BorkelRNVG.Helpers
 
         public static void IncrementManualGating(int amount)
         {
-            GatingLevel += amount;
+            Plugin.gatingLevel.Value += amount;
             CameraClass.Instance.NightVision.UpdateIntensity();
         }
     }
