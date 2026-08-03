@@ -72,8 +72,6 @@ namespace BorkelRNVG.Controllers
         private IEnumerator AdjustAutoGating(float delay, float multiplier)
         {
             yield return new WaitForSeconds(delay);
-            
-            Plugin.Logger.LogInfo($"autogating multiplier {multiplier}");
 
             FlashGatingFactor = multiplier;
         }
