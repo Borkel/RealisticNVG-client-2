@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="SPTarkov.Server.Core" Version="4.0.8" />
+      <PackageReference Include="SPTarkov.Server.Core" Version="4.1.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,7 +24,7 @@
 
     <Target Name="CopyToSPT" AfterTargets="AfterBuild" Condition="'$(SPTPath)' != ''">
         <PropertyGroup>
-            <ModsDirectoryPath>$(SPTPath)\SPT\user\mods\$(MSBuildProjectName)</ModsDirectoryPath>
+            <ModsDirectoryPath>$(SPTPath)\SPT_Runtime\user\mods\$(MSBuildProjectName)</ModsDirectoryPath>
         </PropertyGroup>
 
         <Message Importance="high" Text="Copying mods to $(ModsDirectoryPath)" />

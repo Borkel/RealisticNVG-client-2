@@ -4,7 +4,6 @@ using EFT.InventoryLogic;
 using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
-using LightStruct = FirearmLightStateStruct; //public static void Serialize(GInterface63 stream, ref GStruct155 tacticalComboStatus)
 using static EFT.Player;
 using System.Collections;
 
@@ -18,9 +17,9 @@ namespace BorkelRNVG.Patches
             //await Task.Delay(delay);
             yield return new WaitForSeconds(delay);
 
-            firearmController.SetLightsState(new LightStruct[]
+            firearmController.SetLightsState(new LightsState[]
             {
-                new LightStruct
+                new LightsState
                 {
                     Id = light.Item.Id,
                     IsActive = newState,

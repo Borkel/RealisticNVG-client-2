@@ -5,6 +5,7 @@ using BorkelRNVG.Controllers;
 using BorkelRNVG.Models;
 using Comfort.Common;
 using EFT;
+using EFT.InventoryLogic;
 using SPT.Reflection.Patching;
 using System;
 using System.Reflection;
@@ -20,7 +21,7 @@ namespace BorkelRNVG.Patches
         }
 
         [PatchPostfix]
-        private static void PatchPostfix(Player.FirearmController __instance, AmmoItemClass ammo, Vector3 shotPosition, Vector3 shotDirection)
+        private static void PatchPostfix(Player.FirearmController __instance, Ammo ammo, Vector3 shotPosition, Vector3 shotDirection)
         {
             try
             {

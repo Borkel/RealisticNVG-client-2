@@ -1,5 +1,4 @@
-﻿using EFT;
-using HarmonyLib;
+﻿using HarmonyLib;
 using SPT.Reflection.Patching;
 using System.Collections.Generic;
 using System.Reflection;
@@ -17,12 +16,11 @@ namespace BorkelRNVG.Patches
 
     public class LaserBeamAwakePatch : ModulePatch
     {
-        private static FieldInfo intensityField = AccessTools.Field(typeof(LaserBeam), "IntensityFactor");
         public static List<LaserInfo> ikLasers = new();
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(LaserBeam), nameof(LaserBeam.method_0));
+            return AccessTools.Method(typeof(LaserBeam), nameof(LaserBeam.CreateLight));
         }
 
         public static void UpdateAll()

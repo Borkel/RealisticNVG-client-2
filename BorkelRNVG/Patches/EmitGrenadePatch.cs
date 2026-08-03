@@ -1,10 +1,4 @@
-﻿using BorkelRNVG.Configuration;
-using BorkelRNVG.Enum;
-using BorkelRNVG.Helpers;
-using BorkelRNVG.Controllers;
-using BorkelRNVG.Models;
-using Comfort.Common;
-using EFT;
+﻿using BorkelRNVG.Controllers;
 using HarmonyLib;
 using SPT.Reflection.Patching;
 using System;

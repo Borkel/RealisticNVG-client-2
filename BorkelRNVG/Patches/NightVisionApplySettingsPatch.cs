@@ -18,18 +18,18 @@ namespace BorkelRNVG.Patches
         
         protected override MethodBase GetTargetMethod()
         {
-            _materialCameraField = AccessTools.Field(typeof(TextureMask), "camera_0");
+            _materialCameraField = AccessTools.Field(typeof(TextureMask), "_camera");
             return AccessTools.Method(typeof(NightVision), nameof(NightVision.ApplySettings));
         }
 
         [PatchPrefix]
-        private static bool PatchPrefix(ref NightVision __instance, ref Vector4 ___vector4_0, ref bool ___bool_1)
+        private static bool PatchPrefix(ref NightVision __instance, ref Vector4 ____scaleVector, ref bool ____on)
         {
             NvgData nvgData = ApplyModSettings(__instance);
             
             if (__instance.TextureMask == null) return true;
             
-            Material lensMaterial = __instance.Material_0;
+            Material lensMaterial = __instance.Material;
             lensMaterial.SetFloat(ShaderProperties.InvMaskSizeId, 1f / __instance.MaskSize);
             
             float invAspectValue = __instance.Mask ? __instance.Mask.height / (float)__instance.Mask.width : 1f;
@@ -40,16 +40,16 @@ namespace BorkelRNVG.Patches
             lensMaterial.SetFloat(ShaderProperties.CameraAspectId, cameraAspectValue);
 
             float num = __instance.NoiseScale * Screen.height / __instance.Noise.height;
-            ___vector4_0 = new Vector4(num * Screen.width / Screen.height, num, 0f, 0f);
+            ____scaleVector = new Vector4(num * Screen.width / Screen.height, num, 0f, 0f);
             
-            __instance.Material_0.SetColor(ShaderProperties.ColorId, __instance.Color_0);
-            __instance.Material_0.SetFloat(ShaderProperties.NoiseIntensityId, __instance.NoiseIntensity);
-            __instance.Material_0.SetVector(ShaderProperties.NoiseScaleId, ___vector4_0);
-            __instance.Material_0.SetTexture(ShaderProperties.NoiseId, __instance.Noise);
+            __instance.Material.SetColor(ShaderProperties.ColorId, __instance.Color);
+            __instance.Material.SetFloat(ShaderProperties.NoiseIntensityId, __instance.NoiseIntensity);
+            __instance.Material.SetVector(ShaderProperties.NoiseScaleId, ____scaleVector);
+            __instance.Material.SetTexture(ShaderProperties.NoiseId, __instance.Noise);
 
-            if (___bool_1)
+            if (____on)
             {
-                __instance.Material_0.EnableKeyword(ShaderProperties.NightVisionNoiseKeyword);
+                __instance.Material.EnableKeyword(ShaderProperties.NightVisionNoiseKeyword);
             }
             
             if (nvgData.NightVisionConfig.AutoGatingType.Value == EGatingType.Off)
@@ -88,7 +88,7 @@ namespace BorkelRNVG.Patches
             nightVision.Color.b = nvgData.NightVisionConfig.Blue.Value / 255f;
             
             // update nvg lens texture
-            Material lensMaterial = nightVision.Material_0;
+            Material lensMaterial = nightVision.Material;
             lensMaterial.SetTexture(ShaderProperties.MaskId, nvgData.LensTexture);
             
             // update lens distortion from nvgData

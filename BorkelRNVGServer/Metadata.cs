@@ -4,19 +4,18 @@ using Version = SemanticVersioning.Version;
 
 namespace BorkelRNVGServer
 {
-    public record Metadata : AbstractModMetadata
+    public record Metadata : IModMetadata
     {
-        public override string ModGuid { get; init; } = "com.borkel.nvgmasks";
-        public override string Name { get; init; } =  "Borkel's Realistic Night Vision Goggles";
-        public override string Author { get; init; } = "Borkel";
-        public override List<string>? Contributors { get; init; } = ["Fontaine", "Mirni", "CJ", "GrooveypenguinX", "Choccster", "kiobu-kouhai", "DrakiaXYZ", "kiki", "Props", "Mattdokn"];
-        public override Version Version { get; init; } = new Version("2.1.1");
-        public override Range SptVersion { get; init; } = new Range("~4.0.0");
-        public override string? Url { get; init; } = "https://github.com/Borkel/RealisticNVG-client-2/";
-        public override bool? IsBundleMod { get; init; } = true;
-        public override string License { get; init; } = "Creative Commons BY-NC-SA 3.0";
-        
-        public override List<string>? Incompatibilities { get; init; }
-        public override Dictionary<string, Range>? ModDependencies { get; init; }
+        public string ModGuid { get; init; } = "com.borkel.nvgmasks";
+        public string Name { get; init; } =  "Borkel's Realistic Night Vision Goggles";
+        public string Author { get; init; } = "Borkel";
+        public List<string>? Contributors { get; init; } = ["Fontaine", "Mirni", "CJ", "GrooveypenguinX", "Choccster", "kiobu-kouhai", "DrakiaXYZ", "kiki", "Props", "Mattdokn"];
+        public Version Version { get; init; } = new Version("2.2.0");
+        public Range SptVersion { get; init; } = new Range("~4.1.0");
+        public string? Url { get; init; } = "https://github.com/Borkel/RealisticNVG-client-2/";
+        public string License { get; init; } = "Creative Commons BY-NC-SA 3.0";
+        public List<string>? Incompatibilities { get; init; }
+        public Dictionary<string, Range>? ModDependencies { get; init; }
+        public bool HasPrepatcher { get; init; } = false;
     }
 }
