@@ -1,0 +1,19 @@
+{
+    "itemId": "6974cf52ee1fb8a0683b8d9d",
+    "category": "DTNVS (Green)",
+    "gain": 2.8,
+    "noiseIntensity": 0.2,
+    "noiseSize": 0.08,
+    "maskSize": 1.2,
+    "red": 60,
+    "green": 205,
+    "blue": 250,
+    "gatingType": "AutoGating",
+    "gatingSpeed": 0.3,
+    "minBrightness": 0.2,
+    "maxBrightness": 1,
+    "minBrightnessThreshold": 0,
+    "maxBrightnessThreshold": 0.15,
+    "edgeDistortion": 0.02,
+    "edgeDistortionStart": 0.02
+}
