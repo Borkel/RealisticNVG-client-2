@@ -21,6 +21,10 @@ namespace BorkelRNVG.Patches
         [PatchPrefix]
         private static void PatchPrefix(NightVision __instance)
         {
+            if (__instance.GetComponent<SSAA>() == null)
+            {
+                return;
+            }
             if (AutoGatingController.Instance == null)
             {
                 __instance.gameObject.AddComponent<AutoGatingController>();
