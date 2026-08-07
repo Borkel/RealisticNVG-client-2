@@ -31,7 +31,7 @@ namespace BorkelRNVG.Controllers.Extensions
         
         public static void UpdateMaterialIntensity(this NightVision nightVision, float intensity)
         {
-            nightVision.Material.SetFloat(ShaderProperties.IntensityId, intensity);
+            nightVision.Material_0.SetFloat(ShaderProperties.IntensityId, intensity);
         }
     }
 }

@@ -8,12 +8,11 @@ using Comfort.Common;
 using BepInEx.Logging;
 using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Helpers;
-using EFT.CameraControl;
 using HarmonyLib;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.2.0")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.2.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -161,7 +160,7 @@ namespace BorkelRNVG
             {
                 NvgHelper.IncrementManualGating(1);
                 Singleton<BetterAudio>.Instance.PlayAtPoint(new Vector3(0, 0, 0), AssetHelper.LoadedAudioClips["gatingKnob.wav"], 0, BetterAudio.AudioSourceGroupType.Nonspatial, 100);
-                CameraManager.Instance.NightVision.UpdateIntensity();
+                CameraClass.Instance.NightVision.UpdateIntensity();
             }
             else if (Input.GetKeyDown(gatingDec.Value) && gatingLevel.Value > -2)
             {

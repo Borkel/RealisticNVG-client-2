@@ -6,7 +6,6 @@ using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
 using BSG.CameraEffects;
 using EFT;
-using EFT.CameraControl;
 using System.Collections;
 using System.IO;
 using Unity.Collections;
@@ -118,7 +117,7 @@ namespace BorkelRNVG.Controllers
             if (nvgData == null) return;
             
             Player fcOwner = fc?.GetComponent<Player>();
-            Camera camera = CameraManager.Instance.Camera;
+            Camera camera = CameraClass.Instance.Camera;
             
             EMuzzleDeviceType muzzleType = Util.GetMuzzleDeviceType(fc);
             float flashAmount = Util.FlashAmountFromMuzzleType(muzzleType);
@@ -129,7 +128,7 @@ namespace BorkelRNVG.Controllers
                 Vector3 cameraPos = camera.transform.position;
                 Vector3 shotDir = pos - cameraPos;
                 
-                bool isVisible = Util.VisibilityCheckBetweenPoints(cameraPos, pos, LayersMaskController.HighPolyWithTerrainMask);
+                bool isVisible = Util.VisibilityCheckBetweenPoints(cameraPos, pos, LayerMaskClass.HighPolyWithTerrainMask);
                 bool isOnScreen = Util.VisibilityCheckOnScreen(pos);
 
                 if (isVisible && isOnScreen)
@@ -285,7 +284,7 @@ namespace BorkelRNVG.Controllers
             contrastMaterial.SetFloat("_Amount", contrastLevel);
             blurMaterial.SetFloat("_BlurSize", blurSize);
             exposureMaterial.SetFloat("_Exposure", exposureAmount);
-            maskMaterial.SetTexture("_OverlayTex", nightVision.Material.GetTexture(Shader.PropertyToID("_Mask")));
+            maskMaterial.SetTexture("_OverlayTex", nightVision.Material_0.GetTexture(Shader.PropertyToID("_Mask")));
             
             float gatingTarget = Mathf.Lerp(maxBrightnessMult, minBrightnessMult, Mathf.Clamp((_currentBrightness - minInput) / (maxInput - minInput), 0.0f, 1.0f));
             

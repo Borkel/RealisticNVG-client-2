@@ -3,7 +3,6 @@ using BorkelRNVG.Controllers.Extensions;
 using BorkelRNVG.Enum;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
-using EFT.CameraControl;
 using EFT.InventoryLogic;
 using NightVision = BSG.CameraEffects.NightVision;
 
@@ -76,7 +75,7 @@ namespace BorkelRNVG.Helpers
         
         public static void ApplyNightVisionSettings()
         {
-            NightVision nightVision = CameraManager.Instance.NightVision;
+            NightVision nightVision = CameraClass.Instance.NightVision;
             nightVision.ApplySettings();
         }
 
@@ -89,7 +88,7 @@ namespace BorkelRNVG.Helpers
         public static void IncrementManualGating(int amount)
         {
             Plugin.gatingLevel.Value += amount;
-            CameraManager.Instance.NightVision.UpdateIntensity();
+            CameraClass.Instance.NightVision.UpdateIntensity();
         }
     }
 }
