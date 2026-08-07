@@ -71,7 +71,7 @@ namespace BorkelRNVG
             globalMaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
             globalGain.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
-            allowAmbientChange = Config.Bind(Category.globalCategory, "3. Allow ambient change", true, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
+            allowAmbientChange = Config.Bind(Category.globalCategory, "3. Allow ambient change", false, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
             allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
             
             // Global, lens distortion settings
