@@ -52,7 +52,7 @@ namespace BorkelRNVG.Patches
                 __instance.Material.EnableKeyword(ShaderProperties.NightVisionNoiseKeyword);
             }
             
-            if (nvgData.NightVisionConfig.AutoGatingType.Value == EGatingType.Off)
+            if(!NvgHelper.ShouldEnableGating(nvgData))
             {
                 __instance.UpdateMaterialIntensity(__instance.Intensity);    
             }
