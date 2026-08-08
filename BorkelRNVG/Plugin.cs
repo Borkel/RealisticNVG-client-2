@@ -13,7 +13,7 @@ using HarmonyLib;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.2.1")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.2.3")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -72,7 +72,19 @@ namespace BorkelRNVG
             globalMaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
             globalGain.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
-            allowAmbientChange = Config.Bind(Category.globalCategory, "3. Allow ambient change", false, new ConfigDescription("Toggles whether night vision affects ambient lighting.", null));
+            allowAmbientChange = Config.Bind(
+                Category.globalCategory,
+                "3. Allow ambient change",
+                false,
+                new ConfigDescription(
+                    "Toggles whether night vision affects ambient lighting.",
+                    null,
+                    new ConfigurationManagerAttributes
+                    {
+                        Browsable = false
+                    }));
+
+            allowAmbientChange.Value = false;
             allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
             
             // Global, lens distortion settings
