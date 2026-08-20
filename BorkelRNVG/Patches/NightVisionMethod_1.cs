@@ -1,4 +1,4 @@
-﻿using SPT.Reflection.Patching;
+using SPT.Reflection.Patching;
 using BSG.CameraEffects;
 using HarmonyLib;
 using System.Reflection;
@@ -22,6 +22,10 @@ namespace BorkelRNVG.Patches
                 __instance.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null)
                 return;
+
+            if (__instance.TextureMask != null)
+                __instance.TextureMask.enabled = false;
+
             renderer.NightVisionEnabled = __0;
             renderer.enabled = __0;
         }
