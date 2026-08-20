@@ -26,12 +26,6 @@ namespace BorkelRNVG.Configuration
                 "Blue component of the single phosphor color.", value => Values.PhosphorBlue = value, Range(0f, 1f));
             Bind(config, category, "13 Tube - Manual gain", Values.ManualGain,
                 "Base linear gain before automatic exposure.", value => Values.ManualGain = value, Range(0f, 5f));
-            Bind(config, category, "14 Tube - Response gamma", Values.ResponseGamma,
-                "Shapes the tube response; lower values lift midtones.", value => Values.ResponseGamma = value, Range(0.05f, 3f));
-            Bind(config, category, "15 Tube - White point", Values.WhitePoint,
-                "Lower values make the tube saturate sooner.", value => Values.WhitePoint = value, Range(0.01f, 4f));
-            Bind(config, category, "16 Tube - Black level", Values.BlackLevel,
-                "Input luminance removed before amplification.", value => Values.BlackLevel = value, Range(0f, 0.2f));
 
             Bind(config, category, "20 Exposure - Enabled", Values.AutoExposure,
                 "Enable scene-luminance-driven automatic gain.", value => Values.AutoExposure = value);

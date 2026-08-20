@@ -83,9 +83,6 @@ Shader "Hidden/CustomNightVision"
     float3 _SpectralSensitivity;
     float4 _PhosphorTint;
     float _ManualGain;
-    float _BlackLevel;
-    float _WhitePoint;
-    float _ResponseGamma;
 
     float _AutoExposure;
     float _ExposureTarget;
@@ -1305,10 +1302,10 @@ Shader "Hidden/CustomNightVision"
             saturate(_AutoExposure));
         float totalGain = max(_ManualGain, 0.0) * exp2(exposureEV);
 
-        float sceneLuminance = max(
-            Luminance(opticalScene) - _BlackLevel,
-            0.0);
-        float signal = sceneLuminance * totalGain;
+        // Keep raw scene light independent from gain, bloom and tube output.
+        // It is also the sole input to the local noise-visibility mask.
+        float rawSceneLuminance = max(Luminance(opticalScene), 0.0);
+        float signal = rawSceneLuminance * totalGain;
 
         if (_BloomEnabled > 0.5)
         {
@@ -1321,11 +1318,7 @@ Shader "Hidden/CustomNightVision"
             signal += bloom * totalGain * _BloomIntensity;
         }
 
-        float tube = 1.0 - exp(
-            -signal / max(_WhitePoint, 0.001));
-        tube = pow(
-            saturate(tube),
-            max(_ResponseGamma, 0.05));
+        float tube = saturate(signal);
 
         // Local input light decides where noise is visible. Gain independently
         // controls how strongly the tube amplifies the remaining noise.
@@ -1336,7 +1329,7 @@ Shader "Hidden/CustomNightVision"
         float localNoiseVisibility = 1.0 - smoothstep(
             noiseFadeStart,
             noiseFadeEnd,
-            sceneLuminance);
+            rawSceneLuminance);
         float effectiveGainEV = log2(max(totalGain, 0.0001));
         float gainLevel = saturate(
             (effectiveGainEV - _ExposureEVMinMax.x) /

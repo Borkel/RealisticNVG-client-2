@@ -67,9 +67,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
 
     [SerializeField] private Vector3 spectralSensitivity = new Vector3(0.18f, 0.72f, 0.10f);
     [SerializeField] private float manualGain = 1.35f;
-    [SerializeField] private float responseGamma = 0.88f;
-    [SerializeField] private float whitePoint = 0.89f;
-    [SerializeField] private float blackLevel = 0.002f;
 
     [SerializeField] private bool autoExposure = true;
     [SerializeField] private float targetLuminance = 0.18f;
@@ -256,9 +253,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         phosphorTint = new Color(settings.PhosphorRed,
             settings.PhosphorGreen, settings.PhosphorBlue, 1f);
         manualGain = settings.ManualGain * globalGain;
-        responseGamma = settings.ResponseGamma;
-        whitePoint = settings.WhitePoint;
-        blackLevel = settings.BlackLevel;
 
         autoExposure = settings.AutoExposure;
         targetLuminance = settings.TargetLuminance;
@@ -750,9 +744,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
             new Vector4(spectralSensitivity.x, spectralSensitivity.y, spectralSensitivity.z, 0f));
         material.SetColor("_PhosphorTint", phosphorTint);
         material.SetFloat("_ManualGain", manualGain);
-        material.SetFloat("_BlackLevel", blackLevel);
-        material.SetFloat("_WhitePoint", whitePoint);
-        material.SetFloat("_ResponseGamma", responseGamma);
 
         material.SetFloat("_AutoExposure", AutoExposureActive ? 1f : 0f);
         material.SetFloat("_ExposureTarget", targetLuminance);

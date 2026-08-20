@@ -6,9 +6,6 @@ namespace BorkelRNVG.Models
         public float PhosphorGreen { get; set; } = 0.98f;
         public float PhosphorBlue { get; set; } = 0.92f;
         public float ManualGain { get; set; } = 1.35f;
-        public float ResponseGamma { get; set; } = 0.88f;
-        public float WhitePoint { get; set; } = 0.89f;
-        public float BlackLevel { get; set; } = 0.002f;
 
         public bool AutoExposure { get; set; } = true;
         public float TargetLuminance { get; set; } = 0.18f;
