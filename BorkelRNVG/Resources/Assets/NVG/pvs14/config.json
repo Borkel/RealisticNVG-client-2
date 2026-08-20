@@ -41,6 +41,8 @@
         "fixedPatternNoise": 0.018,
         "scintillation": 0.04,
         "scintillationDensity": 1.0,
+        "noiseFadeStartLuminance": 0.018,
+        "noiseFadeEndLuminance": 0.18,
         "grainPixelSize": 1.0,
         "noiseRefreshRate": 60.0,
         "opticScale": 1.0,

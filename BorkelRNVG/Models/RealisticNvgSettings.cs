@@ -46,6 +46,8 @@ namespace BorkelRNVG.Models
         public float FixedPatternNoise { get; set; } = 0.018f;
         public float Scintillation { get; set; } = 0.04f;
         public float ScintillationDensity { get; set; } = 1f;
+        public float NoiseFadeStartLuminance { get; set; } = 0.018f;
+        public float NoiseFadeEndLuminance { get; set; } = 0.18f;
         public float GrainPixelSize { get; set; } = 1f;
         public float NoiseRefreshRate { get; set; } = 60f;
 

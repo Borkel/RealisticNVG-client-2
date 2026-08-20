@@ -101,9 +101,13 @@ namespace BorkelRNVG.Configuration
                 "Brightness of scintillation events.", value => Values.Scintillation = value, Range(0f, 1f));
             Bind(config, category, "65 Noise - Scintillation density", Values.ScintillationDensity,
                 "Number of one-to-three-pixel scintillation events; zero disables them.", value => Values.ScintillationDensity = value, Range(0f, 10f));
-            Bind(config, category, "66 Noise - Grain pixel size", Values.GrainPixelSize,
+            Bind(config, category, "66 Noise - Full visibility luminance", Values.NoiseFadeStartLuminance,
+                "Absolute pre-gain scene luminance below which noise is fully visible.", value => Values.NoiseFadeStartLuminance = value, Range(0f, 4f));
+            Bind(config, category, "67 Noise - Hidden luminance", Values.NoiseFadeEndLuminance,
+                "Absolute pre-gain scene luminance above which noise and scintillation disappear.", value => Values.NoiseFadeEndLuminance = value, Range(0f, 4f));
+            Bind(config, category, "68 Noise - Grain pixel size", Values.GrainPixelSize,
                 "Pixel size of fine and coarse noise; scintillation size is independent.", value => Values.GrainPixelSize = value, Range(0.5f, 8f));
-            Bind(config, category, "67 Noise - Refresh rate", Values.NoiseRefreshRate,
+            Bind(config, category, "69 Noise - Refresh rate", Values.NoiseRefreshRate,
                 "Distinct procedural noise frames per second.", value => Values.NoiseRefreshRate = value, Range(1f, 240f));
 
             Bind(config, category, "70 Optics - Scale", Values.OpticScale,

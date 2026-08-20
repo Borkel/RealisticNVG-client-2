@@ -123,6 +123,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     [Tooltip("Multiplier for the number of scintillation events. Zero disables them.")]
     [Min(0f)]
     [SerializeField] private float scintillationDensity = 1f;
+    [SerializeField] private float noiseFadeStartLuminance = 0.018f;
+    [SerializeField] private float noiseFadeEndLuminance = 0.18f;
     [SerializeField] private float grainPixelSize = 1f;
     [SerializeField] private float noiseRefreshRate = 60f;
 
@@ -294,6 +296,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         fixedPatternNoise = settings.FixedPatternNoise;
         scintillation = settings.Scintillation;
         scintillationDensity = settings.ScintillationDensity;
+        noiseFadeStartLuminance = settings.NoiseFadeStartLuminance;
+        noiseFadeEndLuminance = settings.NoiseFadeEndLuminance;
         grainPixelSize = settings.GrainPixelSize;
         noiseRefreshRate = settings.NoiseRefreshRate;
 
@@ -763,6 +767,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         material.SetFloat("_FixedPatternNoise", fixedPatternNoise);
         material.SetFloat("_Scintillation", scintillation);
         material.SetFloat("_ScintillationDensity", scintillationDensity);
+        material.SetFloat("_NoiseFadeStartLuminance", noiseFadeStartLuminance);
+        material.SetFloat("_NoiseFadeEndLuminance", noiseFadeEndLuminance);
         material.SetFloat("_GrainPixelSize", grainPixelSize);
         material.SetFloat("_NoiseRefreshRate", noiseRefreshRate);
         material.SetFloat("_EffectTime", CurrentTime());

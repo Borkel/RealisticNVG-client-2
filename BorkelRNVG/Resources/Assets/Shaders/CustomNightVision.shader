@@ -101,6 +101,8 @@ Shader "Hidden/CustomNightVision"
     float _FixedPatternNoise;
     float _Scintillation;
     float _ScintillationDensity;
+    float _NoiseFadeStartLuminance;
+    float _NoiseFadeEndLuminance;
     float _GrainPixelSize;
     float _NoiseRefreshRate;
     float _EffectTime;
@@ -1325,20 +1327,21 @@ Shader "Hidden/CustomNightVision"
             saturate(tube),
             max(_ResponseGamma, 0.05));
 
-        // Fewer input photons produce a poorer relative SNR. Higher tube gain
-        // then makes that weak-signal noise and isolated events more visible.
-        float inputLightLevel = saturate(
-            sceneLuminance / max(_ExposureTarget, 0.0001));
-        float photonScarcity = 1.0 - sqrt(inputLightLevel);
+        // Local input light decides where noise is visible. Gain independently
+        // controls how strongly the tube amplifies the remaining noise.
+        float noiseFadeStart = max(_NoiseFadeStartLuminance, 0.0);
+        float noiseFadeEnd = max(
+            _NoiseFadeEndLuminance,
+            noiseFadeStart + 0.0001);
+        float localNoiseVisibility = 1.0 - smoothstep(
+            noiseFadeStart,
+            noiseFadeEnd,
+            sceneLuminance);
         float effectiveGainEV = log2(max(totalGain, 0.0001));
         float gainLevel = saturate(
             (effectiveGainEV - _ExposureEVMinMax.x) /
             max(_ExposureEVMinMax.y - _ExposureEVMinMax.x, 0.0001));
         float gainNoiseBoost = lerp(0.65, 1.65, gainLevel);
-        float scarcityNoiseBoost = lerp(
-            0.65,
-            1.35,
-            photonScarcity);
 
         float2 pixel = i.uv * _SourceSize.xy;
         float grainSize = max(_GrainPixelSize, 0.5);
@@ -1358,16 +1361,17 @@ Shader "Hidden/CustomNightVision"
 
         float fixedPatternVisibility = lerp(0.7, 1.4, gainLevel);
         tube *= 1.0 + fixedPattern * _FixedPatternNoise *
-            fixedPatternVisibility;
+            fixedPatternVisibility * localNoiseVisibility;
         float sigma = _ReadNoise +
             _ShotNoise * sqrt(max(tube, 0.001));
-        sigma *= gainNoiseBoost * scarcityNoiseBoost;
+        sigma *= gainNoiseBoost;
         float noise = fineNoise * sigma;
         noise += coarseNoise * _CoarseNoise *
-            gainNoiseBoost * scarcityNoiseBoost;
+            gainNoiseBoost;
+        noise *= localNoiseVisibility;
 
         float scintillationVisibility = saturate(
-            0.15 + photonScarcity * 0.55 + gainLevel * 0.45);
+            0.15 + gainLevel * 0.85);
         float baseEventProbability = lerp(
             0.0005,
             0.0020,
@@ -1382,6 +1386,7 @@ Shader "Hidden/CustomNightVision"
         float2 pixelInTile = scintillationPixel - scintillationTile * 3.0;
         float tileEventProbability = saturate(
             baseEventProbability * 4.5 * max(_ScintillationDensity, 0.0));
+        tileEventProbability *= step(0.0001, localNoiseVisibility);
         float tileEventHash = Hash13(float3(scintillationTile, frame));
         float clusterExists = step(
             1.0 - tileEventProbability,
@@ -1438,7 +1443,8 @@ Shader "Hidden/CustomNightVision"
 
         float scintillationAmplitude = _Scintillation *
             lerp(0.2, 1.4, scintillationVisibility) *
-            (1.25 - saturate(tube));
+            (1.25 - saturate(tube)) *
+            localNoiseVisibility;
         noise += clusterExists * clusterPixel * scintillationAmplitude;
         tube = saturate(tube + noise);
 
