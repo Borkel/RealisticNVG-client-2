@@ -31,6 +31,7 @@ namespace BorkelRNVG.Patches
             renderer.ConfigureRuntime(
                 AssetHelper.nightVisionShader,
                 data.LensTexture,
+                data.MaskTexture,
                 data.NightVisionConfig.Values,
                 __instance.GetComponent<SSAAPropagator>(),
                 Plugin.globalGain.Value,
@@ -40,15 +41,7 @@ namespace BorkelRNVG.Patches
 
             __instance.Mask = data.MaskTexture;
             if (__instance.TextureMask != null)
-            {
-                float maskScale = data.NightVisionConfig.Values.OpticScale *
-                                  Plugin.globalMaskSize.Value;
-                __instance.MaskSize = maskScale;
-                __instance.TextureMask.enabled = true;
-                __instance.TextureMask.Mask = data.MaskTexture;
-                __instance.TextureMask.Size = maskScale;
-                __instance.TextureMask.ApplySettings();
-            }
+                __instance.TextureMask.enabled = false;
 
             return false;
         }
