@@ -183,6 +183,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     private static readonly int ExposureTexId = Shader.PropertyToID("_ExposureTex");
     private static readonly int ExposureHistoryId = Shader.PropertyToID("_ExposureHistory");
     private readonly Vector4[] lensDefinitionUpload = new Vector4[MaximumLensDefinitions];
+    private static Texture2D transparentMaskOverlay;
 
     private bool NearPassActive
     {
@@ -217,7 +218,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
 
     private bool OpticReady
     {
-        get { return lensTexture != null && maskOverlay != null; }
+        get { return lensTexture != null; }
     }
 
     public bool NightVisionEnabled
@@ -239,7 +240,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         set { manualGain = value; }
     }
 
-    public void ConfigureRuntime(Shader shader, Texture lens, Texture overlay,
+    public void ConfigureRuntime(Shader shader, Texture lens,
         RealisticNvgSettings settings, SSAAPropagator propagator,
         float globalGain, float globalScale)
     {
@@ -249,7 +250,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         effectShader = shader;
         ssaaPropagator = propagator;
         lensTexture = lens as Texture2D;
-        maskOverlay = overlay as Texture2D;
+        // Tarkov's TextureMask remains responsible for the exterior housing.
+        // The multipass shader must leave every pixel outside the tube untouched.
+        maskOverlay = GetTransparentMaskOverlay();
 
         phosphorTint = new Color(settings.PhosphorRed,
             settings.PhosphorGreen, settings.PhosphorBlue, 1f);
@@ -715,7 +718,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
                 ? lensTexture.width / (float)lensTexture.height
                 : 1f;
         material.SetTexture("_LensTexture", lensTexture);
-        material.SetTexture("_MaskOverlay", maskOverlay);
+        material.SetTexture("_MaskOverlay", maskOverlay != null
+            ? maskOverlay
+            : GetTransparentMaskOverlay());
         material.SetFloat("_OpticTextureAspect", opticAspect);
         material.SetFloat("_OpticTextureScale", opticTextureScale);
         material.SetFloat("_LensAlphaCutoff", lensAlphaCutoff);
@@ -1086,6 +1091,19 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         }
 
         return Mathf.Clamp(deltaTime, 1f / 240f, 0.1f);
+    }
+
+    private static Texture2D GetTransparentMaskOverlay()
+    {
+        if (transparentMaskOverlay != null)
+            return transparentMaskOverlay;
+
+        transparentMaskOverlay = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+        transparentMaskOverlay.name = "Transparent NVG mask overlay";
+        transparentMaskOverlay.hideFlags = HideFlags.HideAndDontSave;
+        transparentMaskOverlay.SetPixel(0, 0, Color.clear);
+        transparentMaskOverlay.Apply(false, true);
+        return transparentMaskOverlay;
     }
 
     private static float CurrentTime()

@@ -29,9 +29,6 @@ namespace BorkelRNVG.Patches
             if (renderer == null)
                 renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
             renderer.enabled = false;
-
-            if (__instance.TextureMask != null)
-                __instance.TextureMask.enabled = false;
         }
     }
 }
