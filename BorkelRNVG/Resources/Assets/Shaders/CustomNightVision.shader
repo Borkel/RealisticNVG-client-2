@@ -1318,7 +1318,10 @@ Shader "Hidden/CustomNightVision"
             signal += bloom * totalGain * _BloomIntensity;
         }
 
-        float tube = saturate(signal);
+        // Preserve over-range tube energy until after phosphor coloration.
+        // Clipping each RGB channel at the end lets intense highlights converge
+        // toward white, matching the response of the old shader.
+        float tube = max(signal, 0.0);
 
         // Local input light decides where noise is visible. Gain independently
         // controls how strongly the tube amplifies the remaining noise.
@@ -1439,7 +1442,7 @@ Shader "Hidden/CustomNightVision"
             (1.25 - saturate(tube)) *
             localNoiseVisibility;
         noise += clusterExists * clusterPixel * scintillationAmplitude;
-        tube = saturate(tube + noise);
+        tube = max(tube + noise, 0.0);
 
         float transmission = 1.0;
         if (_MultiLensVignetteEnabled > 0.5 &&
@@ -1461,7 +1464,7 @@ Shader "Hidden/CustomNightVision"
         }
         tube *= saturate(transmission);
 
-        float3 nightVision = tube * _PhosphorTint.rgb;
+        float3 nightVision = saturate(tube * _PhosphorTint.rgb);
 
         if (_LensSeamMode > 0.5 && lensDomain.valid > 0.5)
         {
