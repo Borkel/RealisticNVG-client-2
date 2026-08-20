@@ -17,14 +17,13 @@ namespace BorkelRNVG.Helpers
         public static readonly string assetsDirectory = $"{directory}\\Assets";
 
         public static Shader pixelationShader; // Assets/Systems/Effects/Pixelation/Pixelation.shader
-        public static Shader nightVisionShader; // Assets/Shaders/CustomNightVision.shader
+        public static Shader nightVisionShader;
         public static Shader contrastShader;
         public static Shader additiveBlendShader;
         public static Shader blurShader;
         public static Shader exposureShader;
         public static Shader maskShader;
 
-        public static Texture noiseTexture;
         public static Texture pixelTexture;
 
         public static Dictionary<string, AudioClip> LoadedAudioClips = [];
@@ -34,11 +33,12 @@ namespace BorkelRNVG.Helpers
         public static void LoadShaders()
         {
             string eftShaderPath = Path.Combine(Environment.CurrentDirectory, "EscapeFromTarkov_Data", "StreamingAssets", "Windows", "shaders");
-            string nightVisionShaderPath = $"{assetsDirectory}\\Shaders\\borkel_realisticnvg_shaders";
+            string nightVisionShaderPath = ModFiles.BorkelShadersPath;
             string peinShaders = Path.Combine(ModDirectories.ShadersPath, "pein_shaders");
 
             pixelationShader = FileHelper.LoadShader("Assets/Systems/Effects/Pixelation/Pixelation.shader", eftShaderPath); // T-7 pixelation
-            nightVisionShader = FileHelper.LoadShader("Assets/Shaders/CustomNightVision.shader", nightVisionShaderPath);
+            nightVisionShader = FileHelper.LoadShader(
+                "Assets/BRNVG_NEW/CustomNightVision.shader", nightVisionShaderPath);
             contrastShader = FileHelper.LoadShader("assets/shaders/pein/shaders/contrastshader.shader", peinShaders);
             additiveBlendShader = FileHelper.LoadShader("assets/shaders/pein/shaders/additiveblendshader.shader", peinShaders);
             blurShader = FileHelper.LoadShader("assets/shaders/pein/shaders/blurshader.shader", peinShaders);
@@ -50,32 +50,19 @@ namespace BorkelRNVG.Helpers
         {
             string[] nvgDirs = Directory.GetDirectories(ModDirectories.NvgPath);
             
-            noiseTexture = FileHelper.LoadTexture(Path.Combine(ModDirectories.CommonAssetsPath, "noise.png"), TextureWrapMode.Repeat);
-            
             foreach (string nvgDir in nvgDirs)
             {
                 NvgItemConfig nvgConfig = FileHelper.ParseJson<NvgItemConfig>(nvgDir, "config.json");
                 Texture maskTexture = FileHelper.LoadTexture(Path.Combine(nvgDir, "mask.png"));
                 Texture lensTexture = FileHelper.LoadTexture(Path.Combine(nvgDir, "lens.png"));
 
-                NightVisionConfigStruct configStruct = new NightVisionConfigStruct()
-                {
-                    Gain = nvgConfig.Gain,
-                    NoiseIntensity = nvgConfig.NoiseIntensity,
-                    NoiseSize = nvgConfig.NoiseSize,
-                    MaskSize = nvgConfig.MaskSize,
-                    Red = nvgConfig.Red,
-                    Green = nvgConfig.Green,
-                    Blue = nvgConfig.Blue,
-                    GatingType = nvgConfig.GatingType,
-                    GatingSpeed = nvgConfig.GatingSpeed,
-                    MaxBrightness = nvgConfig.MaxBrightness,
-                    MinBrightness = nvgConfig.MinBrightness,
-                    MaxBrightnessThreshold = nvgConfig.MaxBrightnessThreshold,
-                    MinBrightnessThreshold = nvgConfig.MinBrightnessThreshold,
-                    EdgeDistortion = nvgConfig.EdgeDistortion,
-                    EdgeDistortionStart = nvgConfig.EdgeDistortionStart
-                };
+                bool exposeSettings = nvgConfig.Category == "PVS-14" ||
+                                      nvgConfig.Category == "GPNVG-18";
+                if (nvgConfig.Category.IndexOf("GPNVG", StringComparison.OrdinalIgnoreCase) >= 0)
+                    nvgConfig.Shader.FourTubeLayout = true;
+                NightVisionConfig nightVisionConfig = new NightVisionConfig(
+                    config, nvgConfig.Category + " - New Shader",
+                    nvgConfig.Shader, exposeSettings);
                 
                 if (nvgConfig.ItemId != null)
                 {
@@ -84,7 +71,7 @@ namespace BorkelRNVG.Helpers
                         NvgItemConfig = nvgConfig,
                         MaskTexture = maskTexture,
                         LensTexture = lensTexture,
-                        NightVisionConfig = new NightVisionConfig(config, nvgConfig.Category, configStruct)
+                        NightVisionConfig = nightVisionConfig
                     };
                     
                     NvgData.Add(nvgConfig.ItemId, nvgData);
@@ -102,7 +89,7 @@ namespace BorkelRNVG.Helpers
                             NvgItemConfig = nvgConfig,
                             MaskTexture = maskTexture,
                             LensTexture = lensTexture,
-                            NightVisionConfig = new NightVisionConfig(config, nvgConfig.Category, configStruct)
+                            NightVisionConfig = nightVisionConfig
                         };
                         
                         NvgData.Add(itemId, nvgData);

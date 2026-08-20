@@ -1,19 +1,4 @@
 {
-    "itemId": "6974ce066e50d4be623b8d9b",
-    "category": "DTNVS (White)",
-    "gain": 2.8,
-    "noiseIntensity": 0.2,
-    "noiseSize": 0.08,
-    "maskSize": 1.2,
-    "red": 152,
-    "green": 214,
-    "blue": 252,
-    "gatingType": "AutoGating",
-    "gatingSpeed": 0.3,
-    "minBrightness": 0.2,
-    "maxBrightness": 1,
-    "minBrightnessThreshold": 0,
-    "maxBrightnessThreshold": 0.15,
-    "edgeDistortion": 0.02,
-    "edgeDistortionStart": 0.02
+  "itemId": "6974ce066e50d4be623b8d9b",
+  "category": "DTNVS (White)"
 }

@@ -5,9 +5,6 @@ using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
 using BorkelRNVG.Helpers;
-using BorkelRNVG.Enum;
-using BorkelRNVG.Globals;
-using System.IO;
 
 namespace BorkelRNVG.Patches
 {
@@ -21,17 +18,20 @@ namespace BorkelRNVG.Patches
         [PatchPrefix]
         private static void PatchPrefix(NightVision __instance)
         {
-            if (__instance.GetComponent<SSAA>() == null)
-            {
-                return;
-            }
-            if (AutoGatingController.Instance == null)
-            {
-                __instance.gameObject.AddComponent<AutoGatingController>();
-            }
-            
-            __instance.Noise = AssetHelper.noiseTexture;
             __instance.Shader = AssetHelper.nightVisionShader;
+        }
+
+        [PatchPostfix]
+        private static void PatchPostfix(NightVision __instance)
+        {
+            RealisticNightVisionRenderer renderer =
+                __instance.GetComponent<RealisticNightVisionRenderer>();
+            if (renderer == null)
+                renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
+            renderer.enabled = false;
+
+            if (__instance.TextureMask != null)
+                __instance.TextureMask.enabled = false;
         }
     }
 }

@@ -3,6 +3,7 @@ using BSG.CameraEffects;
 using HarmonyLib;
 using System.Reflection;
 using BorkelRNVG.Helpers;
+using BorkelRNVG.Controllers;
 
 namespace BorkelRNVG.Patches
 {
@@ -14,9 +15,15 @@ namespace BorkelRNVG.Patches
         }
 
         [PatchPostfix]
-        private static void PatchPostfix(bool __0)
+        private static void PatchPostfix(NightVision __instance, bool __0)
         {
             NvgHelper.IsNvgOn = __0;
+            RealisticNightVisionRenderer renderer =
+                __instance.GetComponent<RealisticNightVisionRenderer>();
+            if (renderer == null)
+                return;
+            renderer.NightVisionEnabled = __0;
+            renderer.enabled = __0;
         }
     }
 }

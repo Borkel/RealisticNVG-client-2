@@ -1,19 +1,4 @@
 {
-    "itemId": "6a4c74f853926ec162d22a43",
-    "category": "PVS-31A ISB FDE",
-    "gain": 2.8,
-    "noiseIntensity": 0.15,
-    "noiseSize": 0.08,
-    "maskSize": 1.2,
-    "red": 60,
-    "green": 205,
-    "blue": 250,
-    "gatingType": "AutoGating",
-    "gatingSpeed": 0.3,
-    "minBrightness": 0.2,
-    "maxBrightness": 1,
-    "minBrightnessThreshold": 0,
-    "maxBrightnessThreshold": 0.15,
-    "edgeDistortion": 0.01,
-    "edgeDistortionStart": 0.02
+  "itemId": "6a4c74f853926ec162d22a43",
+  "category": "PVS-31A ISB FDE"
 }

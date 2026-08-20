@@ -1,8 +1,5 @@
-using BorkelRNVG.Controllers;
-using BorkelRNVG.Controllers.Extensions;
-using BorkelRNVG.Enum;
-using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
+using BorkelRNVG.Globals;
 using EFT.InventoryLogic;
 using NightVision = BSG.CameraEffects.NightVision;
 
@@ -68,27 +65,11 @@ namespace BorkelRNVG.Helpers
             };
         }
 
-        public static bool ShouldEnableGating(NvgData nvgData)
-        {
-            return Plugin.enableAutoGating.Value && nvgData.NightVisionConfig.AutoGatingType.Value != EGatingType.Off;
-        }
-        
         public static void ApplyNightVisionSettings()
         {
-            NightVision nightVision = CameraClass.Instance.NightVision;
-            nightVision.ApplySettings();
-        }
-
-        public static void ApplyGatingSettings()
-        {
-            NvgData nvgData = CurrentNvgData;
-            AutoGatingController.Instance.ApplySettings(nvgData);
-        }
-
-        public static void IncrementManualGating(int amount)
-        {
-            Plugin.gatingLevel.Value += amount;
-            CameraClass.Instance.NightVision.UpdateIntensity();
+            NightVision nightVision = CameraClass.Instance?.NightVision;
+            if (nightVision != null)
+                nightVision.ApplySettings();
         }
     }
 }
