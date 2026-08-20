@@ -1,0 +1,19 @@
+{
+    "itemId": "6a4c716dcbf243af9349bafd",
+    "category": "PVS-31A GRN PHOS",
+    "gain": 2.8,
+    "noiseIntensity": 0.15,
+    "noiseSize": 0.08,
+    "maskSize": 1.2,
+    "red": 152,
+    "green": 233,
+    "blue": 160,
+    "gatingType": "AutoGating",
+    "gatingSpeed": 0.3,
+    "minBrightness": 0.2,
+    "maxBrightness": 1,
+    "minBrightnessThreshold": 0,
+    "maxBrightnessThreshold": 0.15,
+    "edgeDistortion": 0.01,
+    "edgeDistortionStart": 0.02
+}
