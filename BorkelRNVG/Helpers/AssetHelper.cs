@@ -58,8 +58,10 @@ namespace BorkelRNVG.Helpers
 
                 bool exposeSettings = nvgConfig.Category == "PVS-14" ||
                                       nvgConfig.Category == "GPNVG-18";
-                if (nvgConfig.Category.IndexOf("GPNVG", StringComparison.OrdinalIgnoreCase) >= 0)
-                    nvgConfig.Shader.FourTubeLayout = true;
+                if (nvgConfig.Shader.FourTubeLayout ||
+                    (nvgConfig.Shader.LensLayout == NvgLensLayout.Pvs14 &&
+                     nvgConfig.Category.IndexOf("GPNVG", StringComparison.OrdinalIgnoreCase) >= 0))
+                    nvgConfig.Shader.LensLayout = NvgLensLayout.Gpnvg;
                 NightVisionConfig nightVisionConfig = new NightVisionConfig(
                     config, nvgConfig.Category + " - New Shader",
                     nvgConfig.Shader, exposeSettings);

@@ -46,7 +46,7 @@
         "grainPixelSize": 1.0,
         "noiseRefreshRate": 30.0,
         "opticScale": 1.0,
-        "fourTubeLayout": false,
+        "lensLayout": "Pvs14",
         "edgeDistortion": true,
         "distortionStrengthPixels": 6.0,
         "distortionWidthPixels": 60.0,

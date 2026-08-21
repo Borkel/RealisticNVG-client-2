@@ -11,6 +11,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     {
         Pvs14 = 1,
         Gpnvg = 2,
+        DualTube = 4,
         Custom = 3
     }
 
@@ -298,10 +299,19 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         noiseRefreshRate = settings.NoiseRefreshRate;
 
         opticTextureScale = settings.OpticScale * globalScale;
-        lensLayoutPreset = settings.FourTubeLayout
-            ? LensLayoutPreset.Gpnvg
-            : LensLayoutPreset.Pvs14;
-        lensSeamMode = settings.FourTubeLayout
+        switch (settings.LensLayout)
+        {
+            case NvgLensLayout.DualTube:
+                lensLayoutPreset = LensLayoutPreset.DualTube;
+                break;
+            case NvgLensLayout.Gpnvg:
+                lensLayoutPreset = LensLayoutPreset.Gpnvg;
+                break;
+            default:
+                lensLayoutPreset = LensLayoutPreset.Pvs14;
+                break;
+        }
+        lensSeamMode = lensLayoutPreset == LensLayoutPreset.Gpnvg
             ? LensSeamMode.Dark
             : LensSeamMode.None;
         multiLensEdgeDistortion = settings.EdgeDistortion;
@@ -836,6 +846,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     {
         return preset == LensLayoutPreset.Pvs14 ||
                preset == LensLayoutPreset.Gpnvg ||
+               preset == LensLayoutPreset.DualTube ||
                preset == LensLayoutPreset.Custom;
     }
 
@@ -853,6 +864,19 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         {
             definition = new LensDefinition(
                 new Vector2(0.5f, 0.5f), 0.372265625f, 1f, 0);
+            return true;
+        }
+
+        if (preset == LensLayoutPreset.DualTube)
+        {
+            if (index == 0)
+                definition = new LensDefinition(
+                    new Vector2(0.475f, 0.5f), 0.3875f, 1f, 1);
+            else if (index == 1)
+                definition = new LensDefinition(
+                    new Vector2(0.525f, 0.5f), 0.3875f, 1f, 1);
+            else
+                return false;
             return true;
         }
 

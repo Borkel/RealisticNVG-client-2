@@ -1,5 +1,12 @@
 namespace BorkelRNVG.Models
 {
+    public enum NvgLensLayout
+    {
+        Pvs14 = 1,
+        DualTube = 2,
+        Gpnvg = 3
+    }
+
     public sealed class RealisticNvgSettings
     {
         public float PhosphorRed { get; set; } = 0.62f;
@@ -52,6 +59,8 @@ namespace BorkelRNVG.Models
         public float NoiseRefreshRate { get; set; } = 30f;
 
         public float OpticScale { get; set; } = 1f;
+        public NvgLensLayout LensLayout { get; set; } = NvgLensLayout.Pvs14;
+        // Kept only so older third-party profile JSON files still deserialize.
         public bool FourTubeLayout { get; set; }
         public bool EdgeDistortion { get; set; } = true;
         public float DistortionStrengthPixels { get; set; } = 6f;

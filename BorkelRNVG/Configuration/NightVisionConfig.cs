@@ -110,6 +110,8 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "69 Noise - Refresh rate", Values.NoiseRefreshRate,
                 "Distinct procedural noise frames per second.", value => Values.NoiseRefreshRate = value, Range(1f, 240f));
 
+            Bind(config, category, "70 Optics - Lens layout", Values.LensLayout,
+                "Lens-domain preset used for this device.", value => Values.LensLayout = value);
             Bind(config, category, "70 Optics - Scale", Values.OpticScale,
                 "Scale of lens and housing textures.", value => Values.OpticScale = value, Range(0.25f, 2f));
             Bind(config, category, "71 Optics - Edge distortion", Values.EdgeDistortion,
