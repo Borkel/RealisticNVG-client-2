@@ -26,6 +26,12 @@ namespace BorkelRNVG.Configuration
                 "Blue component of the single phosphor color.", value => Values.PhosphorBlue = value, Range(0f, 1f));
             Bind(config, category, "13 Tube - Manual gain", Values.ManualGain,
                 "Base linear gain before automatic exposure.", value => Values.ManualGain = value, Range(0f, 5f));
+            Bind(config, category, "14 Tube - Spectral sensitivity red", Values.SpectralSensitivityRed,
+                "Relative sensitivity to the red input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityRed = value, Range(0f, 1f));
+            Bind(config, category, "15 Tube - Spectral sensitivity green", Values.SpectralSensitivityGreen,
+                "Relative sensitivity to the green input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityGreen = value, Range(0f, 1f));
+            Bind(config, category, "16 Tube - Spectral sensitivity blue", Values.SpectralSensitivityBlue,
+                "Relative sensitivity to the blue input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityBlue = value, Range(0f, 1f));
 
             Bind(config, category, "20 Exposure - Enabled", Values.AutoExposure,
                 "Enable scene-luminance-driven automatic gain.", value => Values.AutoExposure = value);

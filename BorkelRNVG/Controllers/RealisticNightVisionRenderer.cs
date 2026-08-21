@@ -252,6 +252,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
 
         phosphorTint = new Color(settings.PhosphorRed,
             settings.PhosphorGreen, settings.PhosphorBlue, 1f);
+        spectralSensitivity = new Vector3(settings.SpectralSensitivityRed,
+            settings.SpectralSensitivityGreen, settings.SpectralSensitivityBlue);
         manualGain = settings.ManualGain * globalGain;
 
         autoExposure = settings.AutoExposure;
