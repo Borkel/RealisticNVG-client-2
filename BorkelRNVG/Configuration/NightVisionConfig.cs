@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using BepInEx.Configuration;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Models;
@@ -12,7 +14,8 @@ namespace BorkelRNVG.Configuration
         public RealisticNvgSettings Values { get; }
 
         public NightVisionConfig(ConfigFile config, string category,
-            RealisticNvgSettings defaults, bool exposeSettings)
+            RealisticNvgSettings defaults, bool exposeSettings,
+            IEnumerable<string> lensLayoutIds)
         {
             Values = (defaults ?? new RealisticNvgSettings()).Clone();
             if (!exposeSettings)
@@ -110,8 +113,15 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "69 Noise - Refresh rate", Values.NoiseRefreshRate,
                 "Distinct procedural noise frames per second.", value => Values.NoiseRefreshRate = value, Range(1f, 240f));
 
+            string[] availableLayouts = (lensLayoutIds ?? Array.Empty<string>())
+                .OrderBy(id => id, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            AcceptableValueBase layoutChoices = availableLayouts.Length > 0
+                ? new AcceptableValueList<string>(availableLayouts)
+                : null;
             Bind(config, category, "70 Optics - Lens layout", Values.LensLayout,
-                "Lens-domain preset used for this device.", value => Values.LensLayout = value);
+                "Data-driven lens layout used for this device.",
+                value => Values.LensLayout = value, layoutChoices);
             Bind(config, category, "70 Optics - Scale", Values.OpticScale,
                 "Scale of lens and housing textures.", value => Values.OpticScale = value, Range(0.25f, 2f));
             Bind(config, category, "71 Optics - Edge distortion", Values.EdgeDistortion,

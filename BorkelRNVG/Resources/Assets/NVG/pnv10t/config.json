@@ -1,4 +1,7 @@
 {
   "itemId": "5c0696830db834001d23f5da",
-  "category": "PNV-10T"
+  "category": "PNV-10T",
+  "shader": {
+    "lensLayout": "dual-tube"
+  }
 }

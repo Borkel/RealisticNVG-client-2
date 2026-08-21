@@ -87,6 +87,7 @@ namespace BorkelRNVG
 
             // load assets
             AssetHelper.LoadShaders();
+            AssetHelper.LoadLensLayouts(Config);
             AssetHelper.LoadNvgs(Config);
             AssetHelper.LoadThermals(Config);
             AssetHelper.LoadAudioClips();

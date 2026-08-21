@@ -24,7 +24,10 @@ Shader "Hidden/CustomNightVision"
     float4 _OpticalHazeTex_TexelSize;
     sampler2D _BloomTex;
     sampler2D _BloomWideTex;
-    sampler2D _ExposureTex;
+    sampler2D _ExposureTex0;
+    sampler2D _ExposureTex1;
+    sampler2D _ExposureTex2;
+    sampler2D _ExposureTex3;
     sampler2D _ExposureHistory;
     sampler2D _LensTexture;
     sampler2D _MaskOverlay;
@@ -90,6 +93,7 @@ Shader "Hidden/CustomNightVision"
     float2 _AdaptationSpeeds;
     float _HighlightProtection;
     float _ExposureHistoryValid;
+    float _ExposureLensIndex;
     float _DeltaTime;
 
     float _ReadNoise;
@@ -317,22 +321,13 @@ Shader "Hidden/CustomNightVision"
 
     float LensDividerEnabled(float firstIndex, float secondIndex)
     {
-        float lower = min(firstIndex, secondIndex);
-        float upper = max(firstIndex, secondIndex);
-        float sidePair = 0.0;
-
-        if (lower < 0.5 && upper > 0.5 && upper < 1.5)
-            sidePair = 1.0;
-        else if (lower > 1.5 && lower < 2.5 && upper > 2.5)
-            sidePair = 1.0;
-
         float groupsDiffer = step(
             0.25,
             abs(LensFusionGroupAt(firstIndex) -
                 LensFusionGroupAt(secondIndex)));
         float bothEnabled = LensDefinitionEnabledAt(firstIndex) *
             LensDefinitionEnabledAt(secondIndex);
-        return sidePair * groupsDiffer * bothEnabled;
+        return groupsDiffer * bothEnabled;
     }
 
     float LensVignetteMultiplierAt(float index)
@@ -1076,9 +1071,78 @@ Shader "Hidden/CustomNightVision"
         float optic = EffectLensMask(uv);
         if (optic <= 0.0001)
             return 0.0;
+
         float2 opticUV = OpticTextureUV(uv);
-        float domainValid = step(-0.5, LensOwnerAtOpticUV(opticUV));
-        return optic * domainValid;
+        float4 definition = LensDefinitionAt(_ExposureLensIndex);
+        float enabled = LensDefinitionEnabledAt(_ExposureLensIndex);
+        float inside = step(LensPower(opticUV, definition), 0.0);
+        return optic * enabled * inside;
+    }
+
+    float ExposureEVAt(float index)
+    {
+        float exposureEV = tex2D(_ExposureTex0, float2(0.5, 0.5)).r;
+        if (index > 0.5)
+            exposureEV = tex2D(_ExposureTex1, float2(0.5, 0.5)).r;
+        if (index > 1.5)
+            exposureEV = tex2D(_ExposureTex2, float2(0.5, 0.5)).r;
+        if (index > 2.5)
+            exposureEV = tex2D(_ExposureTex3, float2(0.5, 0.5)).r;
+        return exposureEV;
+    }
+
+    void BlendFusionTubeExposure(
+        float index,
+        float4 definition,
+        float enabled,
+        float2 opticUV,
+        float ownerIndex,
+        float ownerFusionGroup,
+        float ownerGain,
+        inout float fusedGain)
+    {
+        if (enabled < 0.5 ||
+            abs(index - ownerIndex) < 0.25 ||
+            abs(LensFusionGroupAt(index) - ownerFusionGroup) > 0.25 ||
+            LensPower(opticUV, definition) > 0.0)
+            return;
+
+        float2 offset = LensPhysicalOffset(opticUV, definition.xy);
+        float clearancePixels = OpticDistanceToPixels(
+            definition.z - length(offset));
+        float fusionWeight = smoothstep(
+            0.0,
+            24.0,
+            max(clearancePixels, 0.0));
+        float candidateGain = exp2(ExposureEVAt(index));
+        float higherGain = max(ownerGain, candidateGain);
+        fusedGain = max(
+            fusedGain,
+            lerp(ownerGain, higherGain, fusionWeight));
+    }
+
+    float FusedTubeExposureEV(float2 screenUV, float ownerIndex)
+    {
+        float2 opticUV = OpticTextureUV(screenUV);
+        if (TextureUVBounds(opticUV) < 0.5 || ownerIndex < -0.5)
+            return 0.0;
+
+        float ownerFusionGroup = LensFusionGroupAt(ownerIndex);
+        float ownerGain = exp2(ExposureEVAt(ownerIndex));
+        float fusedGain = ownerGain;
+        BlendFusionTubeExposure(
+            0.0, _LensDefinition0, _LensDefinitionEnabled.x,
+            opticUV, ownerIndex, ownerFusionGroup, ownerGain, fusedGain);
+        BlendFusionTubeExposure(
+            1.0, _LensDefinition1, _LensDefinitionEnabled.y,
+            opticUV, ownerIndex, ownerFusionGroup, ownerGain, fusedGain);
+        BlendFusionTubeExposure(
+            2.0, _LensDefinition2, _LensDefinitionEnabled.z,
+            opticUV, ownerIndex, ownerFusionGroup, ownerGain, fusedGain);
+        BlendFusionTubeExposure(
+            3.0, _LensDefinition3, _LensDefinitionEnabled.w,
+            opticUV, ownerIndex, ownerFusionGroup, ownerGain, fusedGain);
+        return log2(max(fusedGain, 0.0001));
     }
 
     float4 FragLuminancePrefilter(v2f i) : SV_Target
@@ -1293,9 +1357,9 @@ Shader "Hidden/CustomNightVision"
             opticalScene = lerp(opticalScene, nearColor, blurBlend);
         }
 
-        float exposureEV = tex2D(
-            _ExposureTex,
-            float2(0.5, 0.5)).r;
+        float exposureEV = FusedTubeExposureEV(
+            i.uv,
+            lensDomain.ownerIndex);
         exposureEV = lerp(
             0.0,
             exposureEV,

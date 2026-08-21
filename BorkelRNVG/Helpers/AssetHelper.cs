@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using System.Reflection;
 using System;
+using System.Linq;
 using BorkelRNVG.Globals;
 using BorkelRNVG.Models;
 using BorkelRNVG.Struct;
@@ -29,6 +30,8 @@ namespace BorkelRNVG.Helpers
         public static Dictionary<string, AudioClip> LoadedAudioClips = [];
         public static Dictionary<string, NvgData> NvgData = [];
         public static Dictionary<string, ThermalData> ThermalData = [];
+        public static Dictionary<string, LensLayoutConfig> LensLayouts =
+            new Dictionary<string, LensLayoutConfig>(StringComparer.OrdinalIgnoreCase);
 
         public static void LoadShaders()
         {
@@ -46,6 +49,52 @@ namespace BorkelRNVG.Helpers
             maskShader = FileHelper.LoadShader("assets/shaders/pein/shaders/maskshader.shader", peinShaders);
         }
 
+        public static void LoadLensLayouts(ConfigFile config)
+        {
+            LensLayouts.Clear();
+            if (!Directory.Exists(ModDirectories.LensLayoutsPath))
+                throw new DirectoryNotFoundException(
+                    "Lens layout directory not found: " + ModDirectories.LensLayoutsPath);
+
+            foreach (string filePath in Directory.GetFiles(
+                         ModDirectories.LensLayoutsPath, "*.json"))
+            {
+                LensLayoutDefinition definition = FileHelper.ParseJson<LensLayoutDefinition>(
+                    Path.GetDirectoryName(filePath), Path.GetFileName(filePath));
+                definition ??= new LensLayoutDefinition();
+                if (string.IsNullOrWhiteSpace(definition.Id))
+                    definition.Id = Path.GetFileNameWithoutExtension(filePath);
+                if (definition.Lenses == null || definition.Lenses.Count == 0)
+                    throw new InvalidDataException(
+                        "Lens layout '" + definition.Id + "' has no lenses.");
+                if (definition.Lenses.Count > 4)
+                    throw new InvalidDataException(
+                        "Lens layout '" + definition.Id + "' exceeds the four-tube shader limit.");
+                if (LensLayouts.ContainsKey(definition.Id))
+                    throw new InvalidDataException(
+                        "Duplicate lens layout id: " + definition.Id);
+
+                LensLayouts.Add(definition.Id,
+                    new LensLayoutConfig(config, definition));
+                Plugin.Log("Loaded lens layout " + definition.Id);
+            }
+
+            if (LensLayouts.Count == 0)
+                throw new InvalidDataException("No lens layouts were loaded.");
+        }
+
+        public static LensLayoutDefinition FindLensLayout(string id)
+        {
+            if (!string.IsNullOrWhiteSpace(id) &&
+                LensLayouts.TryGetValue(id, out LensLayoutConfig layout))
+                return layout.Values;
+
+            if (LensLayouts.TryGetValue("pvs14", out LensLayoutConfig fallback))
+                return fallback.Values;
+
+            return LensLayouts.Values.FirstOrDefault()?.Values;
+        }
+
         public static void LoadNvgs(ConfigFile config)
         {
             string[] nvgDirs = Directory.GetDirectories(ModDirectories.NvgPath);
@@ -58,13 +107,17 @@ namespace BorkelRNVG.Helpers
 
                 bool exposeSettings = nvgConfig.Category == "PVS-14" ||
                                       nvgConfig.Category == "GPNVG-18";
-                if (nvgConfig.Shader.FourTubeLayout ||
-                    (nvgConfig.Shader.LensLayout == NvgLensLayout.Pvs14 &&
-                     nvgConfig.Category.IndexOf("GPNVG", StringComparison.OrdinalIgnoreCase) >= 0))
-                    nvgConfig.Shader.LensLayout = NvgLensLayout.Gpnvg;
+                if (string.IsNullOrWhiteSpace(nvgConfig.Shader.LensLayout) ||
+                    !LensLayouts.TryGetValue(
+                        nvgConfig.Shader.LensLayout,
+                        out LensLayoutConfig referencedLayout))
+                    throw new InvalidDataException(
+                        "NVG '" + nvgConfig.Category + "' references unknown lens layout '" +
+                        nvgConfig.Shader.LensLayout + "'.");
+                nvgConfig.Shader.LensLayout = referencedLayout.Values.Id;
                 NightVisionConfig nightVisionConfig = new NightVisionConfig(
                     config, nvgConfig.Category + " - New Shader",
-                    nvgConfig.Shader, exposeSettings);
+                    nvgConfig.Shader, exposeSettings, LensLayouts.Keys);
                 
                 if (nvgConfig.ItemId != null)
                 {

@@ -1,4 +1,7 @@
 {
   "itemId": "6a4c74f853926ec162d22a43",
-  "category": "PVS-31A ISB FDE"
+  "category": "PVS-31A ISB FDE",
+  "shader": {
+    "lensLayout": "dual-tube"
+  }
 }

@@ -1,0 +1,42 @@
+{
+    "id": "gpnvg",
+    "displayName": "GPNVG-18",
+    "lenses": [
+        {
+            "enabled": true,
+            "centerX": 0.204605263,
+            "centerY": 0.5,
+            "radius": 0.3875,
+            "distortionMultiplier": 1.0,
+            "fusionGroup": 0,
+            "vignetteMultiplier": 1.0
+        },
+        {
+            "enabled": true,
+            "centerX": 0.475,
+            "centerY": 0.5,
+            "radius": 0.3875,
+            "distortionMultiplier": 1.0,
+            "fusionGroup": 1,
+            "vignetteMultiplier": 1.0
+        },
+        {
+            "enabled": true,
+            "centerX": 0.525,
+            "centerY": 0.5,
+            "radius": 0.3875,
+            "distortionMultiplier": 1.0,
+            "fusionGroup": 1,
+            "vignetteMultiplier": 1.0
+        },
+        {
+            "enabled": true,
+            "centerX": 0.795394737,
+            "centerY": 0.5,
+            "radius": 0.3875,
+            "distortionMultiplier": 1.0,
+            "fusionGroup": 2,
+            "vignetteMultiplier": 1.0
+        }
+    ]
+}

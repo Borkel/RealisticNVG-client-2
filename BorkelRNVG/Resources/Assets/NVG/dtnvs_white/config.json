@@ -1,4 +1,7 @@
 {
   "itemId": "6974ce066e50d4be623b8d9b",
-  "category": "DTNVS (White)"
+  "category": "DTNVS (White)",
+  "shader": {
+    "lensLayout": "dual-tube"
+  }
 }

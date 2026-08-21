@@ -7,14 +7,6 @@ namespace BorkelRNVG.Controllers
 [DisallowMultipleComponent]
 public sealed class RealisticNightVisionRenderer : MonoBehaviour
 {
-    public enum LensLayoutPreset
-    {
-        Pvs14 = 1,
-        Gpnvg = 2,
-        DualTube = 4,
-        Custom = 3
-    }
-
     public enum LensSeamMode
     {
         None = 0,
@@ -133,7 +125,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     [SerializeField] private float lensAlphaFeather = 0.005f;
     [SerializeField] private float opticTextureScale = 1f;
 
-    [SerializeField] private LensLayoutPreset lensLayoutPreset = LensLayoutPreset.Pvs14;
     [SerializeField] private LensDefinition[] lensDefinitions = new LensDefinition[MaximumLensDefinitions];
 
     [SerializeField] private bool multiLensEdgeDistortion = true;
@@ -249,7 +240,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     }
 
     public void ConfigureRuntime(Shader shader, Texture lens, Texture overlay,
-        RealisticNvgSettings settings, SSAAPropagator propagator,
+        RealisticNvgSettings settings, LensLayoutDefinition lensLayout,
+        SSAAPropagator propagator,
         float globalGain, float globalScale)
     {
         if (settings == null)
@@ -308,19 +300,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         noiseRefreshRate = settings.NoiseRefreshRate;
 
         opticTextureScale = settings.OpticScale * globalScale;
-        switch (settings.LensLayout)
-        {
-            case NvgLensLayout.DualTube:
-                lensLayoutPreset = LensLayoutPreset.DualTube;
-                break;
-            case NvgLensLayout.Gpnvg:
-                lensLayoutPreset = LensLayoutPreset.Gpnvg;
-                break;
-            default:
-                lensLayoutPreset = LensLayoutPreset.Pvs14;
-                break;
-        }
-        lensSeamMode = lensLayoutPreset == LensLayoutPreset.Gpnvg
+        ApplyLensLayout(lensLayout);
+        lensSeamMode = HasMultipleFusionGroups(lensLayout)
             ? LensSeamMode.Dark
             : LensSeamMode.None;
         multiLensEdgeDistortion = settings.EdgeDistortion;
@@ -334,23 +315,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         multiLensOuterVignetteStrength = settings.VignetteStrength;
         multiLensVignetteFalloff = settings.VignetteFalloff;
 
-        ApplyBuiltInPreset(lensLayoutPreset);
         ResetExposure();
         UpdateDepthTextureMode();
         EnsureMaterial();
-    }
-
-    public void ConfigureOptic(Texture2D lens, Texture2D overlay,
-        LensLayoutPreset preset, LensSeamMode seamMode, float scale = 1f)
-    {
-        lensTexture = lens;
-        maskOverlay = overlay;
-        opticTextureScale = scale;
-        lensSeamMode = IsValidSeamMode(seamMode) ? seamMode : LensSeamMode.Dark;
-        lensLayoutPreset = IsValidPreset(preset) ? preset : LensLayoutPreset.Pvs14;
-        ApplyBuiltInPreset(lensLayoutPreset);
-        ResetExposure();
-        UpdateDepthTextureMode();
     }
 
     public void ConfigureLensEdgeDistortion(bool enabled, float strengthPixels,
@@ -396,7 +363,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
             throw new System.ArgumentOutOfRangeException("index");
 
         lensDefinitions[index] = definition;
-        lensLayoutPreset = LensLayoutPreset.Custom;
         ResetExposure();
     }
 
@@ -410,7 +376,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
                 : default(LensDefinition);
             lensDefinitions[index] = definition;
         }
-        lensLayoutPreset = LensLayoutPreset.Custom;
         ResetExposure();
     }
 
@@ -423,7 +388,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     private void OnEnable()
     {
         EnsureLensDefinitionArray();
-        ApplyBuiltInPreset(lensLayoutPreset);
         targetCamera = GetComponent<Camera>();
         if (SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.ARGBHalf))
         {
@@ -448,7 +412,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     private void OnValidate()
     {
         EnsureLensDefinitionArray();
-        ApplyBuiltInPreset(lensLayoutPreset);
         ResetExposure();
 
         if (!isActiveAndEnabled)
@@ -849,84 +812,50 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         lensDefinitions = resized;
     }
 
-    private static bool IsValidPreset(LensLayoutPreset preset)
-    {
-        return preset == LensLayoutPreset.Pvs14 ||
-               preset == LensLayoutPreset.Gpnvg ||
-               preset == LensLayoutPreset.DualTube ||
-               preset == LensLayoutPreset.Custom;
-    }
-
-    private static bool IsValidSeamMode(LensSeamMode mode)
-    {
-        return mode == LensSeamMode.None || mode == LensSeamMode.Soft ||
-               mode == LensSeamMode.Dark || mode == LensSeamMode.Hard;
-    }
-
-    private static bool TryGetPresetLensDefinition(LensLayoutPreset preset, int index,
-        out LensDefinition definition)
-    {
-        definition = default(LensDefinition);
-        if (preset == LensLayoutPreset.Pvs14 && index == 0)
-        {
-            definition = new LensDefinition(
-                new Vector2(0.5f, 0.5f), 0.372265625f, 1f, 0);
-            return true;
-        }
-
-        if (preset == LensLayoutPreset.DualTube)
-        {
-            if (index == 0)
-                definition = new LensDefinition(
-                    new Vector2(0.475f, 0.5f), 0.372265625f, 1f, 1);
-            else if (index == 1)
-                definition = new LensDefinition(
-                    new Vector2(0.525f, 0.5f), 0.372265625f, 1f, 1);
-            else
-                return false;
-            return true;
-        }
-
-        if (preset != LensLayoutPreset.Gpnvg)
-            return false;
-
-        if (index == 0)
-            definition = new LensDefinition(
-                new Vector2(0.204605263f, 0.5f), 0.3875f, 1f, 0);
-        else if (index == 1)
-            definition = new LensDefinition(
-                new Vector2(0.475f, 0.5f), 0.3875f, 1f, 1);
-        else if (index == 2)
-            definition = new LensDefinition(
-                new Vector2(0.525f, 0.5f), 0.3875f, 1f, 1);
-        else if (index == 3)
-            definition = new LensDefinition(
-                new Vector2(0.795394737f, 0.5f), 0.3875f, 1f, 2);
-        else
-            return false;
-        return true;
-    }
-
-    private void ApplyBuiltInPreset(LensLayoutPreset preset)
+    private void ApplyLensLayout(LensLayoutDefinition layout)
     {
         EnsureLensDefinitionArray();
-        if (!IsValidPreset(preset))
-        {
-            lensLayoutPreset = LensLayoutPreset.Pvs14;
-            preset = LensLayoutPreset.Pvs14;
-        }
-        if (preset == LensLayoutPreset.Custom)
-            return;
-
         for (int index = 0; index < MaximumLensDefinitions; index++)
             lensDefinitions[index] = default(LensDefinition);
 
-        for (int index = 0; index < MaximumLensDefinitions; index++)
+        if (layout?.Lenses == null)
+            return;
+
+        int count = Mathf.Min(layout.Lenses.Count, MaximumLensDefinitions);
+        for (int index = 0; index < count; index++)
         {
-            LensDefinition definition;
-            if (TryGetPresetLensDefinition(preset, index, out definition))
-                lensDefinitions[index] = definition;
+            LensLayoutTube tube = layout.Lenses[index];
+            if (tube == null || !tube.Enabled || tube.Radius <= 0.0001f)
+                continue;
+
+            lensDefinitions[index] = new LensDefinition(
+                new Vector2(tube.CenterX, tube.CenterY),
+                tube.Radius,
+                tube.DistortionMultiplier,
+                Mathf.Clamp(tube.FusionGroup, 0, 3),
+                tube.VignetteMultiplier);
         }
+    }
+
+    private static bool HasMultipleFusionGroups(LensLayoutDefinition layout)
+    {
+        if (layout?.Lenses == null)
+            return false;
+
+        int firstGroup = -1;
+        int count = Mathf.Min(layout.Lenses.Count, MaximumLensDefinitions);
+        for (int index = 0; index < count; index++)
+        {
+            LensLayoutTube tube = layout.Lenses[index];
+            if (tube == null || !tube.Enabled || tube.Radius <= 0.0001f)
+                continue;
+            int group = Mathf.Clamp(tube.FusionGroup, 0, 3);
+            if (firstGroup < 0)
+                firstGroup = group;
+            else if (group != firstGroup)
+                return true;
+        }
+        return false;
     }
 
     private void BlurFromFullResolutionSource(RenderTexture fullResolutionSource,

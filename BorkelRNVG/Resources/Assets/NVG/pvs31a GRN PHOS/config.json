@@ -1,4 +1,7 @@
 {
   "itemId": "6a4c716dcbf243af9349bafd",
-  "category": "PVS-31A GRN PHOS"
+  "category": "PVS-31A GRN PHOS",
+  "shader": {
+    "lensLayout": "dual-tube"
+  }
 }

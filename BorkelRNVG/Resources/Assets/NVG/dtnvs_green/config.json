@@ -1,4 +1,7 @@
 {
   "itemId": "6974cf52ee1fb8a0683b8d9d",
-  "category": "DTNVS (Green)"
+  "category": "DTNVS (Green)",
+  "shader": {
+    "lensLayout": "dual-tube"
+  }
 }

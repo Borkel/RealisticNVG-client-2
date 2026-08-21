@@ -1,4 +1,7 @@
 {
   "itemId": "694b2e29274ab9b2a319b6ed",
-  "category": "GPNVG-18 ISB"
+  "category": "GPNVG-18 ISB",
+  "shader": {
+    "lensLayout": "gpnvg"
+  }
 }

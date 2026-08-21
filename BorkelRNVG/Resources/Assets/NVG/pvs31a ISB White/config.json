@@ -1,4 +1,7 @@
 {
   "itemId": "6a4c7475199066d1ea0b5131",
-  "category": "PVS-31A ISB WHITE"
+  "category": "PVS-31A ISB WHITE",
+  "shader": {
+    "lensLayout": "dual-tube"
+  }
 }

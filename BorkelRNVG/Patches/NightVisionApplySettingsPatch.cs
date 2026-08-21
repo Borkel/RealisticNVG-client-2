@@ -23,6 +23,15 @@ namespace BorkelRNVG.Patches
             if (data == null)
                 return false;
 
+            LensLayoutDefinition lensLayout = AssetHelper.FindLensLayout(
+                data.NightVisionConfig.Values.LensLayout);
+            if (lensLayout == null)
+            {
+                Plugin.Logger.LogError(
+                    "No lens layout is available for NVG " + data.NvgItemConfig.Category);
+                return false;
+            }
+
             RealisticNightVisionRenderer renderer =
                 __instance.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null)
@@ -33,6 +42,7 @@ namespace BorkelRNVG.Patches
                 data.LensTexture,
                 data.MaskTexture,
                 data.NightVisionConfig.Values,
+                lensLayout,
                 __instance.GetComponent<SSAAPropagator>(),
                 Plugin.globalGain.Value,
                 Plugin.globalMaskSize.Value);
