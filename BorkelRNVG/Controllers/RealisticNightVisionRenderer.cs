@@ -158,8 +158,10 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     private Camera targetCamera;
     private SSAAPropagator ssaaPropagator;
     private Material material;
-    private RenderTexture exposureRead;
-    private RenderTexture exposureWrite;
+    private readonly RenderTexture[] exposureRead =
+        new RenderTexture[MaximumLensDefinitions];
+    private readonly RenderTexture[] exposureWrite =
+        new RenderTexture[MaximumLensDefinitions];
     private RenderTextureFormat intermediateFormat;
     private bool supportsSignedIntermediates;
     private bool exposureHistoryValid;
@@ -179,8 +181,16 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     private static readonly int NearBlurTexId = Shader.PropertyToID("_NearBlurTex");
     private static readonly int BloomTexId = Shader.PropertyToID("_BloomTex");
     private static readonly int BloomWideTexId = Shader.PropertyToID("_BloomWideTex");
-    private static readonly int ExposureTexId = Shader.PropertyToID("_ExposureTex");
+    private static readonly int[] ExposureTexIds =
+    {
+        Shader.PropertyToID("_ExposureTex0"),
+        Shader.PropertyToID("_ExposureTex1"),
+        Shader.PropertyToID("_ExposureTex2"),
+        Shader.PropertyToID("_ExposureTex3")
+    };
     private static readonly int ExposureHistoryId = Shader.PropertyToID("_ExposureHistory");
+    private static readonly int ExposureLensIndexId =
+        Shader.PropertyToID("_ExposureLensIndex");
     private readonly Vector4[] lensDefinitionUpload = new Vector4[MaximumLensDefinitions];
 
     private bool NearPassActive
@@ -686,12 +696,14 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
             if (AutoExposureActive)
             {
                 UpdateExposure(source, deltaTime);
-                material.SetTexture(ExposureTexId, exposureRead);
+                for (int index = 0; index < MaximumLensDefinitions; index++)
+                    material.SetTexture(ExposureTexIds[index], exposureRead[index]);
             }
             else
             {
                 exposureHistoryValid = false;
-                material.SetTexture(ExposureTexId, Texture2D.blackTexture);
+                for (int index = 0; index < MaximumLensDefinitions; index++)
+                    material.SetTexture(ExposureTexIds[index], Texture2D.blackTexture);
             }
 
             Graphics.Blit(source, destination, material, PassComposite);
@@ -979,51 +991,68 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     {
         EnsureExposureBuffers();
         int luminanceSize = LargestPowerOfTwoAtMost(Mathf.Min(64, Mathf.Min(source.width, source.height)));
-        RenderTexture luminance = null;
-
-        try
+        for (int lensIndex = 0; lensIndex < MaximumLensDefinitions; lensIndex++)
         {
-            luminance = GetTemporary(source, luminanceSize, luminanceSize, FilterMode.Bilinear);
-            material.SetVector(SourceToTargetScaleId,
-                new Vector4(source.width / (float)luminanceSize,
-                    source.height / (float)luminanceSize, 0f, 0f));
-            Graphics.Blit(source, luminance, material, PassLuminancePrefilter);
+            LensDefinition definition = lensDefinitions[lensIndex];
+            if (!definition.enabled || definition.radiusInTextureHeights <= 0.0001f)
+                continue;
 
-            int size = luminanceSize;
-            while (size > 1)
+            RenderTexture luminance = null;
+            try
             {
-                int nextSize = Mathf.Max(1, size / 2);
-                RenderTexture next = GetTemporary(source, nextSize, nextSize, FilterMode.Bilinear);
-                Graphics.Blit(luminance, next, material, PassLuminanceDownsample);
-                ReleaseTemporary(luminance);
-                luminance = next;
-                size = nextSize;
-            }
+                material.SetFloat(ExposureLensIndexId, lensIndex);
+                luminance = GetTemporary(source, luminanceSize, luminanceSize, FilterMode.Bilinear);
+                material.SetVector(SourceToTargetScaleId,
+                    new Vector4(source.width / (float)luminanceSize,
+                        source.height / (float)luminanceSize, 0f, 0f));
+                Graphics.Blit(source, luminance, material, PassLuminancePrefilter);
 
-            material.SetTexture(ExposureHistoryId, exposureRead);
-            material.SetFloat("_ExposureHistoryValid", exposureHistoryValid ? 1f : 0f);
-            material.SetFloat("_DeltaTime", deltaTime);
-            Graphics.Blit(luminance, exposureWrite, material, PassExposureAdapt);
-            Swap(ref exposureRead, ref exposureWrite);
-            exposureHistoryValid = true;
+                int size = luminanceSize;
+                while (size > 1)
+                {
+                    int nextSize = Mathf.Max(1, size / 2);
+                    RenderTexture next = GetTemporary(source, nextSize, nextSize, FilterMode.Bilinear);
+                    Graphics.Blit(luminance, next, material, PassLuminanceDownsample);
+                    ReleaseTemporary(luminance);
+                    luminance = next;
+                    size = nextSize;
+                }
+
+                material.SetTexture(ExposureHistoryId, exposureRead[lensIndex]);
+                material.SetFloat("_ExposureHistoryValid", exposureHistoryValid ? 1f : 0f);
+                material.SetFloat("_DeltaTime", deltaTime);
+                Graphics.Blit(luminance, exposureWrite[lensIndex], material, PassExposureAdapt);
+                Swap(ref exposureRead[lensIndex], ref exposureWrite[lensIndex]);
+            }
+            finally
+            {
+                ReleaseTemporary(luminance);
+            }
         }
-        finally
-        {
-            ReleaseTemporary(luminance);
-        }
+        exposureHistoryValid = true;
     }
 
     private void EnsureExposureBuffers()
     {
-        if (exposureRead != null && exposureWrite != null &&
-            exposureRead.IsCreated() && exposureWrite.IsCreated())
+        bool buffersReady = true;
+        for (int index = 0; index < MaximumLensDefinitions; index++)
+        {
+            buffersReady &= exposureRead[index] != null && exposureWrite[index] != null &&
+                exposureRead[index].IsCreated() && exposureWrite[index].IsCreated();
+        }
+        if (buffersReady)
             return;
 
         ReleaseExposureBuffers();
-        exposureRead = CreateExposureTexture("Night Vision Exposure A");
-        exposureWrite = CreateExposureTexture("Night Vision Exposure B");
-        ClearTexture(exposureRead);
-        ClearTexture(exposureWrite);
+        for (int index = 0; index < MaximumLensDefinitions; index++)
+        {
+            exposureRead[index] = CreateExposureTexture(
+                "Night Vision Exposure " + index + " A");
+            exposureWrite[index] = CreateExposureTexture(
+                "Night Vision Exposure " + index + " B");
+            ClearTexture(exposureRead[index]);
+            ClearTexture(exposureWrite[index]);
+        }
         exposureHistoryValid = false;
     }
 
@@ -1050,8 +1079,11 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
 
     private void ReleaseExposureBuffers()
     {
-        ReleasePersistent(ref exposureRead);
-        ReleasePersistent(ref exposureWrite);
+        for (int index = 0; index < MaximumLensDefinitions; index++)
+        {
+            ReleasePersistent(ref exposureRead[index]);
+            ReleasePersistent(ref exposureWrite[index]);
+        }
         exposureHistoryValid = false;
     }
 
