@@ -878,10 +878,10 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         {
             if (index == 0)
                 definition = new LensDefinition(
-                    new Vector2(0.475f, 0.5f), 0.3875f, 1f, 1);
+                    new Vector2(0.475f, 0.5f), 0.372265625f, 1f, 1);
             else if (index == 1)
                 definition = new LensDefinition(
-                    new Vector2(0.525f, 0.5f), 0.3875f, 1f, 1);
+                    new Vector2(0.525f, 0.5f), 0.372265625f, 1f, 1);
             else
                 return false;
             return true;
