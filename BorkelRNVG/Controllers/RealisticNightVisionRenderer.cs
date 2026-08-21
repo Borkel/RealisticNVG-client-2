@@ -132,7 +132,6 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     [SerializeField] private float lensAlphaCutoff = 0.55f;
     [SerializeField] private float lensAlphaFeather = 0.005f;
     [SerializeField] private float opticTextureScale = 1f;
-    [SerializeField] private float opticTextureAspectOverride = 0f;
 
     [SerializeField] private LensLayoutPreset lensLayoutPreset = LensLayoutPreset.Pvs14;
     [SerializeField] private LensDefinition[] lensDefinitions = new LensDefinition[MaximumLensDefinitions];
@@ -332,13 +331,11 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     }
 
     public void ConfigureOptic(Texture2D lens, Texture2D overlay,
-        LensLayoutPreset preset, LensSeamMode seamMode, float scale = 1f,
-        float sourceAspectOverride = 0f)
+        LensLayoutPreset preset, LensSeamMode seamMode, float scale = 1f)
     {
         lensTexture = lens;
         maskOverlay = overlay;
         opticTextureScale = scale;
-        opticTextureAspectOverride = sourceAspectOverride;
         lensSeamMode = IsValidSeamMode(seamMode) ? seamMode : LensSeamMode.Dark;
         lensLayoutPreset = IsValidPreset(preset) ? preset : LensLayoutPreset.Pvs14;
         ApplyBuiltInPreset(lensLayoutPreset);
@@ -719,11 +716,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         material.SetVector("_LensCenter",
             new Vector4(opticTextureCenter.x, opticTextureCenter.y, 0f, 0f));
 
-        float opticAspect = opticTextureAspectOverride > 0f
-            ? opticTextureAspectOverride
-            : lensTexture.height > 0
-                ? lensTexture.width / (float)lensTexture.height
-                : 1f;
+        float opticAspect = lensTexture.height > 0
+            ? lensTexture.width / (float)lensTexture.height
+            : 1f;
         material.SetTexture("_LensTexture", lensTexture);
         material.SetTexture("_MaskOverlay", maskOverlay);
         material.SetFloat("_OpticTextureAspect", opticAspect);
