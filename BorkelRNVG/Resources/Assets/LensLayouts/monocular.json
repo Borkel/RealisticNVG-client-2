@@ -1,12 +1,12 @@
 {
-    "id": "pvs14",
-    "displayName": "PVS-14",
+    "id": "monocular",
+    "displayName": "Monocular",
     "lenses": [
         {
             "enabled": true,
             "centerX": 0.5,
             "centerY": 0.5,
-            "radius": 0.372265625,
+            "radius": 0.375,
             "distortionMultiplier": 1.0,
             "fusionGroup": 0,
             "vignetteMultiplier": 1.0

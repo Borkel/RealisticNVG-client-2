@@ -2,6 +2,10 @@
   "itemId": "689b889473ebd6871805edd6",
   "category": "PVS-31A",
   "shader": {
-    "lensLayout": "dual-tube"
+    "phosphorRed": 0.235294,
+    "phosphorGreen": 0.803922,
+    "phosphorBlue": 0.980392,
+    "baseGain": 2.8,
+    "lensLayout": "binocular"
   }
 }

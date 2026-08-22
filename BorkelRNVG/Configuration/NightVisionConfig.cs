@@ -14,12 +14,10 @@ namespace BorkelRNVG.Configuration
         public RealisticNvgSettings Values { get; }
 
         public NightVisionConfig(ConfigFile config, string category,
-            RealisticNvgSettings defaults, bool exposeSettings,
+            RealisticNvgSettings defaults,
             IEnumerable<string> lensLayoutIds)
         {
             Values = (defaults ?? new RealisticNvgSettings()).Clone();
-            if (!exposeSettings)
-                return;
 
             Bind(config, category, "10 Tube - Phosphor red", Values.PhosphorRed,
                 "Red component of the single phosphor color.", value => Values.PhosphorRed = value, Range(0f, 1f));
@@ -27,8 +25,8 @@ namespace BorkelRNVG.Configuration
                 "Green component of the single phosphor color.", value => Values.PhosphorGreen = value, Range(0f, 1f));
             Bind(config, category, "12 Tube - Phosphor blue", Values.PhosphorBlue,
                 "Blue component of the single phosphor color.", value => Values.PhosphorBlue = value, Range(0f, 1f));
-            Bind(config, category, "13 Tube - Manual gain", Values.ManualGain,
-                "Base linear gain before automatic exposure.", value => Values.ManualGain = value, Range(0f, 5f));
+            Bind(config, category, "13 Tube - Base gain", Values.BaseGain,
+                "Base linear gain before automatic exposure.", value => Values.BaseGain = value, Range(0f, 5f));
             Bind(config, category, "14 Tube - Spectral sensitivity red", Values.SpectralSensitivityRed,
                 "Relative sensitivity to the red input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityRed = value, Range(0f, 1f));
             Bind(config, category, "15 Tube - Spectral sensitivity green", Values.SpectralSensitivityGreen,
@@ -114,7 +112,9 @@ namespace BorkelRNVG.Configuration
                 "Distinct procedural noise frames per second.", value => Values.NoiseRefreshRate = value, Range(1f, 240f));
 
             string[] availableLayouts = (lensLayoutIds ?? Array.Empty<string>())
-                .OrderBy(id => id, StringComparer.OrdinalIgnoreCase)
+                .OrderBy(id => string.Equals(id, Values.LensLayout,
+                    StringComparison.OrdinalIgnoreCase) ? 0 : 1)
+                .ThenBy(id => id, StringComparer.OrdinalIgnoreCase)
                 .ToArray();
             AcceptableValueBase layoutChoices = availableLayouts.Length > 0
                 ? new AcceptableValueList<string>(availableLayouts)

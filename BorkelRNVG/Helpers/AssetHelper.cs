@@ -89,7 +89,7 @@ namespace BorkelRNVG.Helpers
                 LensLayouts.TryGetValue(id, out LensLayoutConfig layout))
                 return layout.Values;
 
-            if (LensLayouts.TryGetValue("pvs14", out LensLayoutConfig fallback))
+            if (LensLayouts.TryGetValue("monocular", out LensLayoutConfig fallback))
                 return fallback.Values;
 
             return LensLayouts.Values.FirstOrDefault()?.Values;
@@ -105,8 +105,6 @@ namespace BorkelRNVG.Helpers
                 Texture maskTexture = FileHelper.LoadTexture(Path.Combine(nvgDir, "mask.png"));
                 Texture lensTexture = FileHelper.LoadTexture(Path.Combine(nvgDir, "lens.png"));
 
-                bool exposeSettings = nvgConfig.Category == "PVS-14" ||
-                                      nvgConfig.Category == "GPNVG-18";
                 if (string.IsNullOrWhiteSpace(nvgConfig.Shader.LensLayout) ||
                     !LensLayouts.TryGetValue(
                         nvgConfig.Shader.LensLayout,
@@ -116,8 +114,8 @@ namespace BorkelRNVG.Helpers
                         nvgConfig.Shader.LensLayout + "'.");
                 nvgConfig.Shader.LensLayout = referencedLayout.Values.Id;
                 NightVisionConfig nightVisionConfig = new NightVisionConfig(
-                    config, nvgConfig.Category + " - New Shader",
-                    nvgConfig.Shader, exposeSettings, LensLayouts.Keys);
+                    config, nvgConfig.Category + " - NVG Settings",
+                    nvgConfig.Shader, LensLayouts.Keys);
                 
                 if (nvgConfig.ItemId != null)
                 {

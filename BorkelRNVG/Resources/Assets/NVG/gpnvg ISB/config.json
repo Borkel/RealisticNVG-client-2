@@ -2,6 +2,10 @@
   "itemId": "694b2e29274ab9b2a319b6ed",
   "category": "GPNVG-18 ISB",
   "shader": {
-    "lensLayout": "gpnvg"
+    "phosphorRed": 0.596078,
+    "phosphorGreen": 0.839216,
+    "phosphorBlue": 0.988235,
+    "baseGain": 2.5,
+    "lensLayout": "quadnods"
   }
 }

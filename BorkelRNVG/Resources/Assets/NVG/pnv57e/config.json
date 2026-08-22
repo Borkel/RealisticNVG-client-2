@@ -2,6 +2,10 @@
   "itemId": "67506ca81f18589016006aa6",
   "category": "PNV-57E",
   "shader": {
-    "lensLayout": "dual-tube"
+    "phosphorRed": 0.313725,
+    "phosphorGreen": 0.843137,
+    "phosphorBlue": 0.235294,
+    "baseGain": 1.2,
+    "lensLayout": "binocular"
   }
 }

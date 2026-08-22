@@ -2,6 +2,10 @@
   "itemId": "6a4c7475199066d1ea0b5131",
   "category": "PVS-31A ISB WHITE",
   "shader": {
-    "lensLayout": "dual-tube"
+    "phosphorRed": 0.235294,
+    "phosphorGreen": 0.803922,
+    "phosphorBlue": 0.980392,
+    "baseGain": 2.8,
+    "lensLayout": "binocular"
   }
 }

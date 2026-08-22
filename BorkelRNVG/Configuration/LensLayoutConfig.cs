@@ -64,7 +64,11 @@ namespace BorkelRNVG.Configuration
         {
             ConfigEntry<T> entry = config.Bind(category, key, defaultValue,
                 new ConfigDescription(description, acceptable,
-                    new ConfigurationManagerAttributes { Order = order -= 10 }));
+                    new ConfigurationManagerAttributes
+                    {
+                        IsAdvanced = true,
+                        Order = order -= 10
+                    }));
             setter(entry.Value);
             entry.SettingChanged += (_, _) =>
             {

@@ -5,7 +5,7 @@ namespace BorkelRNVG.Models
         public float PhosphorRed { get; set; } = 0.62f;
         public float PhosphorGreen { get; set; } = 0.92f;
         public float PhosphorBlue { get; set; } = 0.98f;
-        public float ManualGain { get; set; } = 1.35f;
+        public float BaseGain { get; set; } = 1.35f;
         public float SpectralSensitivityRed { get; set; } = 0.45f;
         public float SpectralSensitivityGreen { get; set; } = 0.45f;
         public float SpectralSensitivityBlue { get; set; } = 0.10f;
@@ -52,7 +52,7 @@ namespace BorkelRNVG.Models
         public float NoiseRefreshRate { get; set; } = 30f;
 
         public float OpticScale { get; set; } = 1f;
-        public string LensLayout { get; set; } = "pvs14";
+        public string LensLayout { get; set; } = "monocular";
         public bool EdgeDistortion { get; set; } = true;
         public float DistortionStrengthPixels { get; set; } = 6f;
         public float DistortionWidthPixels { get; set; } = 60f;

@@ -2,6 +2,10 @@
   "itemId": "6974cf52ee1fb8a0683b8d9d",
   "category": "DTNVS (Green)",
   "shader": {
-    "lensLayout": "dual-tube"
+    "phosphorRed": 0.235294,
+    "phosphorGreen": 0.803922,
+    "phosphorBlue": 0.980392,
+    "baseGain": 2.8,
+    "lensLayout": "binocular"
   }
 }
