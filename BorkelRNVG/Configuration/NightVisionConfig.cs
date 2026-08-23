@@ -25,8 +25,6 @@ namespace BorkelRNVG.Configuration
                 "Green component of the single phosphor color.", value => Values.PhosphorGreen = value, Range(0f, 1f));
             Bind(config, category, "12 Tube - Phosphor blue", Values.PhosphorBlue,
                 "Blue component of the single phosphor color.", value => Values.PhosphorBlue = value, Range(0f, 1f));
-            Bind(config, category, "13 Tube - Base gain", Values.BaseGain,
-                "Base linear gain before automatic exposure.", value => Values.BaseGain = value, Range(0f, 5f));
             Bind(config, category, "14 Tube - Spectral sensitivity red", Values.SpectralSensitivityRed,
                 "Relative sensitivity to the red input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityRed = value, Range(0f, 1f));
             Bind(config, category, "15 Tube - Spectral sensitivity green", Values.SpectralSensitivityGreen,
@@ -34,8 +32,10 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "16 Tube - Spectral sensitivity blue", Values.SpectralSensitivityBlue,
                 "Relative sensitivity to the blue input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityBlue = value, Range(0f, 1f));
 
-            Bind(config, category, "20 Exposure - Enabled", Values.AutoExposure,
-                "Enable scene-luminance-driven automatic gain.", value => Values.AutoExposure = value);
+            Bind(config, category, "20 Exposure - Automatic gain", Values.AutoExposure,
+                "Use target luminance to reduce gain when the scene is bright.", value => Values.AutoExposure = value);
+            Bind(config, category, "20 Exposure - Manual gain control", Values.ManualGainControl,
+                "Allow the gain keys to lower or restore the maximum exposure available to automatic gain.", value => Values.ManualGainControl = value);
             Bind(config, category, "21 Exposure - Target luminance", Values.TargetLuminance,
                 "Average aperture luminance targeted by automatic gain.", value => Values.TargetLuminance = value, Range(0.001f, 2f));
             Bind(config, category, "22 Exposure - Minimum EV", Values.MinimumExposureEV,
@@ -90,12 +90,8 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "55 Bloom - Wide radius pixels", Values.WideBloomRadiusPixels,
                 "Radius of the broad secondary glow.", value => Values.WideBloomRadiusPixels = value, Range(0f, 300f));
 
-            Bind(config, category, "60 Noise - Read", Values.ReadNoise,
-                "Baseline electronic noise.", value => Values.ReadNoise = value, Range(0f, 0.5f));
-            Bind(config, category, "61 Noise - Shot", Values.ShotNoise,
-                "Photon-statistics noise.", value => Values.ShotNoise = value, Range(0f, 0.5f));
-            Bind(config, category, "62 Noise - Coarse", Values.CoarseNoise,
-                "Large-scale procedural noise.", value => Values.CoarseNoise = value, Range(0f, 0.5f));
+            Bind(config, category, "60 Noise - Intensity", Values.NoiseIntensity,
+                "Scales read, shot and coarse noise together while preserving their profile-defined balance.", value => Values.NoiseIntensity = value, Range(0f, 5f));
             Bind(config, category, "63 Noise - Fixed pattern", Values.FixedPatternNoise,
                 "Stationary spatial gain variation.", value => Values.FixedPatternNoise = value, Range(0f, 0.5f));
             Bind(config, category, "64 Noise - Scintillation strength", Values.Scintillation,

@@ -5,7 +5,11 @@
     "phosphorRed": 0.596078,
     "phosphorGreen": 0.839216,
     "phosphorBlue": 0.988235,
-    "baseGain": 2.5,
+    "maximumExposureEV": 4.0,
+    "brightSceneSpeed": 30.0,
+    "noiseIntensity": 0.5,
+    "scintillation": 0.35,
+    "noiseFadeEndLuminance": 0.1,
     "lensLayout": "quadnods"
   }
 }

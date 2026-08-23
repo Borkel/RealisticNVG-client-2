@@ -5,7 +5,16 @@
     "phosphorRed": 0.313725,
     "phosphorGreen": 0.843137,
     "phosphorBlue": 0.235294,
-    "baseGain": 1.2,
-    "lensLayout": "binocular"
+    "autoExposure": false,
+    "manualGainControl": false,
+    "minimumExposureEV": 0.0,
+    "maximumExposureEV": 0.5,
+    "hazeEdgeWidthPixels": 300.0,
+    "scintillation": 0.35,
+    "noiseFadeEndLuminance": 0.1,
+    "lensLayout": "binocular",
+    "distortionStrengthPixels": 32.0,
+    "distortionWidthPixels": 300.0,
+    "seamOpacity": 0.65
   }
 }

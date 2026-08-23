@@ -5,15 +5,15 @@ namespace BorkelRNVG.Models
         public float PhosphorRed { get; set; } = 0.62f;
         public float PhosphorGreen { get; set; } = 0.92f;
         public float PhosphorBlue { get; set; } = 0.98f;
-        public float BaseGain { get; set; } = 1.35f;
         public float SpectralSensitivityRed { get; set; } = 0.45f;
         public float SpectralSensitivityGreen { get; set; } = 0.45f;
         public float SpectralSensitivityBlue { get; set; } = 0.10f;
 
         public bool AutoExposure { get; set; } = true;
+        public bool ManualGainControl { get; set; }
         public float TargetLuminance { get; set; } = 0.18f;
         public float MinimumExposureEV { get; set; } = 0f;
-        public float MaximumExposureEV { get; set; } = 3f;
+        public float MaximumExposureEV { get; set; } = 3.432959f;
         public float BrightSceneSpeed { get; set; } = 10f;
         public float DarkSceneSpeed { get; set; } = 2f;
         public float HighlightProtection { get; set; } = 1f;
@@ -43,6 +43,7 @@ namespace BorkelRNVG.Models
         public float ReadNoise { get; set; } = 0.03f;
         public float ShotNoise { get; set; } = 0.065f;
         public float CoarseNoise { get; set; } = 0.022f;
+        public float NoiseIntensity { get; set; } = 1f;
         public float FixedPatternNoise { get; set; } = 0.018f;
         public float Scintillation { get; set; } = 0.5f;
         public float ScintillationDensity { get; set; } = 0.1f;

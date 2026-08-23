@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using BepInEx.Logging;
 using BorkelRNVG.Helpers;
+using BorkelRNVG.Controllers;
 using HarmonyLib;
+using UnityEngine;
 
 namespace BorkelRNVG
 {
@@ -21,6 +23,11 @@ namespace BorkelRNVG
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
+
+        // manual gain
+        public static ConfigEntry<KeyboardShortcut> manualGainIncrease;
+        public static ConfigEntry<KeyboardShortcut> manualGainDecrease;
+        public static ConfigEntry<float> manualGainSpeed;
 
         //sprint patch stuff
         public static ConfigEntry<bool> enableSprintPatch;
@@ -53,7 +60,7 @@ namespace BorkelRNVG
             // Global
             globalMaskSize = Config.Bind(Category.globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
             globalMaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
-            globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Applies gain multiplier to all NVGs", new AcceptableValueRange<float>(0f, 5f)));
+            globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Final visual gain multiplier used to compensate for display or post-processing settings.", new AcceptableValueRange<float>(0f, 5f)));
             globalGain.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             allowAmbientChange = Config.Bind(
                 Category.globalCategory,
@@ -69,6 +76,25 @@ namespace BorkelRNVG
 
             allowAmbientChange.Value = false;
             allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
+
+            // Manual gain
+            manualGainIncrease = Config.Bind(
+                Category.gainControlCategory,
+                "1. Increase manual gain",
+                new KeyboardShortcut(KeyCode.None),
+                "Hold to restore the maximum exposure available to automatic gain.");
+            manualGainDecrease = Config.Bind(
+                Category.gainControlCategory,
+                "2. Decrease manual gain",
+                new KeyboardShortcut(KeyCode.None),
+                "Hold to lower the maximum exposure available to automatic gain.");
+            manualGainSpeed = Config.Bind(
+                Category.gainControlCategory,
+                "3. Manual gain speed",
+                2f,
+                new ConfigDescription(
+                    "Continuous manual gain adjustment speed in EV per second.",
+                    new AcceptableValueRange<float>(0.05f, 10f)));
             
             // IR illumination
             irFlashlightBrightnessMult = Config.Bind(Category.illuminationCategory, "IR flashlight brightness multiplier", 1.5f, new ConfigDescription("Brightness multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 5f)));
@@ -122,6 +148,27 @@ namespace BorkelRNVG
             //new WeaponSwapPatch().Enable(); //not working
             //new UltimateBloomPatch().Enable(); //works if Awake is prevented from running
             //new LevelSettingsPatch().Enable();
+        }
+
+        private void Update()
+        {
+            if (!NvgHelper.IsNvgOn)
+                return;
+
+            RealisticNightVisionRenderer renderer =
+                CameraClass.Instance?.NightVision?.GetComponent<RealisticNightVisionRenderer>();
+            if (renderer == null || !renderer.ManualGainControlEnabled)
+                return;
+
+            float direction = 0f;
+            if (manualGainIncrease.Value.IsPressed())
+                direction += 1f;
+            if (manualGainDecrease.Value.IsPressed())
+                direction -= 1f;
+
+            if (!Mathf.Approximately(direction, 0f))
+                renderer.AdjustManualExposureEV(
+                    direction * manualGainSpeed.Value * Time.unscaledDeltaTime);
         }
 
         public static void Log(string message)

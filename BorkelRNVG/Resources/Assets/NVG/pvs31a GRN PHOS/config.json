@@ -2,10 +2,15 @@
   "itemId": "6a4c716dcbf243af9349bafd",
   "category": "PVS-31A GRN PHOS",
   "shader": {
-    "phosphorRed": 0.235294,
-    "phosphorGreen": 0.803922,
-    "phosphorBlue": 0.980392,
-    "baseGain": 2.8,
+    "phosphorRed": 0.392157,
+    "phosphorGreen": 1.0,
+    "phosphorBlue": 0.274510,
+    "maximumExposureEV": 4.0,
+    "brightSceneSpeed": 30.0,
+    "noiseIntensity": 0.5,
+    "scintillation": 0.35,
+    "noiseFadeEndLuminance": 0.1,
+    "manualGainControl": true,
     "lensLayout": "binocular"
   }
 }

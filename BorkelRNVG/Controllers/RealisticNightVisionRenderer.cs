@@ -59,12 +59,14 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     [SerializeField] private Color phosphorTint = new Color(0.62f, 0.98f, 0.92f, 1f);
 
     [SerializeField] private Vector3 spectralSensitivity = new Vector3(0.18f, 0.72f, 0.10f);
-    [SerializeField] private float baseGain = 1.35f;
+    [SerializeField] private float globalGainMultiplier = 1f;
 
     [SerializeField] private bool autoExposure = true;
+    [SerializeField] private bool manualGainControl;
     [SerializeField] private float targetLuminance = 0.18f;
     [SerializeField] private float minimumExposureEV = -2f;
     [SerializeField] private float maximumExposureEV = 5f;
+    [SerializeField] private float manualExposureEV;
 
     [SerializeField] private float brightSceneSpeed = 10f;
 
@@ -159,6 +161,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     private bool shaderErrorReported;
     private bool missingOpticTexturesReported;
     private bool depthModeAdded;
+    private RealisticNvgSettings runtimeSettings;
     private float previousRenderTime = -1f;
 
     private static readonly int SourceSizeId = Shader.PropertyToID("_SourceSize");
@@ -233,10 +236,35 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         }
     }
 
-    public float BaseGain
+    public bool AutomaticGainEnabled
     {
-        get { return baseGain; }
-        set { baseGain = value; }
+        get { return autoExposure; }
+    }
+
+    public bool ManualGainControlEnabled
+    {
+        get { return manualGainControl; }
+    }
+
+    public float ManualExposureEV
+    {
+        get { return manualExposureEV; }
+    }
+
+    public void AdjustManualExposureEV(float deltaEV)
+    {
+        if (!manualGainControl || Mathf.Approximately(deltaEV, 0f))
+            return;
+
+        float minimum = Mathf.Min(minimumExposureEV, maximumExposureEV);
+        float maximum = Mathf.Max(minimumExposureEV, maximumExposureEV);
+        manualExposureEV = Mathf.Clamp(manualExposureEV + deltaEV,
+            minimum, maximum);
+    }
+
+    private void ResetManualExposureToMaximum()
+    {
+        manualExposureEV = Mathf.Max(minimumExposureEV, maximumExposureEV);
     }
 
     public void ConfigureRuntime(Shader shader, Texture lens, Texture overlay,
@@ -246,6 +274,16 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     {
         if (settings == null)
             settings = new RealisticNvgSettings();
+        bool firstConfiguration = runtimeSettings == null;
+        bool profileChanged = !firstConfiguration &&
+                              !ReferenceEquals(runtimeSettings, settings);
+        bool enabledManualGainControl = !manualGainControl &&
+                                        settings.ManualGainControl;
+        bool maximumExposureChanged = !firstConfiguration &&
+                                      !Mathf.Approximately(
+                                          maximumExposureEV,
+                                          settings.MaximumExposureEV);
+        runtimeSettings = settings;
 
         effectShader = shader;
         ssaaPropagator = propagator;
@@ -256,12 +294,20 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
             settings.PhosphorGreen, settings.PhosphorBlue, 1f);
         spectralSensitivity = new Vector3(settings.SpectralSensitivityRed,
             settings.SpectralSensitivityGreen, settings.SpectralSensitivityBlue);
-        baseGain = settings.BaseGain * globalGain;
+        globalGainMultiplier = globalGain;
 
         autoExposure = settings.AutoExposure;
+        manualGainControl = settings.ManualGainControl;
         targetLuminance = settings.TargetLuminance;
         minimumExposureEV = settings.MinimumExposureEV;
         maximumExposureEV = settings.MaximumExposureEV;
+        if (firstConfiguration || profileChanged || enabledManualGainControl ||
+            (manualGainControl && maximumExposureChanged))
+            ResetManualExposureToMaximum();
+        else
+            manualExposureEV = Mathf.Clamp(manualExposureEV,
+                Mathf.Min(minimumExposureEV, maximumExposureEV),
+                Mathf.Max(minimumExposureEV, maximumExposureEV));
         brightSceneSpeed = settings.BrightSceneSpeed;
         darkSceneSpeed = settings.DarkSceneSpeed;
         highlightProtection = settings.HighlightProtection;
@@ -288,9 +334,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         bloomRadiusPixels = settings.BloomRadiusPixels;
         wideBloomRadiusPixels = settings.WideBloomRadiusPixels;
 
-        readNoise = settings.ReadNoise;
-        shotNoise = settings.ShotNoise;
-        coarseNoise = settings.CoarseNoise;
+        readNoise = settings.ReadNoise * settings.NoiseIntensity;
+        shotNoise = settings.ShotNoise * settings.NoiseIntensity;
+        coarseNoise = settings.CoarseNoise * settings.NoiseIntensity;
         fixedPatternNoise = settings.FixedPatternNoise;
         scintillation = settings.Scintillation;
         scintillationDensity = settings.ScintillationDensity;
@@ -725,7 +771,14 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         material.SetVector("_SpectralSensitivity",
             new Vector4(spectralSensitivity.x, spectralSensitivity.y, spectralSensitivity.z, 0f));
         material.SetColor("_PhosphorTint", phosphorTint);
-        material.SetFloat("_ManualGain", baseGain);
+        float maximumEV = Mathf.Max(minimumExposureEV, maximumExposureEV);
+        float manualExposureLimitEV = manualGainControl
+            ? manualExposureEV
+            : maximumEV;
+        float exposureEV = autoExposure ? 0f : manualExposureLimitEV;
+        material.SetFloat("_GlobalGainMultiplier", globalGainMultiplier);
+        material.SetFloat("_ManualExposureEV", exposureEV);
+        material.SetFloat("_ManualExposureEVLimit", manualExposureLimitEV);
 
         material.SetFloat("_AutoExposure", AutoExposureActive ? 1f : 0f);
         material.SetFloat("_ExposureTarget", targetLuminance);

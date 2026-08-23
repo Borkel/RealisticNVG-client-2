@@ -85,7 +85,9 @@ Shader "Hidden/CustomNightVision"
 
     float3 _SpectralSensitivity;
     float4 _PhosphorTint;
-    float _ManualGain;
+    float _GlobalGainMultiplier;
+    float _ManualExposureEV;
+    float _ManualExposureEVLimit;
 
     float _AutoExposure;
     float _ExposureTarget;
@@ -1361,10 +1363,10 @@ Shader "Hidden/CustomNightVision"
             i.uv,
             lensDomain.ownerIndex);
         exposureEV = lerp(
-            0.0,
-            exposureEV,
+            _ManualExposureEV,
+            min(exposureEV, _ManualExposureEVLimit),
             saturate(_AutoExposure));
-        float totalGain = max(_ManualGain, 0.0) * exp2(exposureEV);
+        float totalGain = max(_GlobalGainMultiplier, 0.0) * exp2(exposureEV);
 
         // Keep raw scene light independent from gain, bloom and tube output.
         // It is also the sole input to the local noise-visibility mask.
