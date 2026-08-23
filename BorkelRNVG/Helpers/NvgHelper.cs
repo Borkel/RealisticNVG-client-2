@@ -1,5 +1,6 @@
 using BorkelRNVG.Models;
 using BorkelRNVG.Globals;
+using EFT.CameraControl;
 using EFT.InventoryLogic;
 using NightVision = BSG.CameraEffects.NightVision;
 
@@ -67,7 +68,7 @@ namespace BorkelRNVG.Helpers
 
         public static void ApplyNightVisionSettings()
         {
-            NightVision nightVision = CameraClass.Instance?.NightVision;
+            NightVision nightVision = CameraManager.Instance?.NightVision;
             if (nightVision != null)
                 nightVision.ApplySettings();
         }

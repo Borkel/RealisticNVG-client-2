@@ -17,7 +17,7 @@ namespace BorkelRNVG.Patches
 
     public class IkLightAwakePatch : ModulePatch
     {
-        private static FieldInfo _intensityField = AccessTools.Field(typeof(IkLight), "float_0");
+        private static FieldInfo _intensityField = AccessTools.Field(typeof(IkLight), "_prevIntensity");
         private static List<LightInfo> _ikLights = new();
 
         protected override MethodBase GetTargetMethod()

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using BepInEx.Logging;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Controllers;
+using EFT.CameraControl;
 using HarmonyLib;
 using UnityEngine;
 
@@ -156,7 +157,7 @@ namespace BorkelRNVG
                 return;
 
             RealisticNightVisionRenderer renderer =
-                CameraClass.Instance?.NightVision?.GetComponent<RealisticNightVisionRenderer>();
+                CameraManager.Instance?.NightVision?.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null || !renderer.ManualGainControlEnabled)
                 return;
 

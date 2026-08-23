@@ -6,7 +6,6 @@ using System.Reflection;
 using UnityEngine;
 using static EFT.Player;
 using System.Collections;
-using LightStruct = FirearmLightStateStruct;
 
 namespace BorkelRNVG.Patches
 {
@@ -18,9 +17,9 @@ namespace BorkelRNVG.Patches
             //await Task.Delay(delay);
             yield return new WaitForSeconds(delay);
 
-            firearmController.SetLightsState(new LightStruct[]
+            firearmController.SetLightsState(new LightsState[]
             {
-                new LightStruct
+                new LightsState
                 {
                     Id = light.Item.Id,
                     IsActive = newState,

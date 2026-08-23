@@ -14,8 +14,8 @@ namespace BorkelRNVG.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            commandBufferField = AccessTools.Field(typeof(NightVision), "commandBuffer_0");
-            ssaaPropagatorField = AccessTools.Field(typeof(NightVision), "ssaapropagator_0");
+            commandBufferField = AccessTools.Field(typeof(NightVision), "_nightVisionCB");
+            ssaaPropagatorField = AccessTools.Field(typeof(NightVision), "_ssaaPropagator");
             return AccessTools.Method(typeof(NightVision), nameof(NightVision.OnPreCull));
         }
 

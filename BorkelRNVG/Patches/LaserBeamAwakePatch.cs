@@ -20,7 +20,7 @@ namespace BorkelRNVG.Patches
 
         protected override MethodBase GetTargetMethod()
         {
-            return AccessTools.Method(typeof(LaserBeam), nameof(LaserBeam.method_0));
+            return AccessTools.Method(typeof(LaserBeam), nameof(LaserBeam.CreateLight));
         }
 
         public static void UpdateAll()
