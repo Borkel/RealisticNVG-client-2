@@ -20,11 +20,11 @@ namespace BorkelRNVG.Configuration
             Values = (defaults ?? new RealisticNvgSettings()).Clone();
 
             Bind(config, category, "10 Tube - Phosphor red", Values.PhosphorRed,
-                "Red component of the single phosphor color.", value => Values.PhosphorRed = value, Range(0f, 1f));
+                "Red component of the single phosphor color.", value => Values.PhosphorRed = value, Range(0f, 1f), advanced: false);
             Bind(config, category, "11 Tube - Phosphor green", Values.PhosphorGreen,
-                "Green component of the single phosphor color.", value => Values.PhosphorGreen = value, Range(0f, 1f));
+                "Green component of the single phosphor color.", value => Values.PhosphorGreen = value, Range(0f, 1f), advanced: false);
             Bind(config, category, "12 Tube - Phosphor blue", Values.PhosphorBlue,
-                "Blue component of the single phosphor color.", value => Values.PhosphorBlue = value, Range(0f, 1f));
+                "Blue component of the single phosphor color.", value => Values.PhosphorBlue = value, Range(0f, 1f), advanced: false);
             Bind(config, category, "14 Tube - Spectral sensitivity red", Values.SpectralSensitivityRed,
                 "Relative sensitivity to the red input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityRed = value, Range(0f, 1f));
             Bind(config, category, "15 Tube - Spectral sensitivity green", Values.SpectralSensitivityGreen,
@@ -33,24 +33,24 @@ namespace BorkelRNVG.Configuration
                 "Relative sensitivity to the blue input channel; RGB weights are normalized by the shader.", value => Values.SpectralSensitivityBlue = value, Range(0f, 1f));
 
             Bind(config, category, "20 Exposure - Automatic gain", Values.AutoExposure,
-                "Use target luminance to reduce gain when the scene is bright.", value => Values.AutoExposure = value);
+                "Use target luminance to reduce gain when the scene is bright.", value => Values.AutoExposure = value, advanced: false);
             Bind(config, category, "20 Exposure - Manual gain control", Values.ManualGainControl,
-                "Allow the gain keys to lower or restore the maximum exposure available to automatic gain.", value => Values.ManualGainControl = value);
+                "Allow the gain keys to lower or restore the maximum exposure available to automatic gain.", value => Values.ManualGainControl = value, advanced: false);
             Bind(config, category, "21 Exposure - Target luminance", Values.TargetLuminance,
                 "Average aperture luminance targeted by automatic gain.", value => Values.TargetLuminance = value, Range(0.001f, 2f));
             Bind(config, category, "22 Exposure - Minimum EV", Values.MinimumExposureEV,
-                "Lowest automatic exposure correction in bright scenes.", value => Values.MinimumExposureEV = value, Range(-10f, 10f));
+                "Lowest automatic exposure correction in bright scenes.", value => Values.MinimumExposureEV = value, Range(-10f, 10f), advanced: false);
             Bind(config, category, "23 Exposure - Maximum EV", Values.MaximumExposureEV,
-                "Highest automatic exposure correction in dark scenes.", value => Values.MaximumExposureEV = value, Range(-10f, 12f));
+                "Highest automatic exposure correction in dark scenes.", value => Values.MaximumExposureEV = value, Range(-10f, 12f), advanced: false);
             Bind(config, category, "24 Exposure - Bright scene speed", Values.BrightSceneSpeed,
-                "Speed at which gain is reduced.", value => Values.BrightSceneSpeed = value, Range(0f, 30f));
+                "Speed at which gain is reduced.", value => Values.BrightSceneSpeed = value, Range(0f, 30f), advanced: false);
             Bind(config, category, "25 Exposure - Dark scene speed", Values.DarkSceneSpeed,
-                "Speed at which gain recovers in darkness.", value => Values.DarkSceneSpeed = value, Range(0f, 30f));
+                "Speed at which gain recovers in darkness.", value => Values.DarkSceneSpeed = value, Range(0f, 30f), advanced: false);
             Bind(config, category, "26 Exposure - Highlight protection", Values.HighlightProtection,
                 "Makes bright pixels influence metering more strongly.", value => Values.HighlightProtection = value, Range(0f, 1f));
 
             Bind(config, category, "30 Near focus - Enabled", Values.NearDepthOfField,
-                "Blur objects closer than the focus distance.", value => Values.NearDepthOfField = value);
+                "Blur objects closer than the focus distance.", value => Values.NearDepthOfField = value, advanced: false);
             Bind(config, category, "31 Near focus - Full blur distance", Values.FullBlurDistance,
                 "Distance at which near blur is strongest.", value => Values.FullBlurDistance = value, Range(0.01f, 10f));
             Bind(config, category, "32 Near focus - Sharp distance", Values.SharpDistance,
@@ -61,7 +61,7 @@ namespace BorkelRNVG.Configuration
                 "Full-resolution blur radius.", value => Values.NearBlurRadiusPixels = value, Range(0f, 64f));
 
             Bind(config, category, "40 Haze - Enabled", Values.OpticalHaze,
-                "Enable edge haze and optical veil.", value => Values.OpticalHaze = value);
+                "Enable edge haze and optical veil.", value => Values.OpticalHaze = value, advanced: false);
             Bind(config, category, "41 Haze - Blur radius pixels", Values.HazeBlurRadiusPixels,
                 "Blur radius used by the optical haze.", value => Values.HazeBlurRadiusPixels = value, Range(0f, 32f));
             Bind(config, category, "42 Haze - Center strength", Values.HazeCenterStrength,
@@ -78,7 +78,7 @@ namespace BorkelRNVG.Configuration
                 "Red/blue separation near tube edges.", value => Values.ChromaticAberrationPixels = value, Range(-8f, 8f));
 
             Bind(config, category, "50 Bloom - Enabled", Values.Bloom,
-                "Enable phosphor glow around bright sources.", value => Values.Bloom = value);
+                "Enable phosphor glow around bright sources.", value => Values.Bloom = value, advanced: false);
             Bind(config, category, "51 Bloom - Threshold", Values.BloomThreshold,
                 "Input luminance required to generate bloom.", value => Values.BloomThreshold = value, Range(0f, 4f));
             Bind(config, category, "52 Bloom - Soft knee", Values.BloomSoftKnee,
@@ -91,11 +91,11 @@ namespace BorkelRNVG.Configuration
                 "Radius of the broad secondary glow.", value => Values.WideBloomRadiusPixels = value, Range(0f, 300f));
 
             Bind(config, category, "60 Noise - Intensity", Values.NoiseIntensity,
-                "Scales read, shot and coarse noise together while preserving their profile-defined balance.", value => Values.NoiseIntensity = value, Range(0f, 5f));
+                "Scales read, shot and coarse noise together while preserving their profile-defined balance.", value => Values.NoiseIntensity = value, Range(0f, 5f), advanced: false);
             Bind(config, category, "63 Noise - Fixed pattern", Values.FixedPatternNoise,
                 "Stationary spatial gain variation.", value => Values.FixedPatternNoise = value, Range(0f, 0.5f));
             Bind(config, category, "64 Noise - Scintillation strength", Values.Scintillation,
-                "Brightness of scintillation events.", value => Values.Scintillation = value, Range(0f, 1f));
+                "Brightness of scintillation events.", value => Values.Scintillation = value, Range(0f, 1f), advanced: false);
             Bind(config, category, "65 Noise - Scintillation density", Values.ScintillationDensity,
                 "Number of one-to-three-pixel scintillation events; zero disables them.", value => Values.ScintillationDensity = value, Range(0f, 10f));
             Bind(config, category, "66 Noise - Full visibility luminance", Values.NoiseFadeStartLuminance,
@@ -118,10 +118,16 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "70 Optics - Lens layout", Values.LensLayout,
                 "Data-driven lens layout used for this device.",
                 value => Values.LensLayout = value, layoutChoices);
+            Bind(config, category, "70 Optics - Texture center X", Values.OpticTextureCenterX,
+                "Horizontal screen-space center shared by the lens texture, housing mask and tube layout.",
+                value => Values.OpticTextureCenterX = value, Range(-1f, 2f));
+            Bind(config, category, "70 Optics - Texture center Y", Values.OpticTextureCenterY,
+                "Vertical screen-space center shared by the lens texture, housing mask and tube layout.",
+                value => Values.OpticTextureCenterY = value, Range(-1f, 2f));
             Bind(config, category, "70 Optics - Scale", Values.OpticScale,
                 "Scale of lens and housing textures.", value => Values.OpticScale = value, Range(0.25f, 2f));
             Bind(config, category, "71 Optics - Edge distortion", Values.EdgeDistortion,
-                "Enable distortion around individual tube edges.", value => Values.EdgeDistortion = value);
+                "Enable distortion around individual tube edges.", value => Values.EdgeDistortion = value, advanced: false);
             Bind(config, category, "72 Optics - Distortion strength pixels", Values.DistortionStrengthPixels,
                 "Radial displacement at tube edges.", value => Values.DistortionStrengthPixels = value, Range(-32f, 32f));
             Bind(config, category, "73 Optics - Distortion width pixels", Values.DistortionWidthPixels,
@@ -133,7 +139,7 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "76 Optics - Seam opacity", Values.SeamOpacity,
                 "Darkness of boundaries between GPNVG tubes.", value => Values.SeamOpacity = value, Range(0f, 1f));
             Bind(config, category, "77 Optics - Vignette", Values.Vignette,
-                "Enable per-tube outer vignette.", value => Values.Vignette = value);
+                "Enable per-tube outer vignette.", value => Values.Vignette = value, advanced: false);
             Bind(config, category, "78 Optics - Vignette width", Values.VignetteWidth,
                 "Width of per-tube edge darkening.", value => Values.VignetteWidth = value, Range(0.001f, 1f));
             Bind(config, category, "79 Optics - Vignette strength", Values.VignetteStrength,
@@ -144,11 +150,15 @@ namespace BorkelRNVG.Configuration
 
         private void Bind<T>(ConfigFile config, string category, string key,
             T defaultValue, string description, Action<T> setter,
-            AcceptableValueBase acceptable = null)
+            AcceptableValueBase acceptable = null, bool advanced = true)
         {
             ConfigEntry<T> entry = config.Bind(category, key, defaultValue,
                 new ConfigDescription(description, acceptable,
-                    new ConfigurationManagerAttributes { Order = order -= 10 }));
+                    new ConfigurationManagerAttributes
+                    {
+                        IsAdvanced = advanced,
+                        Order = order -= 10
+                    }));
             setter(entry.Value);
             entry.SettingChanged += (_, _) =>
             {

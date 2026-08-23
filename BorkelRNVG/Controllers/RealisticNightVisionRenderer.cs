@@ -345,6 +345,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         grainPixelSize = settings.GrainPixelSize;
         noiseRefreshRate = settings.NoiseRefreshRate;
 
+        opticTextureCenter = new Vector2(settings.OpticTextureCenterX,
+            settings.OpticTextureCenterY);
         opticTextureScale = settings.OpticScale * globalScale;
         ApplyLensLayout(lensLayout);
         lensSeamMode = HasMultipleFusionGroups(lensLayout)

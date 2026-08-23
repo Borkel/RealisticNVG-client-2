@@ -52,6 +52,8 @@ namespace BorkelRNVG.Models
         public float GrainPixelSize { get; set; } = 1f;
         public float NoiseRefreshRate { get; set; } = 30f;
 
+        public float OpticTextureCenterX { get; set; } = 0.5f;
+        public float OpticTextureCenterY { get; set; } = 0.5f;
         public float OpticScale { get; set; } = 1f;
         public string LensLayout { get; set; } = "monocular";
         public bool EdgeDistortion { get; set; } = true;
