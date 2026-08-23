@@ -76,7 +76,12 @@ namespace BorkelRNVG
                     }));
 
             allowAmbientChange.Value = false;
-            allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
+            allowAmbientChange.SettingChanged += (sender, e) =>
+            {
+                bool disableAmbientChange = !allowAmbientChange.Value;
+                AmbientPatch.TogglePatch(disableAmbientChange);
+                AmandsGraphicsAmbientPatch.TogglePatch(disableAmbientChange);
+            };
 
             // Manual gain
             manualGainIncrease = Config.Bind(
@@ -134,7 +139,9 @@ namespace BorkelRNVG
                 new LaserBeamAwakePatch().Enable();
                 new LaserBeamLateUpdatePatch().Enable();
                 new GameStartedPatch().Enable();
-                AmbientPatch.TogglePatch(!allowAmbientChange.Value);
+                bool disableAmbientChange = !allowAmbientChange.Value;
+                AmbientPatch.TogglePatch(disableAmbientChange);
+                AmandsGraphicsAmbientPatch.TogglePatch(disableAmbientChange);
 
                 Logger.LogInfo("Patches enabled successfully!");
             }
