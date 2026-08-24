@@ -30,6 +30,12 @@ namespace BorkelRNVG.Patches
                 renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
             renderer.enabled = false;
 
+            AmandsNvgFallbackController amandsFallback =
+                __instance.GetComponent<AmandsNvgFallbackController>();
+            if (amandsFallback == null)
+                amandsFallback = __instance.gameObject.AddComponent<AmandsNvgFallbackController>();
+            amandsFallback.SetNightVisionEnabled(__instance.On);
+
             if (__instance.TextureMask != null)
                 __instance.TextureMask.enabled = false;
         }
