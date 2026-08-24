@@ -23,6 +23,7 @@ namespace BorkelRNVG
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
+        public static ConfigEntry<bool> enableAmandsNvgFallback;
 
         // manual gain
         public static ConfigEntry<KeyboardShortcut> manualGainIncrease;
@@ -82,6 +83,18 @@ namespace BorkelRNVG
                     }));
 
             allowAmbientChange.Value = false;
+
+            enableAmandsNvgFallback = Config.Bind(
+                Category.globalCategory,
+                "4. Built-in Amands NVG fallback",
+                true,
+                "Reproduces Amands Graphics NVG post-processing when Amands Graphics is not installed.");
+            enableAmandsNvgFallback.SettingChanged += (_, _) =>
+            {
+                AmandsNvgFallbackController fallback = CameraClass.Instance?.NightVision?
+                    .GetComponent<AmandsNvgFallbackController>();
+                fallback?.SetFallbackEnabled(enableAmandsNvgFallback.Value);
+            };
 
             // Manual gain
             manualGainIncrease = Config.Bind(
