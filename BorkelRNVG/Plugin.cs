@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using BepInEx.Logging;
 using BorkelRNVG.Helpers;
 using BorkelRNVG.Controllers;
-using EFT.CameraControl;
 using HarmonyLib;
 using UnityEngine;
 
@@ -76,12 +75,7 @@ namespace BorkelRNVG
                     }));
 
             allowAmbientChange.Value = false;
-            allowAmbientChange.SettingChanged += (sender, e) =>
-            {
-                bool disableAmbientChange = !allowAmbientChange.Value;
-                AmbientPatch.TogglePatch(disableAmbientChange);
-                AmandsGraphicsAmbientPatch.TogglePatch(disableAmbientChange);
-            };
+            allowAmbientChange.SettingChanged += (sender, e) => AmbientPatch.TogglePatch(!allowAmbientChange.Value);
 
             // Manual gain
             manualGainIncrease = Config.Bind(
@@ -141,7 +135,6 @@ namespace BorkelRNVG
                 new GameStartedPatch().Enable();
                 bool disableAmbientChange = !allowAmbientChange.Value;
                 AmbientPatch.TogglePatch(disableAmbientChange);
-                AmandsGraphicsAmbientPatch.TogglePatch(disableAmbientChange);
 
                 Logger.LogInfo("Patches enabled successfully!");
             }
@@ -164,7 +157,7 @@ namespace BorkelRNVG
                 return;
 
             RealisticNightVisionRenderer renderer =
-                CameraManager.Instance?.NightVision?.GetComponent<RealisticNightVisionRenderer>();
+                CameraClass.Instance?.NightVision?.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null || !renderer.ManualGainControlEnabled)
                 return;
 

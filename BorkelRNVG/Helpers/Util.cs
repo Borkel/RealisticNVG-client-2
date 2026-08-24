@@ -1,7 +1,6 @@
 ﻿using BorkelRNVG.Enum;
 using Comfort.Common;
 using EFT;
-using EFT.CameraControl;
 using EFT.InventoryLogic;
 using UnityEngine;
 
@@ -24,9 +23,9 @@ namespace BorkelRNVG.Helpers
             {
                 switch (slot.ContainedItem)
                 {
-                    case FlashHider:
+                    case FlashHiderItemClass:
                         return EMuzzleDeviceType.FlashHider;
-                    case Silencer:
+                    case SilencerItemClass:
                         return EMuzzleDeviceType.Suppressor;
                 }
             }
@@ -57,7 +56,7 @@ namespace BorkelRNVG.Helpers
 
         public static bool VisibilityCheckOnScreen(Vector3 pos)
         {
-            Vector3 screenPos = CameraManager.Instance.Camera.WorldToScreenPoint(pos);
+            Vector3 screenPos = CameraClass.Instance.Camera.WorldToScreenPoint(pos);
             return screenPos.z > 0 && screenPos.x > 0 && screenPos.x < Screen.width && screenPos.y > 0 && screenPos.y < Screen.height;
         }
     }
