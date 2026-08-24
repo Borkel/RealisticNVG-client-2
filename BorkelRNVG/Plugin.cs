@@ -46,6 +46,13 @@ namespace BorkelRNVG
         public static ConfigEntry<float> irLaserRangeMult;
         public static ConfigEntry<float> irLaserPointClose;
         public static ConfigEntry<float> irLaserPointFar;
+
+        // Sight dimming
+        public static ConfigEntry<bool> enableSightDimming;
+        public static ConfigEntry<float> collimatorBrightness;
+        public static ConfigEntry<float> scopeReticleBrightness;
+
+        private SightDimmerController _sightDimmer;
         //public static bool disabledInMenu = false;
 
         private void Awake()
@@ -104,6 +111,32 @@ namespace BorkelRNVG
             irLaserPointClose = Config.Bind(Category.illuminationCategory, "IR laser point close size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
             irLaserPointFar = Config.Bind(Category.illuminationCategory, "IR laser point far size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
 
+            // Sight dimming
+            enableSightDimming = Config.Bind(
+                Category.sightDimmingCategory,
+                "1. Enable NVG sight dimming",
+                true,
+                "Automatically dims illuminated weapon sights while night vision is active.");
+            collimatorBrightness = Config.Bind(
+                Category.sightDimmingCategory,
+                "2. Holographic and red dot brightness",
+                0.3f,
+                new ConfigDescription(
+                    "Brightness multiplier used for holographic and red dot sights with NVGs. Zero turns the reticle off.",
+                    new AcceptableValueRange<float>(0f, 1f)));
+            scopeReticleBrightness = Config.Bind(
+                Category.sightDimmingCategory,
+                "3. Scope reticle brightness",
+                0.3f,
+                new ConfigDescription(
+                    "Brightness multiplier used for illuminated scope reticles with NVGs. Zero turns the reticle off.",
+                    new AcceptableValueRange<float>(0f, 1f)));
+
+            _sightDimmer = new SightDimmerController();
+            enableSightDimming.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
+            collimatorBrightness.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
+            scopeReticleBrightness.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
+
             irFlashlightBrightnessMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
             irFlashlightRangeMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
             irLaserBrightnessMult.SettingChanged += (sender, e) => LaserBeamAwakePatch.UpdateAll();
@@ -153,6 +186,11 @@ namespace BorkelRNVG
 
         private void Update()
         {
+            _sightDimmer?.Tick(
+                enableSightDimming.Value,
+                collimatorBrightness.Value,
+                scopeReticleBrightness.Value);
+
             if (!NvgHelper.IsNvgOn)
                 return;
 
@@ -170,6 +208,14 @@ namespace BorkelRNVG
             if (!Mathf.Approximately(direction, 0f))
                 renderer.AdjustManualExposureEV(
                     direction * manualGainSpeed.Value * Time.unscaledDeltaTime);
+        }
+
+        private void UpdateSightDimmingImmediately()
+        {
+            _sightDimmer?.ApplyImmediately(
+                enableSightDimming.Value,
+                collimatorBrightness.Value,
+                scopeReticleBrightness.Value);
         }
 
         public static void Log(string message)
