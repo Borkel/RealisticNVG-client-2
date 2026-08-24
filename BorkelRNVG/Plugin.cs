@@ -73,14 +73,15 @@ namespace BorkelRNVG
                 Category.globalCategory,
                 "3. Allow ambient change",
                 false,
-                "Toggles whether vanilla and Amands Graphics night vision may change ambient lighting.");
+                new ConfigDescription(
+                    "Night vision ambient lighting changes are always disabled.",
+                    null,
+                    new ConfigurationManagerAttributes
+                    {
+                        Browsable = false
+                    }));
 
-            allowAmbientChange.SettingChanged += (sender, e) =>
-            {
-                bool disableAmbientChange = !allowAmbientChange.Value;
-                AmbientPatch.TogglePatch(disableAmbientChange);
-                AmandsGraphicsAmbientPatch.TogglePatch(disableAmbientChange);
-            };
+            allowAmbientChange.Value = false;
 
             // Manual gain
             manualGainIncrease = Config.Bind(
@@ -164,9 +165,8 @@ namespace BorkelRNVG
                 new LaserBeamAwakePatch().Enable();
                 new LaserBeamLateUpdatePatch().Enable();
                 new GameStartedPatch().Enable();
-                bool disableAmbientChange = !allowAmbientChange.Value;
-                AmbientPatch.TogglePatch(disableAmbientChange);
-                AmandsGraphicsAmbientPatch.TogglePatch(disableAmbientChange);
+                AmbientPatch.TogglePatch(true);
+                AmandsGraphicsAmbientPatch.TogglePatch(true);
 
                 Logger.LogInfo("Patches enabled successfully!");
             }
