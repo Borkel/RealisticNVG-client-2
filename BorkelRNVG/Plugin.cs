@@ -132,14 +132,14 @@ namespace BorkelRNVG
             collimatorBrightness = Config.Bind(
                 Category.sightDimmingCategory,
                 "2. Holographic and red dot brightness",
-                0.3f,
+                0.1f,
                 new ConfigDescription(
                     "Brightness multiplier used for holographic and red dot sights with NVGs. Zero turns the reticle off.",
                     new AcceptableValueRange<float>(0f, 1f)));
             scopeReticleBrightness = Config.Bind(
                 Category.sightDimmingCategory,
                 "3. Scope reticle brightness",
-                0.3f,
+                0.1f,
                 new ConfigDescription(
                     "Brightness multiplier used for illuminated scope reticles with NVGs. Zero turns the reticle off.",
                     new AcceptableValueRange<float>(0f, 1f)));
