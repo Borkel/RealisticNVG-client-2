@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "2.3.0")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.1")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -44,6 +44,7 @@ namespace BorkelRNVG
         public static ConfigEntry<float> irFlashlightBrightnessMult;
         public static ConfigEntry<float> irFlashlightRangeMult;
         public static ConfigEntry<float> irLaserBrightnessMult;
+        public static ConfigEntry<float> visibleLaserBrightnessWithNvgs;
         public static ConfigEntry<float> irLaserRangeMult;
         public static ConfigEntry<float> irLaserPointClose;
         public static ConfigEntry<float> irLaserPointFar;
@@ -118,7 +119,18 @@ namespace BorkelRNVG
             // IR illumination
             irFlashlightBrightnessMult = Config.Bind(Category.illuminationCategory, "IR flashlight brightness multiplier", 1.5f, new ConfigDescription("Brightness multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 5f)));
             irFlashlightRangeMult = Config.Bind(Category.illuminationCategory, "IR flashlight range multiplier", 2f, new ConfigDescription("Range multiplier for IR flashlights", new AcceptableValueRange<float>(0f, 10f)));
-            irLaserBrightnessMult = Config.Bind(Category.illuminationCategory, "IR laser brightness multiplier", 1f, new ConfigDescription("Brightness multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
+            irLaserBrightnessMult = Config.Bind(Category.illuminationCategory, "IR laser brightness multiplier", 1f, new ConfigDescription("Brightness multiplier for the IR laser beam and impact point", new AcceptableValueRange<float>(0f, 10f)));
+            visibleLaserBrightnessWithNvgs = Config.Bind(
+                Category.illuminationCategory,
+                "Visible laser intensity with NVGs",
+                0.1f,
+                new ConfigDescription(
+                    "Beam and impact-point intensity of visible lasers while NVGs are active, relative to vanilla. Does not affect visible lasers while NVGs are off.",
+                    new AcceptableValueRange<float>(0f, 1f),
+                    new ConfigurationManagerAttributes
+                    {
+                        ShowRangeAsPercent = false
+                    }));
             irLaserRangeMult = Config.Bind(Category.illuminationCategory, "IR laser range multiplier", 1f, new ConfigDescription("Range multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
             irLaserPointClose = Config.Bind(Category.illuminationCategory, "IR laser point close size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
             irLaserPointFar = Config.Bind(Category.illuminationCategory, "IR laser point far size multiplier", 1f, new ConfigDescription("Point size multiplier for IR lasers", new AcceptableValueRange<float>(0f, 10f)));
