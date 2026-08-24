@@ -8,7 +8,9 @@ namespace BorkelRNVG.Patches
     public class LaserBeamLateUpdatePatch : ModulePatch
     {
         private static FieldInfo intensityField = AccessTools.Field(typeof(LaserBeam), "IntensityFactor");
-        private static FieldInfo beamBlockField = AccessTools.Field(typeof(LaserBeam), "_beamBlock");
+        private static FieldInfo beamBlockField =
+            AccessTools.Field(typeof(LaserBeam), "_beamBlock") ??
+            AccessTools.Field(typeof(LaserBeam), "materialPropertyBlock_0");
         private static readonly int colorId = Shader.PropertyToID("_Color");
 
         private struct VisibleLaserState
@@ -27,7 +29,8 @@ namespace BorkelRNVG.Patches
         {
             __state = default;
 
-            if (__instance == null || __instance.BeamMaterial == null)
+            if (__instance == null || __instance.BeamMaterial == null ||
+                beamBlockField == null)
                 return;
 
             bool isIrLaser = __instance.BeamMaterial.name == "LaserBeamIk";
