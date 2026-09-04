@@ -17,6 +17,9 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(NightVision __instance, bool __0)
         {
+            if (!NvgHelper.UsesCustomPipeline(__instance))
+                return;
+
             NvgHelper.IsNvgOn = __0;
             RealisticNightVisionRenderer renderer =
                 __instance.GetComponent<RealisticNightVisionRenderer>();

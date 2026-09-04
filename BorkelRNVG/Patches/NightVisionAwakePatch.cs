@@ -18,12 +18,18 @@ namespace BorkelRNVG.Patches
         [PatchPrefix]
         private static void PatchPrefix(NightVision __instance)
         {
+            if (__instance.GetComponent<SSAA>() == null)
+                return;
+
             __instance.Shader = AssetHelper.nightVisionShader;
         }
 
         [PatchPostfix]
         private static void PatchPostfix(NightVision __instance)
         {
+            if (__instance.GetComponent<SSAA>() == null)
+                return;
+
             RealisticNightVisionRenderer renderer =
                 __instance.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null)
