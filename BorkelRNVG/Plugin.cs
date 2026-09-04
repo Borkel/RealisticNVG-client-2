@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.1")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.2")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -23,6 +23,11 @@ namespace BorkelRNVG
         public static ConfigEntry<float> globalMaskSize;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
+        public static ConfigEntry<bool> globalNearFocus;
+        public static ConfigEntry<bool> globalOpticalHaze;
+        public static ConfigEntry<bool> globalBloom;
+        public static ConfigEntry<bool> globalEdgeDistortion;
+        public static ConfigEntry<bool> globalVignette;
 
         // manual gain
         public static ConfigEntry<KeyboardShortcut> manualGainIncrease;
@@ -83,6 +88,39 @@ namespace BorkelRNVG
                     }));
 
             allowAmbientChange.Value = false;
+
+            globalNearFocus = Config.Bind(
+                Category.globalCategory,
+                "4. Enable near focus",
+                true,
+                "Enable near-object depth-of-field blur for all NVGs.");
+            globalOpticalHaze = Config.Bind(
+                Category.globalCategory,
+                "5. Enable optical haze",
+                true,
+                "Enable edge haze and optical veil for all NVGs.");
+            globalBloom = Config.Bind(
+                Category.globalCategory,
+                "6. Enable bloom",
+                false,
+                "Enable phosphor glow around bright sources for all NVGs.");
+            globalEdgeDistortion = Config.Bind(
+                Category.globalCategory,
+                "7. Enable lens edge distortion",
+                true,
+                "Enable distortion around individual tube edges for all NVGs.");
+            globalVignette = Config.Bind(
+                Category.globalCategory,
+                "8. Enable lens vignette",
+                true,
+                "Enable per-tube outer vignette for all NVGs.");
+
+            globalNearFocus.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalOpticalHaze.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalBloom.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalEdgeDistortion.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalVignette.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+
             // Manual gain
             manualGainIncrease = Config.Bind(
                 Category.gainControlCategory,

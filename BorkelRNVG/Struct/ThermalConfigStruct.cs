@@ -6,6 +6,7 @@ namespace BorkelRNVG.Struct
         public int MinFps;
         public int MaxFps;
         public bool IsPixelated;
+        public int VerticalResolution;
         public bool IsNoisy;
         public bool IsMotionBlurred;
     }

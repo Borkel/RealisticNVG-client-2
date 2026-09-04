@@ -50,11 +50,18 @@ namespace BorkelRNVG.Patches
             if (renderer == null)
                 renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
 
+            RealisticNvgSettings settings = data.NightVisionConfig.Values.Clone();
+            settings.NearDepthOfField = Plugin.globalNearFocus.Value;
+            settings.OpticalHaze = Plugin.globalOpticalHaze.Value;
+            settings.Bloom = Plugin.globalBloom.Value;
+            settings.EdgeDistortion = Plugin.globalEdgeDistortion.Value;
+            settings.Vignette = Plugin.globalVignette.Value;
+
             renderer.ConfigureRuntime(
                 AssetHelper.nightVisionShader,
                 data.LensTexture,
                 data.MaskTexture,
-                data.NightVisionConfig.Values,
+                settings,
                 lensLayout,
                 __instance.GetComponent<SSAAPropagator>(),
                 Plugin.globalGain.Value,

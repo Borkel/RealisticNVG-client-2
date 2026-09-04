@@ -11,6 +11,7 @@ namespace BorkelRNVG.Configuration
         public ConfigEntry<int> MinFps { get; private set; }
         public ConfigEntry<int> MaxFps { get; private set; }
         public ConfigEntry<bool> IsPixelated { get; private set; }
+        public ConfigEntry<int> VerticalResolution { get; private set; }
         public ConfigEntry<bool> IsNoisy { get; private set; }
         public ConfigEntry<bool> IsMotionBlurred { get; private set; }
 
@@ -21,8 +22,15 @@ namespace BorkelRNVG.Configuration
             MinFps = config.Bind(category, "2. Minimum FPS", configStruct.MinFps, new ConfigDescription("Minimum FPS for this device"));
             MaxFps = config.Bind(category, "3. Maximum FPS", configStruct.MaxFps, new ConfigDescription("Maximum FPS for this device"));
             IsPixelated = config.Bind(category, "4. Pixelated", configStruct.IsPixelated, new ConfigDescription("Sets whether the device's vision should be pixelated"));
-            IsNoisy = config.Bind(category, "5. Noisy", configStruct.IsNoisy, new ConfigDescription("Sets whether the device's vision should be noisy"));
-            IsMotionBlurred = config.Bind(category, "6. Motion Blurred", configStruct.IsMotionBlurred, new  ConfigDescription("Sets whether the device's vision should have motion blur"));
+            VerticalResolution = config.Bind(
+                category,
+                "5. Vertical thermal resolution",
+                configStruct.VerticalResolution,
+                new ConfigDescription(
+                    "Vertical pixel resolution inside the T-7 display area. Block count is adjusted automatically for the current screen aspect ratio.",
+                    new AcceptableValueRange<int>(16, 2160)));
+            IsNoisy = config.Bind(category, "6. Noisy", configStruct.IsNoisy, new ConfigDescription("Sets whether the device's vision should be noisy"));
+            IsMotionBlurred = config.Bind(category, "7. Motion Blurred", configStruct.IsMotionBlurred, new  ConfigDescription("Sets whether the device's vision should have motion blur"));
         }
     }
 }

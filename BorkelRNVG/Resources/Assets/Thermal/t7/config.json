@@ -5,6 +5,7 @@
   "minFps": 60,
   "maxFps": 60,
   "isPixelated": true,
+  "verticalResolution": 240,
   "isNoisy": false,
   "isMotionBlurred": false
 }
