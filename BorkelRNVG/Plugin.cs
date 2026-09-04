@@ -57,6 +57,7 @@ namespace BorkelRNVG
         public static ConfigEntry<bool> enableSightDimming;
         public static ConfigEntry<float> collimatorBrightness;
         public static ConfigEntry<float> scopeReticleBrightness;
+        public static ConfigEntry<float> bakedScopeReticleBrightness;
 
         private SightDimmerController _sightDimmer;
         //public static bool disabledInMenu = false;
@@ -179,11 +180,19 @@ namespace BorkelRNVG
                 new ConfigDescription(
                     "Brightness multiplier used for illuminated scope reticles with NVGs. Zero turns the reticle off.",
                     new AcceptableValueRange<float>(0f, 1f)));
+            bakedScopeReticleBrightness = Config.Bind(
+                Category.sightDimmingCategory,
+                "4. ACOG and baked scope reticle brightness",
+                0.1f,
+                new ConfigDescription(
+                    "Brightness multiplier for ACOGs and other optics whose reticle is baked into the lens texture. Zero turns the reticle off.",
+                    new AcceptableValueRange<float>(0f, 1f)));
 
             _sightDimmer = new SightDimmerController();
             enableSightDimming.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
             collimatorBrightness.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
             scopeReticleBrightness.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
+            bakedScopeReticleBrightness.SettingChanged += (_, _) => UpdateSightDimmingImmediately();
 
             irFlashlightBrightnessMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
             irFlashlightRangeMult.SettingChanged += (sender, e) => IkLightAwakePatch.UpdateAll();
@@ -237,7 +246,8 @@ namespace BorkelRNVG
             _sightDimmer?.Tick(
                 enableSightDimming.Value,
                 collimatorBrightness.Value,
-                scopeReticleBrightness.Value);
+                scopeReticleBrightness.Value,
+                bakedScopeReticleBrightness.Value);
 
             if (!NvgHelper.IsNvgOn)
                 return;
@@ -263,7 +273,8 @@ namespace BorkelRNVG
             _sightDimmer?.ApplyImmediately(
                 enableSightDimming.Value,
                 collimatorBrightness.Value,
-                scopeReticleBrightness.Value);
+                scopeReticleBrightness.Value,
+                bakedScopeReticleBrightness.Value);
         }
 
         public static void Log(string message)
