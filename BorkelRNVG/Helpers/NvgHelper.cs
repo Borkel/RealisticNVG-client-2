@@ -9,6 +9,8 @@ namespace BorkelRNVG.Helpers
     {
         public static bool IsNvgOn = false;
 
+        private static NightVision customPipelineNightVision;
+
         public static NvgData CurrentNvgData = null;
         public static ThermalData CurrentThermalData = null;
         
@@ -60,9 +62,50 @@ namespace BorkelRNVG.Helpers
                 NightVisionComponent.EMask.Anvis => FindNvgData(ItemIds.GPNVG),
                 NightVisionComponent.EMask.Binocular => FindNvgData(ItemIds.N15),
                 NightVisionComponent.EMask.OldMonocular => FindNvgData(ItemIds.PVS14),
-                NightVisionComponent.EMask.Thermal => FindNvgData(ItemIds.T7),
+                NightVisionComponent.EMask.Thermal => null,
                 _ => FindNvgData(ItemIds.N15)
             };
+        }
+
+        public static bool TryGetHeadMountedNvgData(NightVision nightVision, out NvgData data)
+        {
+            data = null;
+
+            if (nightVision == null || nightVision != CameraClass.Instance?.NightVision)
+                return false;
+
+            if (PlayerHelper.GetCurrentThermalItemId() != null)
+                return false;
+
+            NightVisionComponent component = PlayerHelper.LocalPlayer?.NightVisionObserver?.Component;
+            if (component?.Item == null || component.Template.Mask == NightVisionComponent.EMask.Thermal)
+                return false;
+
+            string itemId = component.Item.StringTemplateId;
+            if (string.IsNullOrEmpty(itemId))
+                return false;
+
+            data = FindNvgData(itemId);
+            return data != null;
+        }
+
+        public static void ActivateCustomPipeline(NightVision nightVision)
+        {
+            customPipelineNightVision = nightVision;
+        }
+
+        public static void DeactivateCustomPipeline(NightVision nightVision)
+        {
+            if (customPipelineNightVision == nightVision)
+                customPipelineNightVision = null;
+
+            if (nightVision == CameraClass.Instance?.NightVision)
+                IsNvgOn = false;
+        }
+
+        public static bool UsesCustomPipeline(NightVision nightVision)
+        {
+            return nightVision != null && nightVision == customPipelineNightVision;
         }
 
         public static void ApplyNightVisionSettings()

@@ -9,6 +9,8 @@ namespace BorkelRNVG.Patches
 {
     internal class ThermalVisionSetMaterialPatch : ModulePatch
     {
+        private const float T7DisplayHeightFraction = 870f / 1296f;
+
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(ThermalVision), nameof(ThermalVision.SetMaterialProperties));
@@ -37,8 +39,10 @@ namespace BorkelRNVG.Patches
             if (thermalData.ThermalConfig.IsPixelated.Value)
             {
                 pixelationUtilities.Mode = 0;
-                pixelationUtilities.BlockCount = 320; //doesn't do anything really
-                pixelationUtilities.PixelationMask = AssetHelper.pixelTexture;
+                float aspect = CameraClass.Instance?.Camera?.aspect ?? (16f / 9f);
+                pixelationUtilities.BlockCount =
+                    thermalData.ThermalConfig.VerticalResolution.Value *
+                    aspect / T7DisplayHeightFraction;
                 pixelationUtilities.PixelationShader = AssetHelper.pixelationShader;
             }
 

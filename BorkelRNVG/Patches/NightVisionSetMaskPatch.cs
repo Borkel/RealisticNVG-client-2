@@ -24,11 +24,8 @@ namespace BorkelRNVG.Patches
         [PatchPrefix]
         private static bool PatchPrefix(ref NightVision __instance)
         {
-            string itemId = PlayerHelper.GetCurrentNvgItemId();
-            if (itemId == null) return true;
-
-            NvgData nvgData = NvgHelper.FindNvgData(itemId);
-            if (nvgData == null) return true;
+            if (!NvgHelper.TryGetHeadMountedNvgData(__instance, out NvgData nvgData))
+                return true;
             
             __instance.Mask = nvgData.MaskTexture;
             return false;

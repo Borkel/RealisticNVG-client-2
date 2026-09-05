@@ -22,6 +22,9 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(NightVision __instance)
         {
+            if (!Helpers.NvgHelper.UsesCustomPipeline(__instance) || !__instance.On)
+                return;
+
             CommandBuffer commandBuffer =
                 (CommandBuffer)commandBufferField.GetValue(__instance);
             commandBuffer?.Clear();

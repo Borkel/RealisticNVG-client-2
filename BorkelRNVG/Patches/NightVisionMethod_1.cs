@@ -17,6 +17,15 @@ namespace BorkelRNVG.Patches
         [PatchPostfix]
         private static void PatchPostfix(NightVision __instance, bool __0)
         {
+            if (!NvgHelper.UsesCustomPipeline(__instance))
+            {
+                AmandsNvgFallbackController inactiveFallback =
+                    __instance.GetComponent<AmandsNvgFallbackController>();
+                if (inactiveFallback != null)
+                    inactiveFallback.SetNightVisionEnabled(false);
+                return;
+            }
+
             NvgHelper.IsNvgOn = __0;
 
             AmandsNvgFallbackController amandsFallback =
@@ -29,7 +38,7 @@ namespace BorkelRNVG.Patches
             if (renderer == null)
                 return;
 
-            if (__instance.TextureMask != null)
+            if (__0 && __instance.TextureMask != null)
                 __instance.TextureMask.enabled = false;
 
             renderer.NightVisionEnabled = __0;

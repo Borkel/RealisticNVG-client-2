@@ -26,6 +26,9 @@ namespace BorkelRNVG.Models
         
         [JsonProperty("isPixelated")]
         public bool IsPixelated { get; set; } = false;
+
+        [JsonProperty("verticalResolution")]
+        public int VerticalResolution { get; set; } = 240;
         
         [JsonProperty("isNoisy")]
         public bool IsNoisy { get; set; } = false;
