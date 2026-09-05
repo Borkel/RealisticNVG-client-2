@@ -26,7 +26,7 @@ namespace BorkelRNVG.Patches
             if (renderer == null)
                 return;
 
-            if (__instance.TextureMask != null)
+            if (__0 && __instance.TextureMask != null)
                 __instance.TextureMask.enabled = false;
 
             renderer.NightVisionEnabled = __0;
