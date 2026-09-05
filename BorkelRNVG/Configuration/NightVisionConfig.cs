@@ -49,8 +49,6 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "26 Exposure - Highlight protection", Values.HighlightProtection,
                 "Makes bright pixels influence metering more strongly.", value => Values.HighlightProtection = value, Range(0f, 1f));
 
-            Bind(config, category, "30 Near focus - Enabled", Values.NearDepthOfField,
-                "Blur objects closer than the focus distance.", value => Values.NearDepthOfField = value, advanced: false);
             Bind(config, category, "31 Near focus - Full blur distance", Values.FullBlurDistance,
                 "Distance at which near blur is strongest.", value => Values.FullBlurDistance = value, Range(0.01f, 10f));
             Bind(config, category, "32 Near focus - Sharp distance", Values.SharpDistance,
@@ -60,8 +58,6 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "34 Near focus - Radius pixels", Values.NearBlurRadiusPixels,
                 "Full-resolution blur radius.", value => Values.NearBlurRadiusPixels = value, Range(0f, 64f));
 
-            Bind(config, category, "40 Haze - Enabled", Values.OpticalHaze,
-                "Enable edge haze and optical veil.", value => Values.OpticalHaze = value, advanced: false);
             Bind(config, category, "41 Haze - Blur radius pixels", Values.HazeBlurRadiusPixels,
                 "Blur radius used by the optical haze.", value => Values.HazeBlurRadiusPixels = value, Range(0f, 32f));
             Bind(config, category, "42 Haze - Center strength", Values.HazeCenterStrength,
@@ -77,8 +73,6 @@ namespace BorkelRNVG.Configuration
             Bind(config, category, "47 Haze - Chromatic aberration pixels", Values.ChromaticAberrationPixels,
                 "Red/blue separation near tube edges.", value => Values.ChromaticAberrationPixels = value, Range(-8f, 8f));
 
-            Bind(config, category, "50 Bloom - Enabled", Values.Bloom,
-                "Enable phosphor glow around bright sources.", value => Values.Bloom = value, advanced: false);
             Bind(config, category, "51 Bloom - Threshold", Values.BloomThreshold,
                 "Input luminance required to generate bloom.", value => Values.BloomThreshold = value, Range(0f, 4f));
             Bind(config, category, "52 Bloom - Soft knee", Values.BloomSoftKnee,
@@ -126,8 +120,6 @@ namespace BorkelRNVG.Configuration
                 value => Values.OpticTextureCenterY = value, Range(-1f, 2f));
             Bind(config, category, "70 Optics - Scale", Values.OpticScale,
                 "Scale of lens and housing textures.", value => Values.OpticScale = value, Range(0.25f, 2f));
-            Bind(config, category, "71 Optics - Edge distortion", Values.EdgeDistortion,
-                "Enable distortion around individual tube edges.", value => Values.EdgeDistortion = value, advanced: false);
             Bind(config, category, "72 Optics - Distortion strength pixels", Values.DistortionStrengthPixels,
                 "Radial displacement at tube edges.", value => Values.DistortionStrengthPixels = value, Range(-32f, 32f));
             Bind(config, category, "73 Optics - Distortion width pixels", Values.DistortionWidthPixels,
@@ -138,8 +130,6 @@ namespace BorkelRNVG.Configuration
                 "Width of boundaries between GPNVG tubes.", value => Values.SeamWidth = value, Range(0f, 0.1f));
             Bind(config, category, "76 Optics - Seam opacity", Values.SeamOpacity,
                 "Darkness of boundaries between GPNVG tubes.", value => Values.SeamOpacity = value, Range(0f, 1f));
-            Bind(config, category, "77 Optics - Vignette", Values.Vignette,
-                "Enable per-tube outer vignette.", value => Values.Vignette = value, advanced: false);
             Bind(config, category, "78 Optics - Vignette width", Values.VignetteWidth,
                 "Width of per-tube edge darkening.", value => Values.VignetteWidth = value, Range(0.001f, 1f));
             Bind(config, category, "79 Optics - Vignette strength", Values.VignetteStrength,

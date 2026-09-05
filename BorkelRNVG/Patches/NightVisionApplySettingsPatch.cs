@@ -18,10 +18,27 @@ namespace BorkelRNVG.Patches
         [PatchPrefix]
         private static bool PatchPrefix(NightVision __instance)
         {
-            string itemId = PlayerHelper.GetCurrentNvgItemId();
-            NvgData data = NvgHelper.FindNvgData(itemId);
-            if (data == null)
-                return false;
+            if (!NvgHelper.TryGetHeadMountedNvgData(__instance, out NvgData data))
+            {
+                NvgHelper.DeactivateCustomPipeline(__instance);
+
+                RealisticNightVisionRenderer existing =
+                    __instance.GetComponent<RealisticNightVisionRenderer>();
+                if (existing != null)
+                {
+                    existing.NightVisionEnabled = false;
+                    existing.enabled = false;
+                }
+
+                AmandsNvgFallbackController amandsFallback =
+                    __instance.GetComponent<AmandsNvgFallbackController>();
+                if (amandsFallback != null)
+                    amandsFallback.SetNightVisionEnabled(false);
+
+                return true;
+            }
+
+            NvgHelper.ActivateCustomPipeline(__instance);
 
             LensLayoutDefinition lensLayout = AssetHelper.FindLensLayout(
                 data.NightVisionConfig.Values.LensLayout);
@@ -29,7 +46,8 @@ namespace BorkelRNVG.Patches
             {
                 Plugin.Logger.LogError(
                     "No lens layout is available for NVG " + data.NvgItemConfig.Category);
-                return false;
+                NvgHelper.DeactivateCustomPipeline(__instance);
+                return true;
             }
 
             RealisticNightVisionRenderer renderer =
@@ -37,11 +55,18 @@ namespace BorkelRNVG.Patches
             if (renderer == null)
                 renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
 
+            RealisticNvgSettings settings = data.NightVisionConfig.Values.Clone();
+            settings.NearDepthOfField = Plugin.globalNearFocus.Value;
+            settings.OpticalHaze = Plugin.globalOpticalHaze.Value;
+            settings.Bloom = Plugin.globalBloom.Value;
+            settings.EdgeDistortion = Plugin.globalEdgeDistortion.Value;
+            settings.Vignette = Plugin.globalVignette.Value;
+
             renderer.ConfigureRuntime(
                 AssetHelper.nightVisionShader,
                 data.LensTexture,
                 data.MaskTexture,
-                data.NightVisionConfig.Values,
+                settings,
                 lensLayout,
                 __instance.GetComponent<SSAAPropagator>(),
                 Plugin.globalGain.Value,

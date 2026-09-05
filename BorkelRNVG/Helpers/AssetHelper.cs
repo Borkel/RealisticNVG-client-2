@@ -25,8 +25,6 @@ namespace BorkelRNVG.Helpers
         public static Shader exposureShader;
         public static Shader maskShader;
 
-        public static Texture pixelTexture;
-
         public static Dictionary<string, AudioClip> LoadedAudioClips = [];
         public static Dictionary<string, NvgData> NvgData = [];
         public static Dictionary<string, ThermalData> ThermalData = [];
@@ -155,8 +153,6 @@ namespace BorkelRNVG.Helpers
         {
             string[] thermalDirs = Directory.GetDirectories(ModDirectories.ThermalPath);
             
-            pixelTexture = FileHelper.LoadTexture(Path.Combine(ModDirectories.CommonAssetsPath, "pixel_mask.png"), TextureWrapMode.Repeat);
-            
             foreach (string thermalDir in thermalDirs)
             {
                 ThermalItemConfig thermalConfig = FileHelper.ParseJson<ThermalItemConfig>(thermalDir, "config.json");
@@ -171,6 +167,7 @@ namespace BorkelRNVG.Helpers
                     IsMotionBlurred = thermalConfig.IsMotionBlurred,
                     IsNoisy = thermalConfig.IsNoisy,
                     IsPixelated = thermalConfig.IsPixelated,
+                    VerticalResolution = thermalConfig.VerticalResolution,
                 };
                 
                 if (thermalConfig.ItemId != null)

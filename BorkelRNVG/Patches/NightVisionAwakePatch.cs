@@ -4,7 +4,6 @@ using BSG.CameraEffects;
 using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
-using BorkelRNVG.Helpers;
 
 namespace BorkelRNVG.Patches
 {
@@ -15,15 +14,12 @@ namespace BorkelRNVG.Patches
             return AccessTools.Method(typeof(NightVision), nameof(NightVision.Awake));
         }
 
-        [PatchPrefix]
-        private static void PatchPrefix(NightVision __instance)
-        {
-            __instance.Shader = AssetHelper.nightVisionShader;
-        }
-
         [PatchPostfix]
         private static void PatchPostfix(NightVision __instance)
         {
+            if (__instance.GetComponent<SSAA>() == null)
+                return;
+
             RealisticNightVisionRenderer renderer =
                 __instance.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null)
