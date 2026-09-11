@@ -454,7 +454,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         }
         ResetExposure();
         UpdateDepthTextureMode();
-        EnsureMaterial();
+        if (runtimeSettings != null)
+            EnsureMaterial();
     }
 
     private void OnValidate()

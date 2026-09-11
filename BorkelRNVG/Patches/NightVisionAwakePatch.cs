@@ -1,27 +1,16 @@
-﻿using BorkelRNVG.Controllers;
-using SPT.Reflection.Patching;
+using System.Reflection;
+using BorkelRNVG.Controllers;
 using BSG.CameraEffects;
 using HarmonyLib;
-using System.Reflection;
-using UnityEngine;
-using BorkelRNVG.Helpers;
+using SPT.Reflection.Patching;
 
 namespace BorkelRNVG.Patches
 {
-    internal class NightVisionAwakePatch : ModulePatch
+    internal sealed class NightVisionAwakePatch : ModulePatch
     {
         protected override MethodBase GetTargetMethod()
         {
             return AccessTools.Method(typeof(NightVision), nameof(NightVision.Awake));
-        }
-
-        [PatchPrefix]
-        private static void PatchPrefix(NightVision __instance)
-        {
-            if (__instance.GetComponent<SSAA>() == null)
-                return;
-
-            __instance.Shader = AssetHelper.nightVisionShader;
         }
 
         [PatchPostfix]
@@ -30,14 +19,15 @@ namespace BorkelRNVG.Patches
             if (__instance.GetComponent<SSAA>() == null)
                 return;
 
-            RealisticNightVisionRenderer renderer =
-                __instance.GetComponent<RealisticNightVisionRenderer>();
-            if (renderer == null)
-                renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
-            renderer.enabled = false;
+            // Reserve the image-effect position before SSAA's final output.
+            // ApplySettings alone decides whether this camera may use NVG rendering.
+            if (__instance.GetComponent<RealisticNightVisionRenderer>() != null)
+                return;
 
-            if (__instance.TextureMask != null)
-                __instance.TextureMask.enabled = false;
+            RealisticNightVisionRenderer renderer =
+                __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
+            renderer.NightVisionEnabled = false;
+            renderer.enabled = false;
         }
     }
 }

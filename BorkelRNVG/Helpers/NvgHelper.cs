@@ -1,5 +1,6 @@
 using BorkelRNVG.Models;
 using BorkelRNVG.Globals;
+using BorkelRNVG.Controllers;
 using EFT.InventoryLogic;
 using NightVision = BSG.CameraEffects.NightVision;
 
@@ -93,10 +94,22 @@ namespace BorkelRNVG.Helpers
         public static void ActivateCustomPipeline(NightVision nightVision)
         {
             customPipelineNightVision = nightVision;
+            IsNvgOn = nightVision.On;
         }
 
         public static void DeactivateCustomPipeline(NightVision nightVision)
         {
+            if (nightVision == null)
+                return;
+
+            RealisticNightVisionRenderer renderer =
+                nightVision.GetComponent<RealisticNightVisionRenderer>();
+            if (renderer != null)
+            {
+                renderer.NightVisionEnabled = false;
+                renderer.enabled = false;
+            }
+
             if (customPipelineNightVision == nightVision)
                 customPipelineNightVision = null;
 

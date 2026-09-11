@@ -22,18 +22,8 @@ namespace BorkelRNVG.Patches
             {
                 NvgHelper.DeactivateCustomPipeline(__instance);
 
-                RealisticNightVisionRenderer existing =
-                    __instance.GetComponent<RealisticNightVisionRenderer>();
-                if (existing != null)
-                {
-                    existing.NightVisionEnabled = false;
-                    existing.enabled = false;
-                }
-
                 return true;
             }
-
-            NvgHelper.ActivateCustomPipeline(__instance);
 
             LensLayoutDefinition lensLayout = AssetHelper.FindLensLayout(
                 data.NightVisionConfig.Values.LensLayout);
@@ -48,7 +38,11 @@ namespace BorkelRNVG.Patches
             RealisticNightVisionRenderer renderer =
                 __instance.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null)
+            {
                 renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
+                renderer.NightVisionEnabled = false;
+                renderer.enabled = false;
+            }
 
             RealisticNvgSettings settings = data.NightVisionConfig.Values.Clone();
             settings.NearDepthOfField = Plugin.globalNearFocus.Value;
@@ -72,6 +66,9 @@ namespace BorkelRNVG.Patches
             __instance.Mask = data.MaskTexture;
             if (__instance.TextureMask != null)
                 __instance.TextureMask.enabled = false;
+
+            // Authorize render hooks only after the profile and renderer are ready.
+            NvgHelper.ActivateCustomPipeline(__instance);
 
             return false;
         }
