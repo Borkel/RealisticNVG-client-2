@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.2")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.3")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;

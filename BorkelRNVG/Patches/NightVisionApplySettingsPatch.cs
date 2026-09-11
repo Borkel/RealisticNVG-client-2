@@ -22,23 +22,8 @@ namespace BorkelRNVG.Patches
             {
                 NvgHelper.DeactivateCustomPipeline(__instance);
 
-                RealisticNightVisionRenderer existing =
-                    __instance.GetComponent<RealisticNightVisionRenderer>();
-                if (existing != null)
-                {
-                    existing.NightVisionEnabled = false;
-                    existing.enabled = false;
-                }
-
-                AmandsNvgFallbackController amandsFallback =
-                    __instance.GetComponent<AmandsNvgFallbackController>();
-                if (amandsFallback != null)
-                    amandsFallback.SetNightVisionEnabled(false);
-
                 return true;
             }
-
-            NvgHelper.ActivateCustomPipeline(__instance);
 
             LensLayoutDefinition lensLayout = AssetHelper.FindLensLayout(
                 data.NightVisionConfig.Values.LensLayout);
@@ -53,7 +38,11 @@ namespace BorkelRNVG.Patches
             RealisticNightVisionRenderer renderer =
                 __instance.GetComponent<RealisticNightVisionRenderer>();
             if (renderer == null)
+            {
                 renderer = __instance.gameObject.AddComponent<RealisticNightVisionRenderer>();
+                renderer.NightVisionEnabled = false;
+                renderer.enabled = false;
+            }
 
             RealisticNvgSettings settings = data.NightVisionConfig.Values.Clone();
             settings.NearDepthOfField = Plugin.globalNearFocus.Value;
@@ -77,6 +66,16 @@ namespace BorkelRNVG.Patches
             __instance.Mask = data.MaskTexture;
             if (__instance.TextureMask != null)
                 __instance.TextureMask.enabled = false;
+
+            AmandsNvgFallbackController amandsFallback =
+                __instance.GetComponent<AmandsNvgFallbackController>();
+            if (amandsFallback == null)
+                amandsFallback =
+                    __instance.gameObject.AddComponent<AmandsNvgFallbackController>();
+            amandsFallback.SetNightVisionEnabled(__instance.On);
+
+            // Authorize render hooks only after all NVG components are ready.
+            NvgHelper.ActivateCustomPipeline(__instance);
 
             return false;
         }
