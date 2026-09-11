@@ -365,7 +365,8 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
 
         ResetExposure();
         UpdateDepthTextureMode();
-        EnsureMaterial();
+        if (runtimeSettings != null)
+            EnsureMaterial();
     }
 
     public void ConfigureLensEdgeDistortion(bool enabled, float strengthPixels,
