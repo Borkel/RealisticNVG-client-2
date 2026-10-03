@@ -1,0 +1,20 @@
+{
+  "itemId": "69e3d5a8dffbd50412ff1889",
+  "category": "67. Modded NVGs - PVS-5A",
+  "shader": {
+    "phosphorRed": 0.313725,
+    "phosphorGreen": 0.843137,
+    "phosphorBlue": 0.235294,
+    "autoExposure": false,
+    "manualGainControl": false,
+    "minimumExposureEV": 0.0,
+    "maximumExposureEV": 0.5,
+    "hazeEdgeWidthPixels": 300.0,
+    "scintillation": 0.35,
+    "noiseFadeEndLuminance": 0.1,
+    "lensLayout": "binocular",
+    "distortionStrengthPixels": 32.0,
+    "distortionWidthPixels": 300.0,
+    "seamOpacity": 0.65
+  }
+}
