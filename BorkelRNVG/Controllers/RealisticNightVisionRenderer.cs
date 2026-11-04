@@ -1,4 +1,5 @@
 using UnityEngine;
+using BorkelRNVG.Helpers;
 using BorkelRNVG.Models;
 
 namespace BorkelRNVG.Controllers
@@ -126,6 +127,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     [SerializeField] private float lensAlphaCutoff = 0.55f;
     [SerializeField] private float lensAlphaFeather = 0.005f;
     [SerializeField] private float opticTextureScale = 1f;
+    [SerializeField] private bool fitOpticToScreen = true;
+    private Vector2 lensExtent;
+    private float housingExtent;
 
     [SerializeField] private LensDefinition[] lensDefinitions = new LensDefinition[MaximumLensDefinitions];
 
@@ -270,7 +274,7 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
     public void ConfigureRuntime(Shader shader, Texture lens, Texture overlay,
         RealisticNvgSettings settings, LensLayoutDefinition lensLayout,
         SSAAPropagator propagator,
-        float globalGain, float globalScale)
+        float globalGain, float globalScale, bool fitToScreen)
     {
         if (settings == null)
             settings = new RealisticNvgSettings();
@@ -348,6 +352,9 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         opticTextureCenter = new Vector2(settings.OpticTextureCenterX,
             settings.OpticTextureCenterY);
         opticTextureScale = settings.OpticScale * globalScale;
+        fitOpticToScreen = fitToScreen;
+        lensExtent = OpticFitHelper.GetLensExtent(lensTexture, lensAlphaCutoff);
+        housingExtent = OpticFitHelper.GetHousingExtent(maskOverlay);
         ApplyLensLayout(lensLayout);
         lensSeamMode = HasMultipleFusionGroups(lensLayout)
             ? LensSeamMode.Dark
@@ -746,7 +753,11 @@ public sealed class RealisticNightVisionRenderer : MonoBehaviour
         material.SetTexture("_LensTexture", lensTexture);
         material.SetTexture("_MaskOverlay", maskOverlay);
         material.SetFloat("_OpticTextureAspect", opticAspect);
-        material.SetFloat("_OpticTextureScale", opticTextureScale);
+        material.SetFloat("_OpticTextureScale", fitOpticToScreen
+            ? OpticFitHelper.ResolveScale(opticTextureScale,
+                source.width / (float)Mathf.Max(source.height, 1),
+                opticTextureCenter, lensExtent, housingExtent)
+            : opticTextureScale);
         material.SetFloat("_LensAlphaCutoff", lensAlphaCutoff);
         material.SetFloat("_LensAlphaFeather", lensAlphaFeather);
         SetLensLayoutProperties();

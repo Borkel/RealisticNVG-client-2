@@ -59,7 +59,8 @@ namespace BorkelRNVG.Patches
                 lensLayout,
                 __instance.GetComponent<SSAAPropagator>(),
                 Plugin.globalGain.Value,
-                Plugin.globalMaskSize.Value);
+                Plugin.globalMaskSize.Value,
+                Plugin.globalFitMaskToScreen.Value);
             renderer.NightVisionEnabled = __instance.On;
             renderer.enabled = __instance.On;
 

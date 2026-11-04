@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace BorkelRNVG
 {
-    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.3")]
+    [BepInPlugin("com.borkel.nvgmasks", "Borkel's Realistic NVGs", "3.0.5")]
     public class Plugin : BaseUnityPlugin
     {
         public static new ManualLogSource Logger;
@@ -22,6 +22,7 @@ namespace BorkelRNVG
 
         // global
         public static ConfigEntry<float> globalMaskSize;
+        public static ConfigEntry<bool> globalFitMaskToScreen;
         public static ConfigEntry<float> globalGain;
         public static ConfigEntry<bool> allowAmbientChange;
         public static ConfigEntry<bool> enableAmandsNvgFallback;
@@ -76,6 +77,8 @@ namespace BorkelRNVG
             // Global
             globalMaskSize = Config.Bind(Category.globalCategory, "1. Mask size multiplier", 1.07f, new ConfigDescription("Applies size multiplier to all masks", new AcceptableValueRange<float>(0f, 2f)));
             globalMaskSize.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
+            globalFitMaskToScreen = Config.Bind(Category.globalCategory, "1a. Fit mask to screen height", true, "Enlarges each mask until its housing reaches the top and bottom of the screen, without cropping lenses that are fully visible at the current aspect ratio. While enabled, the mask size multiplier only has an effect above that size. Disable to use the multiplier exactly.");
+            globalFitMaskToScreen.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             globalGain = Config.Bind(Category.globalCategory, "2. Gain multiplier", 1f, new ConfigDescription("Final visual gain multiplier used to compensate for display or post-processing settings.", new AcceptableValueRange<float>(0f, 5f)));
             globalGain.SettingChanged += (_, _) => NvgHelper.ApplyNightVisionSettings();
             allowAmbientChange = Config.Bind(
